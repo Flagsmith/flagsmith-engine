@@ -1,6 +1,5 @@
 from marshmallow import Schema, fields
 from datetime import date
-from pprint import pprint
 
 class Feature(Schema):
     name = fields.Str()

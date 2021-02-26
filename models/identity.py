@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import List
+import typing
 
 @dataclass
 class Trait():
@@ -14,5 +14,5 @@ class Identity():
     environment_api_key:str 
     created_date: date
     environment_id: int
-    traits: List[Trait]
+    traits: typing.List[Trait]
 
