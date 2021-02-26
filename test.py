@@ -14,9 +14,12 @@ benr = dict(identifier="someone@example.com",
         environment_api_key="324234234", 
         traits = trait_list)
 
-idschema=IdentitySchema()
-result = idschema.dump(benr)
-pprint(result, indent=2)
+idschema = IdentitySchema()
+data = idschema.dump(benr)
+pprint(data, indent=2)
+
+identity = idschema.load(data)
+pprint(identity)
 
 """
 ❯ python identity.py

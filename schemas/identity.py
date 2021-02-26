@@ -1,4 +1,6 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
+from models.identity import Identity
+
 from datetime import date
 from pprint import pprint
 
@@ -18,6 +20,11 @@ class IdentitySchema(Schema):
     environment_api_key = fields.Str()
     traits = fields.List(fields.Nested(TraitSchema))
     identity_flags = fields.List(fields.Nested(IdentityFlagSchema))
+
+    @post_load
+    def make_identity(self, data, **kwargs):
+        return Identity(**data)
+
 
 
 
