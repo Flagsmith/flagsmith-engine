@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 from datetime import date
 from pprint import pprint
 
-from .identity import IdentitySchema
+from schemas.identity import IdentitySchema
 
 trait_a = dict(key="email", value="someone@example.com")
 trait_b = dict(key="age", value="old lol")
