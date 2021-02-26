@@ -16,7 +16,7 @@ benr = dict(identifier="someone@example.com",
 
 idschema = IdentitySchema()
 data = idschema.dump(benr)
-pprint(data, indent=2)
+pprint(data)
 
 identity = idschema.load(data)
 pprint(identity)

@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, post_load
-from models.identity import Identity
+from models.identity import Identity, Trait
 
 from datetime import date
 from pprint import pprint
@@ -7,6 +7,10 @@ from pprint import pprint
 class TraitSchema(Schema):
     key = fields.Str()
     value = fields.Str()
+
+    @post_load
+    def make_trait(self, data, **kwargs):
+        return Trait(**data)
 
 
 class IdentityFlagSchema(Schema):
