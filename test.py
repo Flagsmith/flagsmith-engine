@@ -2,7 +2,7 @@ from marshmallow import Schema, fields
 from datetime import date
 from pprint import pprint
 
-from schemas.identity import IdentitySchema
+from engine.schemas.identity import IdentityFlagSchema, IdentitySchema
 
 trait_a = dict(key="email", value="someone@example.com")
 trait_b = dict(key="age", value="old lol")
@@ -15,11 +15,11 @@ benr = dict(identifier="someone@example.com",
         traits = trait_list)
 
 idschema = IdentitySchema()
-data = idschema.dump(benr)
-pprint(data)
+#data = idschema.dump(benr)
+#pprint(data)
 
-identity = idschema.load(data)
-pprint(identity)
+#identity = idschema.load(data)
+#pprint(identity)
 
 """
 ❯ python identity.py
@@ -30,3 +30,12 @@ pprint(identity)
   'traits': [ {'key': 'email', 'value': 'someone@example.com'},
               {'key': 'age', 'value': 'old lol'}]}
 """
+
+from environments.identities.models import Identity
+
+identity = Identity.objects.get(pk=1)
+pprint(identity)
+data = idschema.dump(identity)
+pprint(data)
+identitymodel = idschema.load(data)
+pprint(identitymodel)

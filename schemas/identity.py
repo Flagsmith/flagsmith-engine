@@ -1,5 +1,5 @@
 from marshmallow import Schema, fields, post_load
-from models.identity import Identity, Trait
+from ..models.identity import Identity, Trait
 
 from datetime import date
 
