@@ -1,18 +1,20 @@
 stages:
   - test
 
-image: ubuntu:20.04
+image: alpine:latest
 
 .install_pyenv: &install_pyenv
-  - apt-get update
-  - apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev
-  - git clone https://github.com/pyenv/pyenv.git ~/.pyenv
-  - export PYENV_ROOT="$HOME/.pyenv"
-  - export PATH="$PYENV_ROOT/bin:$PATH"
-  - eval "$(pyenv init -)"
+  - apk update
+  - apk add --no-cache bzip2-dev coreutils dpkg-dev dpkg expat-dev \
+    findutils gcc gdbm-dev libc-dev libffi-dev libnsl-dev libtirpc-dev \
+    linux-headers make ncurses-dev openssl-dev pax-utils readline-dev \
+    sqlite-dev tcl-dev tk tk-dev util-linux-dev xz-dev zlib-dev git curl \
+    bash
+  - curl https://pyenv.run | bash
+  - exec $SHELL
 
 
-test:python36:
+test:
   stage: test
   before_script:
     - *install_pyenv
