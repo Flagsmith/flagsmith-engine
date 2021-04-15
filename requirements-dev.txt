@@ -5,3 +5,4 @@ autopep8
 pytest
 black
 pip-tools
+tox
