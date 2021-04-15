@@ -7,6 +7,7 @@ import typing
 class Feature:
     id: int
     name: str
+    type: str
 
 
 @dataclass

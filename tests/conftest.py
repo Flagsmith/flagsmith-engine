@@ -11,14 +11,24 @@ def mock_project():
 
 
 @pytest.fixture()
-def mock_enabled_feature_state(mock_project):
+def mock_feature_1(mock_project):
     mock_feature = mock.MagicMock(id=1, project=mock_project)
-    mock_feature.name = "enabled_feature"
-    return mock.MagicMock(id=1, feature=mock_feature, enabled=True)
+    mock_feature.name = "feature_1"
+    return mock_feature
 
 
 @pytest.fixture()
-def mock_disabled_feature_state(mock_project):
-    mock_feature = mock.MagicMock(id=1, project=mock_project)
-    mock_feature.name = "disabled_feature"
-    return mock.MagicMock(id=1, feature=mock_feature, enabled=False)
+def mock_feature_2(mock_project):
+    mock_feature = mock.MagicMock(id=2, project=mock_project)
+    mock_feature.name = "feature_2"
+    return mock_feature
+
+
+@pytest.fixture()
+def mock_enabled_feature_state(mock_feature_1):
+    return mock.MagicMock(id=1, feature=mock_feature_1, enabled=True)
+
+
+@pytest.fixture()
+def mock_disabled_feature_state(mock_feature_2):
+    return mock.MagicMock(id=1, feature=mock_feature_2, enabled=False)

@@ -1,14 +1,36 @@
 from marshmallow import Schema, fields, post_load, validates_schema, ValidationError
 
-from flag_engine.models import Project, Environment, Trait, Identity, Segment
+from .fields import ListOrDjangoRelatedManagerField
+from .models import (
+    Project,
+    Environment,
+    Trait,
+    Identity,
+    Segment,
+    Feature,
+    FeatureState,
+)
 
 
 class FeatureSchema(Schema):
+    id = fields.Int()
     name = fields.Str()
+    type = fields.Str(required=False, allow_none=True)
+
+    @post_load()
+    def make_feature(self, data, **kwargs) -> Feature:
+        return Feature(**data)
 
 
 class FeatureStateSchema(Schema):
+    id = fields.Int()
     feature = fields.Nested(FeatureSchema)
+    enabled = fields.Bool()
+    value = fields.Field(allow_none=True)
+
+    @post_load()
+    def make_feature_state(self, data, **kwargs) -> FeatureState:
+        return FeatureState(**data)
 
 
 class SegmentConditionSchema(Schema):
@@ -19,8 +41,12 @@ class SegmentConditionSchema(Schema):
 
 class SegmentRuleSchema(Schema):
     type = fields.Str()
-    rules = fields.List(fields.Nested("SegmentRuleSchema"), required=False)
-    conditions = fields.List(fields.Nested(SegmentConditionSchema), required=False)
+    rules = ListOrDjangoRelatedManagerField(
+        fields.Nested("SegmentRuleSchema"), required=False
+    )
+    conditions = ListOrDjangoRelatedManagerField(
+        fields.Nested(SegmentConditionSchema), required=False
+    )
 
     @validates_schema()
     def validate_not_rules_and_conditions(self, data, **kwargs):
@@ -33,7 +59,7 @@ class SegmentRuleSchema(Schema):
 class SegmentSchema(Schema):
     id = fields.Int()
     name = fields.Str()
-    rules = fields.List(fields.Nested(SegmentRuleSchema))
+    rules = ListOrDjangoRelatedManagerField(fields.Nested(SegmentRuleSchema))
 
     @post_load()
     def make_segment(self, data, **kwargs):
@@ -43,7 +69,9 @@ class SegmentSchema(Schema):
 class ProjectSchema(Schema):
     id = fields.Int()
     name = fields.Str()
-    segments = fields.List(fields.Nested(SegmentSchema), required=False)
+    segments = ListOrDjangoRelatedManagerField(
+        fields.Nested(SegmentSchema), required=False
+    )
 
     @post_load()
     def make_project(self, data, **kwargs) -> Project:
@@ -53,7 +81,7 @@ class ProjectSchema(Schema):
 class EnvironmentSchema(Schema):
     id = fields.Int()
     api_key = fields.Str()
-    feature_states = fields.List(fields.Nested(FeatureStateSchema))
+    feature_states = ListOrDjangoRelatedManagerField(fields.Nested(FeatureStateSchema))
     project = fields.Nested(ProjectSchema)
 
     @post_load()
