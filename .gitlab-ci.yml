@@ -1,6 +1,8 @@
 stages:
   - test
 
+image: alpine:latest
+
 
 .install_pyenv: &install_pyenv
   - apt-get update
