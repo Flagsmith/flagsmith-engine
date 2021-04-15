@@ -1,8 +1,7 @@
 stages:
   - test
 
-image: alpine:latest
-
+image: ubuntu:20.04
 
 .install_pyenv: &install_pyenv
   - apt-get update
