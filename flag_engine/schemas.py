@@ -23,7 +23,6 @@ class FeatureSchema(Schema):
 
 
 class FeatureStateSchema(Schema):
-    id = fields.Int()
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
     value = fields.Field(allow_none=True)
