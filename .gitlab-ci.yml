@@ -17,8 +17,8 @@ test:python36:
       files:
         - requirements.txt
         - requirements-dev.txt
-      paths:
-        - /opt/venv
+    paths:
+      - /opt/venv
   stage: test
   before_script:
     - *install_deps
@@ -33,8 +33,8 @@ test:python37:
       files:
         - requirements.txt
         - requirements-dev.txt
-      paths:
-        - /opt/venv
+    paths:
+      - /opt/venv
   stage: test
   before_script:
     - *install_deps
@@ -49,8 +49,8 @@ test:python38:
       files:
         - requirements.txt
         - requirements-dev.txt
-      paths:
-        - /opt/venv
+    paths:
+      - /opt/venv
   stage: test
   before_script:
     - *install_deps
@@ -65,8 +65,8 @@ test:python39:
       files:
         - requirements.txt
         - requirements-dev.txt
-      paths:
-        - /opt/venv
+    paths:
+      - /opt/venv
   stage: test
   before_script:
     - *install_deps
