@@ -1,8 +1,0 @@
--r requirements.txt
-pylint
-pep8
-autopep8
-pytest
-black
-pip-tools
-tox
