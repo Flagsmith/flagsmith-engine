@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 import typing
 
 from flag_engine import constants
+from flag_engine.utils import get_hashed_percentage_for_object_ids
 
 
 @dataclass
@@ -44,6 +45,7 @@ class SegmentRule:
 
 @dataclass
 class Segment:
+    id: int
     name: str
     rules: typing.List[SegmentRule]
 
@@ -112,9 +114,12 @@ class Identity:
         return list(all_feature_states.values())
 
     def in_segment(self, segment: Segment) -> bool:
-        return any(self.matches_segment_rule(rule=rule) for rule in segment.rules)
+        return any(
+            self.matches_segment_rule(rule=rule, segment_id=segment.id)
+            for rule in segment.rules
+        )
 
-    def matches_segment_rule(self, rule: SegmentRule) -> bool:
+    def matches_segment_rule(self, rule: SegmentRule, segment_id: int) -> bool:
         matching_function = {
             constants.ANY_RULE: any,
             constants.ALL_RULE: all,
@@ -123,17 +128,25 @@ class Identity:
 
         if rule.rules:
             return matching_function(
-                [self.matches_segment_rule(nested) for nested in rule.rules]
+                [self.matches_segment_rule(nested, segment_id) for nested in rule.rules]
             )
 
         return matching_function(
-            [self.matches_segment_condition(condition) for condition in rule.conditions]
+            [
+                self.matches_segment_condition(condition, segment_id)
+                for condition in rule.conditions
+            ]
         )
 
-    def matches_segment_condition(self, condition: SegmentCondition) -> bool:
+    def matches_segment_condition(
+        self, condition: SegmentCondition, segment_id: int
+    ) -> bool:
         if condition.operator == constants.PERCENTAGE_SPLIT:
-            # TODO:
-            return True
+            normalised_value = condition.value / 100
+            return (
+                get_hashed_percentage_for_object_ids([segment_id, self.id])
+                <= normalised_value
+            )
 
         matching_function_name = {
             constants.EQUAL: "__eq__",

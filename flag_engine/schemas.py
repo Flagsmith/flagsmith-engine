@@ -64,6 +64,7 @@ class SegmentRuleSchema(Schema):
 
 
 class SegmentSchema(Schema):
+    id = fields.Int()
     name = fields.Str()
     rules = ListOrDjangoRelatedManagerField(fields.Nested(SegmentRuleSchema))
 

@@ -62,6 +62,7 @@ def test_identity_get_all_feature_states_segments_only(
     trait_value = "my_value"
 
     segment = Segment(
+        id=1,
         name="my_segment",
         rules=[
             SegmentRule(
