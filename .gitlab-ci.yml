@@ -22,6 +22,7 @@ stages:
   before_script:
     - *install_deps
 
+
 .test:
   extends: .base
   script: pytest
