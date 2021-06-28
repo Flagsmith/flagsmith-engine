@@ -84,7 +84,10 @@ def test_identity_get_all_feature_states_segments_only(
     )
 
     environment.segment_overrides.append(
-        SegmentOverride(segment=segment, feature=overridden_feature, enabled=True)
+        SegmentOverride(
+            segment=segment,
+            feature_state=FeatureState(feature=overridden_feature, enabled=True),
+        )
     )
 
     # When

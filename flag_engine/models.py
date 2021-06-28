@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 
 import typing
 
+from flag_engine import constants
+
 
 @dataclass
 class Feature:
@@ -35,6 +37,10 @@ class SegmentRule:
     rules: typing.List["SegmentRule"] = field(default_factory=list)
     conditions: typing.List[SegmentCondition] = field(default_factory=list)
 
+    @staticmethod
+    def none(iterable: typing.Iterable) -> bool:
+        return not any(iterable)
+
 
 @dataclass
 class Segment:
@@ -45,9 +51,7 @@ class Segment:
 @dataclass
 class SegmentOverride:
     segment: Segment
-    feature: Feature
-    enabled: bool
-    value: typing.Any = None
+    feature_state: FeatureState
 
 
 @dataclass
@@ -89,11 +93,39 @@ class Identity:
         all_feature_states = {fs.feature: fs for fs in environment.feature_states}
 
         # TODO:
-        #  - segments
         #  - multivariate
+
+        for segment_override in environment.segment_overrides:
+            feature_state = segment_override.feature_state
+            feature = feature_state.feature
+            if self.in_segment(segment_override.segment):
+                all_feature_states[feature] = feature_state
 
         for feature_state in self.feature_states:
             if feature_state.feature in all_feature_states:
                 all_feature_states[feature_state.feature] = feature_state
 
         return list(all_feature_states.values())
+
+    def in_segment(self, segment: Segment) -> bool:
+        return any(self.matches_segment_rule(rule=rule) for rule in segment.rules)
+
+    def matches_segment_rule(self, rule: SegmentRule) -> bool:
+        matching_function = {
+            constants.ANY_RULE: any,
+            constants.ALL_RULE: all,
+            constants.NONE_RULE: SegmentRule.none,
+        }.get(rule.type)
+
+        if rule.rules:
+            return matching_function(
+                [self.matches_segment_rule(nested) for nested in rule.rules]
+            )
+
+        return matching_function(
+            [self.matches_segment_condition(condition) for condition in rule.conditions]
+        )
+
+    def matches_segment_condition(self, condition: SegmentCondition) -> bool:
+        # TODO: implement this
+        return True
