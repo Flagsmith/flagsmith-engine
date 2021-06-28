@@ -1,4 +1,5 @@
 stages:
+  - lint
   - test
 
 
@@ -10,8 +11,7 @@ stages:
   - pip install -r requirements-dev.txt
 
 
-test:python36:
-  image: python:3.6-slim
+.base:
   cache:
     key:
       files:
@@ -22,53 +22,39 @@ test:python36:
   stage: test
   before_script:
     - *install_deps
-  script:
-    - pytest
+
+.test:
+  extends: .base
+  script: pytest
+
+
+check_formatting:
+  extends: .base
+  image: python:3.9-slim
+  script: black --check tests/ flag_engine/
+
+
+check_linting:
+  extends: .base
+  image: python:3.9-slim
+  script: flake8 tests/ flag_engine/
+
+
+test:python36:
+  extends: .test
+  image: python:3.6-slim
 
 
 test:python37:
+  extends: .test
   image: python:3.7-slim
-  cache:
-    key:
-      files:
-        - requirements.txt
-        - requirements-dev.txt
-    paths:
-      - /opt/venv
-  stage: test
-  before_script:
-    - *install_deps
-  script:
-    - pytest
       
       
 test:python38:
+  extends: .test
   image: python:3.8-slim
-  cache:
-    key:
-      files:
-        - requirements.txt
-        - requirements-dev.txt
-    paths:
-      - /opt/venv
-  stage: test
-  before_script:
-    - *install_deps
-  script:
-    - pytest
 
 
 test:python39:
+  extends: .test
   image: python:3.9-slim
-  cache:
-    key:
-      files:
-        - requirements.txt
-        - requirements-dev.txt
-    paths:
-      - /opt/venv
-  stage: test
-  before_script:
-    - *install_deps
-  script:
-    - pytest

@@ -1,5 +1,4 @@
 from flag_engine import constants
-from flag_engine.constants import EQUAL
 from flag_engine.models import (
     Identity,
     FeatureState,
