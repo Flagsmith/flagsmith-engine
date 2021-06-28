@@ -75,7 +75,9 @@ class Identity:
     feature_states: typing.List[FeatureState] = None
     traits: typing.List[Trait] = None
 
-    def get_all_feature_states(self, environment: Environment) -> typing.List[FeatureState]:
+    def get_all_feature_states(
+        self, environment: Environment
+    ) -> typing.List[FeatureState]:
         all_feature_states = {fs.feature: fs for fs in environment.feature_states}
 
         # TODO: segments

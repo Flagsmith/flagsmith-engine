@@ -21,6 +21,7 @@ def test_list_or_django_related_manager_field_serialize(attribute):
     # a dummy object with a single attribute that is defined by the parameterized test
     class MyObject:
         my_attribute = attribute
+
     my_object = MyObject()
 
     # and the field we want to test (arbitrarily instantiated with integer elements)
