@@ -1,5 +1,13 @@
-from marshmallow import Schema, fields, post_load, validates_schema, ValidationError
+from marshmallow import (
+    Schema,
+    fields,
+    post_load,
+    validates_schema,
+    ValidationError,
+    validate,
+)
 
+from . import constants
 from .fields import ListOrDjangoRelatedManagerField
 from .models import (
     Project,
@@ -33,13 +41,13 @@ class FeatureStateSchema(Schema):
 
 
 class SegmentConditionSchema(Schema):
-    operator = fields.Str()
+    operator = fields.Str(validate=validate.OneOf(constants.CONDITION_OPERATORS))
     property = fields.Str()
     value = fields.Field()
 
 
 class SegmentRuleSchema(Schema):
-    type = fields.Str()
+    type = fields.Str(validate=validate.OneOf(constants.RULE_TYPES))
     rules = ListOrDjangoRelatedManagerField(
         fields.Nested("SegmentRuleSchema"), required=False
     )
@@ -56,7 +64,6 @@ class SegmentRuleSchema(Schema):
 
 
 class SegmentSchema(Schema):
-    id = fields.Int()
     name = fields.Str()
     rules = ListOrDjangoRelatedManagerField(fields.Nested(SegmentRuleSchema))
 

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import typing
 
@@ -32,22 +32,29 @@ class SegmentCondition:
 @dataclass
 class SegmentRule:
     type: str
-    rules: typing.List["SegmentRule"] = None
-    conditions: typing.List[SegmentCondition] = None
+    rules: typing.List["SegmentRule"] = field(default_factory=list)
+    conditions: typing.List[SegmentCondition] = field(default_factory=list)
 
 
 @dataclass
 class Segment:
-    id: int
     name: str
     rules: typing.List[SegmentRule]
+
+
+@dataclass
+class SegmentOverride:
+    segment: Segment
+    feature: Feature
+    enabled: bool
+    value: typing.Any = None
 
 
 @dataclass
 class Project:
     id: int
     name: str
-    segments: typing.List[Segment] = None
+    segments: typing.List[Segment] = field(default_factory=list)
 
 
 @dataclass
@@ -55,7 +62,8 @@ class Environment:
     id: int
     api_key: str
     project: Project
-    feature_states: typing.List[FeatureState] = None
+    feature_states: typing.List[FeatureState] = field(default_factory=list)
+    segment_overrides: typing.List[SegmentOverride] = field(default_factory=list)
 
     def get_feature_state_for_feature(self, feature: Feature) -> FeatureState:
         return next(filter(lambda fs: fs.feature == feature, self.feature_states))
@@ -80,7 +88,9 @@ class Identity:
     ) -> typing.List[FeatureState]:
         all_feature_states = {fs.feature: fs for fs in environment.feature_states}
 
-        # TODO: segments
+        # TODO:
+        #  - segments
+        #  - multivariate
 
         for feature_state in self.feature_states:
             if feature_state.feature in all_feature_states:

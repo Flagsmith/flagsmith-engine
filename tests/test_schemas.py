@@ -1,15 +1,16 @@
+from flag_engine import constants
 from flag_engine.schemas import SegmentRuleSchema
 
 
 def test_segment_rule_validation_passes_if_rules_given_only():
     # Given
     data = {
-        "type": "ALL",
+        "type": constants.ALL_RULE,
         "rules": [
             {
-                "type": "ANY",
+                "type": constants.ANY_RULE,
                 "conditions": [
-                    {"operator": "EQUAL", "property": "foo", "value": "bar"}
+                    {"operator": constants.EQUAL, "property": "foo", "value": "bar"}
                 ],
             }
         ],
@@ -26,8 +27,10 @@ def test_segment_rule_validation_passes_if_rules_given_only():
 def test_segment_rule_validation_passes_if_conditions_given_only():
     # Given
     data = {
-        "type": "ALL",
-        "conditions": [{"operator": "EQUAL", "property": "foo", "value": "bar"}],
+        "type": constants.ALL_RULE,
+        "conditions": [
+            {"operator": constants.EQUAL, "property": "foo", "value": "bar"}
+        ],
     }
     segment_rule_schema = SegmentRuleSchema()
 
@@ -41,9 +44,11 @@ def test_segment_rule_validation_passes_if_conditions_given_only():
 def test_segment_rule_validation_fails_if_rules_and_conditions_given():
     # Given
     data = {
-        "type": "ALL",
-        "rules": [{"type": "ANY"}],
-        "conditions": [{"operator": "EQUAL", "property": "foo", "value": "bar"}],
+        "type": constants.ALL_RULE,
+        "rules": [{"type": constants.ANY_RULE}],
+        "conditions": [
+            {"operator": constants.EQUAL, "property": "foo", "value": "bar"}
+        ],
     }
     segment_rule_schema = SegmentRuleSchema()
 
