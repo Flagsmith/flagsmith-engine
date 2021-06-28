@@ -28,7 +28,9 @@ def test_identity_get_all_feature_states(feature_1, feature_2, environment):
             feature_state.feature
         )
 
-        if feature_state.feature == overridden_feature:
-            assert feature_state.enabled is True
-        else:
-            assert feature_state.enabled == environment_feature_state.enabled
+        expected = (
+            True
+            if feature_state.feature == overridden_feature
+            else environment_feature_state.enabled
+        )
+        assert feature_state.enabled is expected
