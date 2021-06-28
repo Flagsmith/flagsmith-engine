@@ -19,25 +19,27 @@ stages:
         - requirements-dev.txt
     paths:
       - /opt/venv
-  stage: test
   before_script:
     - *install_deps
 
 .test:
   extends: .base
   script: pytest
+  stage: test
 
 
 check_formatting:
   extends: .base
   image: python:3.9-slim
   script: black --check tests/ flag_engine/
+  stage: lint
 
 
 check_linting:
   extends: .base
   image: python:3.9-slim
   script: flake8 tests/ flag_engine/
+  stage: lint
 
 
 test:python36:
