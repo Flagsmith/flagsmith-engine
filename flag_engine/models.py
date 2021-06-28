@@ -87,6 +87,10 @@ class Identity:
     feature_states: typing.List[FeatureState] = None
     traits: typing.List[Trait] = None
 
+    @property
+    def trait_keys(self) -> typing.Iterable[str]:
+        return (trait.trait_key for trait in self.traits)
+
     def get_all_feature_states(
         self, environment: Environment
     ) -> typing.List[FeatureState]:
@@ -127,5 +131,29 @@ class Identity:
         )
 
     def matches_segment_condition(self, condition: SegmentCondition) -> bool:
-        # TODO: implement this
-        return True
+        if condition.operator == constants.PERCENTAGE_SPLIT:
+            # TODO:
+            return True
+
+        matching_function_name = {
+            constants.EQUAL: "__eq__",
+            constants.GREATER_THAN: "__gt__",
+            constants.GREATER_THAN_INCLUSIVE: "__gte__",
+            constants.LESS_THAN: "__lt__",
+            constants.LESS_THAN_INCLUSIVE: "__lte__",
+            constants.NOT_EQUAL: "__ne__",
+            constants.CONTAINS: "__contains__",
+            constants.NOT_CONTAINS: "__contains__",
+        }.get(condition.operator)
+        negate_match_result = condition.operator == constants.NOT_CONTAINS
+        matching_function = getattr(
+            condition.value, matching_function_name, lambda *value: False
+        )
+
+        trait = next(filter(lambda t: t.trait_key == condition.property, self.traits))
+        if trait:
+            result = matching_function(trait.trait_value)
+            result = not result if negate_match_result else result
+            return result
+
+        return False
