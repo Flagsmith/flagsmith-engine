@@ -2,19 +2,12 @@ from unittest import mock
 
 import pytest
 
-from flag_engine import constants
-from flag_engine.models import (
-    Project,
-    Feature,
-    FeatureState,
-    Environment,
-    Segment,
-    SegmentRule,
-    SegmentCondition,
-    Trait,
-    Identity,
-)
-
+from flag_engine.segments import constants
+from flag_engine.identities.models import Trait, Identity
+from flag_engine.projects.models import Project
+from flag_engine.segments.models import SegmentCondition, SegmentRule, Segment
+from flag_engine.features.models import Feature, FeatureState
+from flag_engine.environments.models import Environment
 
 segment_condition_property = "foo"
 segment_condition_string_value = "bar"

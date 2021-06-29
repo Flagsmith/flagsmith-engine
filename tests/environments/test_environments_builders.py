@@ -1,7 +1,8 @@
 from unittest import mock
 
-from flag_engine.builders import build_environment_model
-from flag_engine.models import Environment, FeatureState
+from flag_engine.environments.builders import build_environment_model
+from flag_engine.features.models import FeatureState
+from flag_engine.environments.models import Environment
 
 
 def test_get_flags_for_environment_returns_feature_states_for_django_environment(

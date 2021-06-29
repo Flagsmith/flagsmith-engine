@@ -1,5 +1,5 @@
-from flag_engine import constants
-from flag_engine.schemas import SegmentRuleSchema
+from flag_engine.segments import constants
+from flag_engine.segments.schemas import SegmentRuleSchema
 
 
 def test_segment_rule_validation_passes_if_rules_given_only():

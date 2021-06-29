@@ -1,5 +1,5 @@
-from .models import Environment
-from .schemas import EnvironmentSchema
+from flag_engine.environments.models import Environment
+from flag_engine.environments.schemas import EnvironmentSchema
 
 environment_schema = EnvironmentSchema()
 
