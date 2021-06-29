@@ -31,27 +31,27 @@ class SegmentCondition:
     value: typing.Any
     property_: str = None
 
-    @property
-    def matching_function(self) -> callable:
+    def matches_trait_value(self, trait_value: typing.Any) -> bool:
         matching_function_name = {
             constants.EQUAL: "__eq__",
             constants.GREATER_THAN: "__gt__",
-            constants.GREATER_THAN_INCLUSIVE: "__gte__",
+            constants.GREATER_THAN_INCLUSIVE: "__ge__",
             constants.LESS_THAN: "__lt__",
-            constants.LESS_THAN_INCLUSIVE: "__lte__",
+            constants.LESS_THAN_INCLUSIVE: "__le__",
             constants.NOT_EQUAL: "__ne__",
             constants.CONTAINS: "__contains__",
             constants.NOT_CONTAINS: "__contains__",
         }.get(self.operator)
-        return getattr(self.value, matching_function_name, lambda *value: False)
 
-    @property
-    def negate_matching_function(self) -> bool:
-        return self.operator == constants.NOT_CONTAINS
+        matching_function = getattr(
+            trait_value, matching_function_name, lambda v: False
+        )
+        result = matching_function(self.value)
 
-    def matches_trait_value(self, trait_value: typing.Any) -> bool:
-        result = self.matching_function(trait_value)
-        result = not result if self.negate_matching_function else result
+        if self.operator == constants.NOT_CONTAINS:
+            # negate the contains result as there is no built in method for notcontains
+            return not result
+
         return result
 
 
