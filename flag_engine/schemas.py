@@ -42,7 +42,7 @@ class FeatureStateSchema(Schema):
 
 class SegmentConditionSchema(Schema):
     operator = fields.Str(validate=validate.OneOf(constants.CONDITION_OPERATORS))
-    property = fields.Str()
+    property_ = fields.Str(data_key="property")
     value = fields.Field()
 
 

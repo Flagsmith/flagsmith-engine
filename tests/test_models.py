@@ -68,7 +68,7 @@ def test_identity_get_all_feature_states_segments_only(
                 type=constants.ALL_RULE,
                 conditions=[
                     SegmentCondition(
-                        operator=constants.EQUAL, property=trait_key, value=trait_value
+                        operator=constants.EQUAL, property_=trait_key, value=trait_value
                     )
                 ],
             )
