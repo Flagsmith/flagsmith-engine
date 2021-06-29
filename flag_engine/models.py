@@ -28,8 +28,31 @@ class FeatureState:
 @dataclass
 class SegmentCondition:
     operator: str
-    property: str
     value: typing.Any
+    property_: str = None
+
+    @property
+    def matching_function(self) -> callable:
+        matching_function_name = {
+            constants.EQUAL: "__eq__",
+            constants.GREATER_THAN: "__gt__",
+            constants.GREATER_THAN_INCLUSIVE: "__gte__",
+            constants.LESS_THAN: "__lt__",
+            constants.LESS_THAN_INCLUSIVE: "__lte__",
+            constants.NOT_EQUAL: "__ne__",
+            constants.CONTAINS: "__contains__",
+            constants.NOT_CONTAINS: "__contains__",
+        }.get(self.operator)
+        return getattr(self.value, matching_function_name, lambda *value: False)
+
+    @property
+    def negate_matching_function(self) -> bool:
+        return self.operator == constants.NOT_CONTAINS
+
+    def matches_trait_value(self, trait_value: typing.Any) -> bool:
+        result = self.matching_function(trait_value)
+        result = not result if self.negate_matching_function else result
+        return result
 
 
 @dataclass
@@ -41,6 +64,14 @@ class SegmentRule:
     @staticmethod
     def none(iterable: typing.Iterable) -> bool:
         return not any(iterable)
+
+    @property
+    def matching_function(self) -> callable:
+        return {
+            constants.ANY_RULE: any,
+            constants.ALL_RULE: all,
+            constants.NONE_RULE: SegmentRule.none,
+        }.get(self.type)
 
 
 @dataclass
@@ -89,10 +120,6 @@ class Identity:
     feature_states: typing.List[FeatureState] = None
     traits: typing.List[Trait] = None
 
-    @property
-    def trait_keys(self) -> typing.Iterable[str]:
-        return (trait.trait_key for trait in self.traits)
-
     def get_all_feature_states(
         self, environment: Environment
     ) -> typing.List[FeatureState]:
@@ -120,18 +147,12 @@ class Identity:
         )
 
     def matches_segment_rule(self, rule: SegmentRule, segment_id: int) -> bool:
-        matching_function = {
-            constants.ANY_RULE: any,
-            constants.ALL_RULE: all,
-            constants.NONE_RULE: SegmentRule.none,
-        }.get(rule.type)
-
         if rule.rules:
-            return matching_function(
+            return rule.matching_function(
                 [self.matches_segment_rule(nested, segment_id) for nested in rule.rules]
             )
 
-        return matching_function(
+        return rule.matching_function(
             [
                 self.matches_segment_condition(condition, segment_id)
                 for condition in rule.conditions
@@ -148,25 +169,5 @@ class Identity:
                 <= normalised_value
             )
 
-        matching_function_name = {
-            constants.EQUAL: "__eq__",
-            constants.GREATER_THAN: "__gt__",
-            constants.GREATER_THAN_INCLUSIVE: "__gte__",
-            constants.LESS_THAN: "__lt__",
-            constants.LESS_THAN_INCLUSIVE: "__lte__",
-            constants.NOT_EQUAL: "__ne__",
-            constants.CONTAINS: "__contains__",
-            constants.NOT_CONTAINS: "__contains__",
-        }.get(condition.operator)
-        negate_match_result = condition.operator == constants.NOT_CONTAINS
-        matching_function = getattr(
-            condition.value, matching_function_name, lambda *value: False
-        )
-
-        trait = next(filter(lambda t: t.trait_key == condition.property, self.traits))
-        if trait:
-            result = matching_function(trait.trait_value)
-            result = not result if negate_match_result else result
-            return result
-
-        return False
+        trait = next(filter(lambda t: t.trait_key == condition.property_, self.traits))
+        return condition.matches_trait_value(trait.trait_value) if trait else False
