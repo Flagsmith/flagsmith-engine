@@ -58,7 +58,7 @@ class SegmentRule:
 class Segment:
     id: int
     name: str
-    rules: typing.List[SegmentRule]
+    rules: typing.List[SegmentRule] = field(default_factory=list)
 
 
 @dataclass

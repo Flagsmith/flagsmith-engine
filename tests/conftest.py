@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 
 from flag_engine.segments import constants
@@ -11,37 +9,6 @@ from flag_engine.environments.models import Environment
 
 segment_condition_property = "foo"
 segment_condition_string_value = "bar"
-
-
-@pytest.fixture()
-def mock_project():
-    mock_project = mock.MagicMock(id=1)
-    mock_project.name = "Test Project"  # `name` has meaning on mock init
-    return mock_project
-
-
-@pytest.fixture()
-def mock_feature_1(mock_project):
-    mock_feature = mock.MagicMock(id=1, project=mock_project)
-    mock_feature.name = "feature_1"
-    return mock_feature
-
-
-@pytest.fixture()
-def mock_feature_2(mock_project):
-    mock_feature = mock.MagicMock(id=2, project=mock_project)
-    mock_feature.name = "feature_2"
-    return mock_feature
-
-
-@pytest.fixture()
-def mock_enabled_feature_state(mock_feature_1):
-    return mock.MagicMock(id=1, feature=mock_feature_1, enabled=True)
-
-
-@pytest.fixture()
-def mock_disabled_feature_state(mock_feature_2):
-    return mock.MagicMock(id=1, feature=mock_feature_2, enabled=False)
 
 
 @pytest.fixture()
@@ -73,6 +40,11 @@ def environment(feature_1, feature_2, project):
 
 
 @pytest.fixture()
+def identity(environment):
+    return Identity(id=1, identifier="identity_1", environment_id=environment.id)
+
+
+@pytest.fixture()
 def segment_condition():
     return SegmentCondition(
         operator=constants.EQUAL,
@@ -101,8 +73,8 @@ def trait_matching_segment(segment_condition):
 @pytest.fixture()
 def identity_in_segment(trait_matching_segment, environment):
     return Identity(
-        id=1,
-        identifier="my-identifier",
+        id=2,
+        identifier="identity_2",
         environment_id=environment.id,
         traits=[trait_matching_segment],
     )

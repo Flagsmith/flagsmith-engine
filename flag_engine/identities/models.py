@@ -43,25 +43,28 @@ class Identity:
         return list(all_feature_states.values())
 
     def in_segment(self, segment: Segment) -> bool:
-        return any(
-            self.matches_segment_rule(rule=rule, segment_id=segment.id)
+        return len(segment.rules) > 0 and all(
+            self._matches_segment_rule(rule=rule, segment_id=segment.id)
             for rule in segment.rules
         )
 
-    def matches_segment_rule(self, rule: SegmentRule, segment_id: int) -> bool:
+    def _matches_segment_rule(self, rule: SegmentRule, segment_id: int) -> bool:
         if rule.rules:
             return rule.matching_function(
-                [self.matches_segment_rule(nested, segment_id) for nested in rule.rules]
+                [
+                    self._matches_segment_rule(nested, segment_id)
+                    for nested in rule.rules
+                ]
             )
 
         return rule.matching_function(
             [
-                self.matches_segment_condition(condition, segment_id)
+                self._matches_segment_condition(condition, segment_id)
                 for condition in rule.conditions
             ]
         )
 
-    def matches_segment_condition(
+    def _matches_segment_condition(
         self, condition: SegmentCondition, segment_id: int
     ) -> bool:
         if condition.operator == constants.PERCENTAGE_SPLIT:
@@ -71,5 +74,7 @@ class Identity:
                 <= normalised_value
             )
 
-        trait = next(filter(lambda t: t.trait_key == condition.property_, self.traits))
+        trait = next(
+            filter(lambda t: t.trait_key == condition.property_, self.traits), None
+        )
         return condition.matches_trait_value(trait.trait_value) if trait else False

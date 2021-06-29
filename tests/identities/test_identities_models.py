@@ -1,10 +1,28 @@
+import pytest
+
 from flag_engine.features.models import Feature, FeatureState
-from flag_engine.identities.models import Identity
-from flag_engine.segments.models import SegmentOverride
+from flag_engine.identities.models import Identity, Trait
+from flag_engine.segments.models import SegmentOverride, Segment
+from tests.identities.fixtures import (
+    empty_segment,
+    segment_single_condition,
+    trait_value_1,
+    trait_key_1,
+    segment_multiple_conditions_all,
+    trait_key_2,
+    trait_value_2,
+    segment_multiple_conditions_any,
+    segment_nested_rules_all,
+    trait_key_3,
+    trait_value_3,
+    segment_nested_rules_any,
+)
 from tests.identities.helpers import get_environment_feature_state_for_feature
 
 
-def test_identity_get_all_feature_states_no_segments(feature_1, feature_2, environment):
+def test_identity_get_all_feature_states_no_segments(
+    feature_1, feature_2, environment, identity
+):
     # Given
     overridden_feature = Feature(id=3, name="overridden_feature")
 
@@ -14,12 +32,7 @@ def test_identity_get_all_feature_states_no_segments(feature_1, feature_2, envir
     )
 
     # but True for the identity
-    identity = Identity(
-        id=1,
-        identifier="identity",
-        environment_id=environment.id,
-        feature_states=[FeatureState(feature=overridden_feature, enabled=True)],
-    )
+    identity.feature_states = [FeatureState(feature=overridden_feature, enabled=True)]
 
     # When
     all_feature_states = identity.get_all_feature_states(environment=environment)
@@ -77,3 +90,91 @@ def test_identity_get_all_feature_states_segments_only(
             else environment_feature_state.enabled
         )
         assert feature_state.enabled is expected
+
+
+@pytest.mark.parametrize(
+    "segment, identity_traits, expected_in_segment",
+    (
+        (empty_segment, [], False),
+        (segment_single_condition, [], False),
+        (
+            segment_single_condition,
+            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            True,
+        ),
+        (segment_multiple_conditions_all, [], False),
+        (
+            segment_multiple_conditions_all,
+            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            False,
+        ),
+        (
+            segment_multiple_conditions_all,
+            [
+                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
+                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+            ],
+            True,
+        ),
+        (segment_multiple_conditions_any, [], False),
+        (
+            segment_multiple_conditions_any,
+            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            True,
+        ),
+        (
+            segment_multiple_conditions_any,
+            [Trait(trait_key=trait_key_2, trait_value=trait_value_2)],
+            True,
+        ),
+        (
+            segment_multiple_conditions_any,
+            [
+                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
+                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+            ],
+            True,
+        ),
+        (segment_nested_rules_all, [], False),
+        (
+            segment_nested_rules_all,
+            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            False,
+        ),
+        (
+            segment_nested_rules_all,
+            [
+                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
+                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+                Trait(trait_key=trait_key_3, trait_value=trait_value_3),
+            ],
+            True,
+        ),
+        (segment_nested_rules_any, [], False),
+        (
+            segment_nested_rules_any,
+            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            False,
+        ),
+        (
+            segment_nested_rules_any,
+            [
+                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
+                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+            ],
+            True,
+        ),
+        (
+            segment_nested_rules_any,
+            [Trait(trait_key=trait_key_3, trait_value=trait_value_3)],
+            True,
+        ),
+    ),
+)
+def test_identity_in_segment(segment, identity_traits, expected_in_segment):
+    assert (
+        Identity(
+            id=1, identifier="identity", environment_id=1, traits=identity_traits
+        ).in_segment(segment)
+        == expected_in_segment
+    )
