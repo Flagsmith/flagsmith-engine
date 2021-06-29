@@ -1,6 +1,7 @@
 from flag_engine.features.models import Feature, FeatureState
 from flag_engine.identities.models import Identity
 from flag_engine.segments.models import SegmentOverride
+from tests.identities.helpers import get_environment_feature_state_for_feature
 
 
 def test_identity_get_all_feature_states_no_segments(feature_1, feature_2, environment):
@@ -26,8 +27,8 @@ def test_identity_get_all_feature_states_no_segments(feature_1, feature_2, envir
     # Then
     assert len(all_feature_states) == 3
     for feature_state in all_feature_states:
-        environment_feature_state = environment.get_feature_state_for_feature(
-            feature_state.feature
+        environment_feature_state = get_environment_feature_state_for_feature(
+            environment, feature_state.feature
         )
 
         expected = (
@@ -66,8 +67,8 @@ def test_identity_get_all_feature_states_segments_only(
     # Then
     assert len(all_feature_states) == 3
     for feature_state in all_feature_states:
-        environment_feature_state = environment.get_feature_state_for_feature(
-            feature_state.feature
+        environment_feature_state = get_environment_feature_state_for_feature(
+            environment, feature_state.feature
         )
 
         expected = (
