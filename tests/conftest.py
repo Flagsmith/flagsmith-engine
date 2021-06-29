@@ -11,7 +11,8 @@ from flag_engine.models import (
     Segment,
     SegmentRule,
     SegmentCondition,
-    Trait, Identity,
+    Trait,
+    Identity,
 )
 
 

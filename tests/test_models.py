@@ -5,10 +5,7 @@ from flag_engine.models import (
     Identity,
     FeatureState,
     Feature,
-    Segment,
-    SegmentRule,
     SegmentCondition,
-    Trait,
     SegmentOverride,
 )
 
