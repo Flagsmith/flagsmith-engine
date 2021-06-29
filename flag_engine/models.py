@@ -117,8 +117,8 @@ class Identity:
     id: int
     identifier: str
     environment_id: int
-    feature_states: typing.List[FeatureState] = None
-    traits: typing.List[Trait] = None
+    feature_states: typing.List[FeatureState] = field(default_factory=list)
+    traits: typing.List[Trait] = field(default_factory=list)
 
     def get_all_feature_states(
         self, environment: Environment

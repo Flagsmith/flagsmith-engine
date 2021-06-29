@@ -49,42 +49,18 @@ def test_identity_get_all_feature_states_no_segments(feature_1, feature_2, envir
 
 
 def test_identity_get_all_feature_states_segments_only(
-    feature_1, feature_2, environment
+    feature_1, feature_2, environment, segment, identity_in_segment
 ):
     # Given
+    # a feature which we can override
     overridden_feature = Feature(id=3, name="overridden_feature")
 
-    # set the state of the feature to False in the environment configuration
+    # which is given a default value of False in the environment configuration
     environment.feature_states.append(
         FeatureState(feature=overridden_feature, enabled=False)
     )
 
-    trait_key = "my_trait"
-    trait_value = "my_value"
-
-    segment = Segment(
-        id=1,
-        name="my_segment",
-        rules=[
-            SegmentRule(
-                type=constants.ALL_RULE,
-                conditions=[
-                    SegmentCondition(
-                        operator=constants.EQUAL, property_=trait_key, value=trait_value
-                    )
-                ],
-            )
-        ],
-    )
-
-    identity = Identity(
-        id=1,
-        identifier="identity",
-        environment_id=environment.id,
-        feature_states=[],
-        traits=[Trait(trait_key=trait_key, trait_value=trait_value)],
-    )
-
+    # but overridden to True for identities in the segment
     environment.segment_overrides.append(
         SegmentOverride(
             segment=segment,
@@ -93,7 +69,9 @@ def test_identity_get_all_feature_states_segments_only(
     )
 
     # When
-    all_feature_states = identity.get_all_feature_states(environment=environment)
+    all_feature_states = identity_in_segment.get_all_feature_states(
+        environment=environment
+    )
 
     # Then
     assert len(all_feature_states) == 3
