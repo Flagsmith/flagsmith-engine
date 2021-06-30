@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 
 from flag_engine.projects.models import Project
 from flag_engine.segments.models import SegmentOverride
-from flag_engine.features.models import Feature, FeatureState
+from flag_engine.features.models import FeatureState
 
 
 @dataclass

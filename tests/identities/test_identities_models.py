@@ -2,7 +2,7 @@ import pytest
 
 from flag_engine.features.models import Feature, FeatureState
 from flag_engine.identities.models import Identity, Trait
-from flag_engine.segments.models import SegmentOverride, Segment
+from flag_engine.segments.models import SegmentOverride
 from tests.identities.fixtures import (
     empty_segment,
     segment_single_condition,
