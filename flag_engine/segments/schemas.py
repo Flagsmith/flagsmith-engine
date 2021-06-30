@@ -14,7 +14,7 @@ from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
 class SegmentConditionSchema(Schema):
     operator = fields.Str(validate=validate.OneOf(constants.CONDITION_OPERATORS))
-    property_ = fields.Str(data_key="property")
+    property_ = fields.Str(attribute="property")
     value = fields.Field()
 
 
