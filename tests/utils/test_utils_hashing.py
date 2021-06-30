@@ -43,8 +43,10 @@ def test_get_hashed_percentage_for_object_ids_should_be_evenly_distributed():
     the test_sample value and / or decreasing the num_test_buckets value.
     """
 
-    test_sample = 500  # number of ids to sample in each list
-    num_test_buckets = 50  # split the sample into 'buckets' to check that the values are evenly distributed
+    # number of ids to sample in each list
+    test_sample = 500
+    # split the sample into 'buckets' to check that the values are evenly distributed
+    num_test_buckets = 50
     test_bucket_size = int(test_sample / num_test_buckets)
     error_factor = 0.1
 
