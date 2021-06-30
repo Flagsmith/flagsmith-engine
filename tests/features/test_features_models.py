@@ -59,7 +59,10 @@ def test_feature_state_get_value_mv_values(
         id=1,
         feature=my_feature,
         enabled=True,
-        multivariate_values=[mv_feature_state_value_1, mv_feature_state_value_2],
+        multivariate_feature_state_values=[
+            mv_feature_state_value_1,
+            mv_feature_state_value_2,
+        ],
     )
     mv_feature_state.set_value(mv_feature_control_value)
 

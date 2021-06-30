@@ -8,6 +8,7 @@ from flag_engine.features.models import (
     MultivariateFeatureOption,
     MultivariateFeatureStateValue,
 )
+from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
 
 class FeatureSchema(Schema):
@@ -52,7 +53,7 @@ class FeatureStateSchema(Schema):
         allow_none=True,
         required=False,
     )
-    multivariate_feature_state_values = fields.List(
+    multivariate_feature_state_values = ListOrDjangoRelatedManagerField(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
 

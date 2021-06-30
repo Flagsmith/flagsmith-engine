@@ -34,15 +34,15 @@ class FeatureState:
     feature: Feature
     enabled: bool
     _value: typing.Any = field(default=None, init=False)
-    multivariate_values: typing.List[MultivariateFeatureStateValue] = field(
-        default_factory=list
-    )
+    multivariate_feature_state_values: typing.List[
+        MultivariateFeatureStateValue
+    ] = field(default_factory=list)
 
     def set_value(self, value: typing.Any):
         self._value = value
 
     def get_value(self, identity_id: int = None):
-        if identity_id and len(self.multivariate_values) > 0:
+        if identity_id and len(self.multivariate_feature_state_values) > 0:
             return self._get_multivariate_value(identity_id)
         return self._value
 
@@ -55,7 +55,9 @@ class FeatureState:
         # way to ensure that the same value is returned every time we use the same
         # percentage value.
         start_percentage = 0
-        for mv_value in sorted(self.multivariate_values, key=lambda v: v.id):
+        for mv_value in sorted(
+            self.multivariate_feature_state_values, key=lambda v: v.id
+        ):
             limit = mv_value.percentage_allocation + start_percentage
             if start_percentage <= percentage_value < limit:
                 return mv_value.multivariate_feature_option.value
