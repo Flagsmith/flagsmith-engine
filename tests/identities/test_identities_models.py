@@ -5,17 +5,17 @@ from flag_engine.identities.models import Identity, Trait
 from flag_engine.segments.models import SegmentOverride
 from tests.identities.fixtures import (
     empty_segment,
-    segment_single_condition,
-    trait_value_1,
-    trait_key_1,
     segment_multiple_conditions_all,
-    trait_key_2,
-    trait_value_2,
     segment_multiple_conditions_any,
     segment_nested_rules_all,
-    trait_key_3,
-    trait_value_3,
     segment_nested_rules_any,
+    segment_single_condition,
+    trait_key_1,
+    trait_key_2,
+    trait_key_3,
+    trait_value_1,
+    trait_value_2,
+    trait_value_3,
 )
 from tests.identities.helpers import get_environment_feature_state_for_feature
 

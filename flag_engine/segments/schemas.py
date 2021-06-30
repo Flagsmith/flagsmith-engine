@@ -1,10 +1,10 @@
 from marshmallow import (
     Schema,
+    ValidationError,
     fields,
+    post_load,
     validate,
     validates_schema,
-    ValidationError,
-    post_load,
 )
 
 from flag_engine.segments import constants

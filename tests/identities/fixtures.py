@@ -1,5 +1,5 @@
 from flag_engine.segments import constants
-from flag_engine.segments.models import Segment, SegmentRule, SegmentCondition
+from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
 
 trait_key_1 = "email"
 trait_value_1 = "user@example.com"

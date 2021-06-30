@@ -1,10 +1,10 @@
 import typing
 from dataclasses import dataclass, field
 
-from flag_engine.segments import constants
 from flag_engine.environments.models import Environment
 from flag_engine.features.models import FeatureState
-from flag_engine.segments.models import Segment, SegmentRule, SegmentCondition
+from flag_engine.segments import constants
+from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 

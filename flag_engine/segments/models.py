@@ -1,8 +1,8 @@
 import typing
 from dataclasses import dataclass, field
 
-from flag_engine.segments import constants
 from flag_engine.features.models import FeatureState
+from flag_engine.segments import constants
 
 
 @dataclass

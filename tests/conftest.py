@@ -1,11 +1,11 @@
 import pytest
 
-from flag_engine.segments import constants
-from flag_engine.identities.models import Trait, Identity
-from flag_engine.projects.models import Project
-from flag_engine.segments.models import SegmentCondition, SegmentRule, Segment
-from flag_engine.features.models import Feature, FeatureState
 from flag_engine.environments.models import Environment
+from flag_engine.features.models import Feature, FeatureState
+from flag_engine.identities.models import Identity, Trait
+from flag_engine.projects.models import Project
+from flag_engine.segments import constants
+from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
 
 segment_condition_property = "foo"
 segment_condition_string_value = "bar"

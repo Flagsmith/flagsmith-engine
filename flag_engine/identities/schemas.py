@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, post_load
 
 from flag_engine.features.schemas import FeatureStateSchema
-from flag_engine.identities.models import Trait, Identity
+from flag_engine.identities.models import Identity, Trait
 
 
 class TraitSchema(Schema):

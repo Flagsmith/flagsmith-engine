@@ -1,6 +1,5 @@
 from setuptools import setup
 
-
 setup(
     name="Flagsmith Flag Engine",
     version="0.1.0",

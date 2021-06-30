@@ -1,4 +1,5 @@
 import typing
+
 from marshmallow import fields
 
 
