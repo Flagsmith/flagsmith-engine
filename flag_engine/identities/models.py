@@ -68,10 +68,9 @@ class Identity:
         self, condition: SegmentCondition, segment_id: int
     ) -> bool:
         if condition.operator == constants.PERCENTAGE_SPLIT:
-            normalised_value = condition.value / 100
             return (
                 get_hashed_percentage_for_object_ids([segment_id, self.id])
-                <= normalised_value
+                <= condition.value
             )
 
         trait = next(

@@ -12,15 +12,15 @@ def get_hashed_percentage_for_object_ids(
 
     :param object_ids: list of object ids to calculate the has for
     :param iterations: num times to include each id in the generated string to hash
-    :return: (float) number between 0 (inclusive) and 1 (exclusive)
+    :return: (float) number between 0 (inclusive) and 100 (exclusive)
     """
 
     to_hash = ",".join(str(id_) for id_ in list(object_ids) * iterations)
     hashed_value = hashlib.md5(to_hash.encode("utf-8"))
     hashed_value_as_int = int(hashed_value.hexdigest(), base=16)
-    value = (hashed_value_as_int % 9999) / 9998
+    value = ((hashed_value_as_int % 9999) / 9998) * 100
 
-    if value == 1:
+    if value == 100:
         # since we want a number between 0 (inclusive) and 1 (exclusive), in the
         # unlikely case that we get the exact number 1, we call the method again
         # and increase the number of iterations to ensure we get a different result

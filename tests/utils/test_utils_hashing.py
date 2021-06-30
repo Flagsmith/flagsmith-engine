@@ -4,8 +4,8 @@ from unittest import mock
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
-def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_1_exc():
-    assert 1 > get_hashed_percentage_for_object_ids([12, 93]) >= 0
+def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_exc():
+    assert 100 > get_hashed_percentage_for_object_ids([12, 93]) >= 0
 
 
 def test_get_hashed_percentage_for_object_ids_is_the_same_each_time():

@@ -33,8 +33,8 @@ def environment(feature_1, feature_2, project):
         api_key="api-key",
         project=project,
         feature_states=[
-            FeatureState(feature=feature_1, enabled=True),
-            FeatureState(feature=feature_2, enabled=False),
+            FeatureState(id=1, feature=feature_1, enabled=True),
+            FeatureState(id=2, feature=feature_2, enabled=False),
         ],
     )
 
