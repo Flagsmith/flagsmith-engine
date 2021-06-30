@@ -1,3 +1,5 @@
+import typing
+
 from marshmallow import Schema, fields, post_load, validate
 
 from flag_engine.features.models import (
@@ -44,7 +46,12 @@ class FeatureStateSchema(Schema):
     id = fields.Int()
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
-    value = fields.Field(allow_none=True, required=False)
+    value = fields.Method(
+        serialize="serialize_value",
+        deserialize="deserialize_value",
+        allow_none=True,
+        required=False,
+    )
     multivariate_feature_state_values = fields.List(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
@@ -55,3 +62,13 @@ class FeatureStateSchema(Schema):
         feature_state = FeatureState(**data)
         feature_state.set_value(value)
         return feature_state
+
+    def serialize_value(self, instance: object) -> typing.Any:
+        if isinstance(instance, dict) and "value" in instance:
+            return instance["value"]
+
+        getter = getattr(instance, "get_feature_state_value", lambda *args: None)
+        return getter()
+
+    def deserialize_value(self, value: typing.Any) -> typing.Any:
+        return value

@@ -1,3 +1,4 @@
+import typing
 from dataclasses import dataclass
 
 import pytest
@@ -21,28 +22,36 @@ class Feature:
     project: Project
 
 
-@pytest.fixture()
-def mock_feature_1(mock_project):
-    return Feature(id=1, project=mock_project, name="feature_1")
-
-
-@pytest.fixture()
-def mock_feature_2(mock_project):
-    return Feature(id=2, project=mock_project, name="feature_2")
-
-
 @dataclass
 class FeatureState:
     id: int
     feature: Feature
     enabled: bool
+    _value: typing.Any = None
+
+    def get_feature_state_value(self):
+        return self._value
 
 
 @pytest.fixture()
-def mock_enabled_feature_state(mock_feature_1):
-    return FeatureState(id=1, feature=mock_feature_1, enabled=True)
+def mock_enabled_feature_state(mock_project):
+    feature = Feature(id=1, project=mock_project, name="enabled_feature")
+    return FeatureState(id=1, feature=feature, enabled=True)
 
 
 @pytest.fixture()
-def mock_disabled_feature_state(mock_feature_2):
-    return FeatureState(id=2, feature=mock_feature_2, enabled=False)
+def mock_disabled_feature_state(mock_project):
+    feature = Feature(id=2, project=mock_project, name="disabled_feature")
+    return FeatureState(id=2, feature=feature, enabled=False)
+
+
+@pytest.fixture()
+def enabled_feature_with_string_value(mock_project):
+    return Feature(id=3, project=mock_project, name="enabled_feature_with_string_value")
+
+
+@pytest.fixture()
+def mock_enabled_feature_state_with_string_value(enabled_feature_with_string_value):
+    return FeatureState(
+        id=3, feature=enabled_feature_with_string_value, enabled=True, _value="foo"
+    )

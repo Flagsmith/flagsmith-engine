@@ -3,6 +3,7 @@ import pytest
 from flag_engine.features.models import Feature, FeatureState
 from flag_engine.identities.models import Identity, Trait
 from flag_engine.segments.models import SegmentOverride
+from tests.helpers import get_environment_feature_state_for_feature
 from tests.identities.fixtures import (
     empty_segment,
     segment_multiple_conditions_all,
@@ -17,7 +18,6 @@ from tests.identities.fixtures import (
     trait_value_2,
     trait_value_3,
 )
-from tests.identities.helpers import get_environment_feature_state_for_feature
 
 
 def test_identity_get_all_feature_states_no_segments(
