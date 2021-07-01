@@ -14,9 +14,12 @@ class TraitSchema(Schema):
 
 
 class IdentitySchema(Schema):
+    id = fields.Int()
     identifier = fields.Str()
     created_date = fields.Date()
-    environment_id = fields.Integer()
+    environment_id = fields.Method(
+        serialize="serialize_environment_id", deserialize="deserialize_environment_id"
+    )
     environment_api_key = fields.Str()
     traits = fields.List(fields.Nested(TraitSchema))
     identity_flags = fields.List(fields.Nested(FeatureStateSchema))
@@ -24,3 +27,12 @@ class IdentitySchema(Schema):
     @post_load
     def make_identity(self, data, **kwargs):
         return Identity(**data)
+
+    def serialize_environment_id(self, obj: object) -> int:
+        if isinstance(obj, dict):
+            return obj["environment_id"]
+
+        return obj.environment.id
+
+    def deserialize_environment_id(self, environment_id: int) -> int:
+        return environment_id

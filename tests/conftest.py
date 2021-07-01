@@ -7,8 +7,99 @@ from flag_engine.projects.models import Project
 from flag_engine.segments import constants
 from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
 
+from .mock_django_classes import (
+    DjangoEnvironment,
+    DjangoFeature,
+    DjangoFeatureState,
+    DjangoMultivariateFeatureOption,
+    DjangoMultivariateFeatureStateValue,
+    DjangoProject,
+)
+
 segment_condition_property = "foo"
 segment_condition_string_value = "bar"
+
+
+@pytest.fixture()
+def django_project():
+    return DjangoProject(1, "Test Project")
+
+
+@pytest.fixture()
+def django_enabled_feature_state(django_project):
+    feature = DjangoFeature(id=1, project=django_project, name="enabled_feature")
+    return DjangoFeatureState(id=1, feature=feature, enabled=True)
+
+
+@pytest.fixture()
+def django_disabled_feature_state(django_project):
+    feature = DjangoFeature(id=2, project=django_project, name="disabled_feature")
+    return DjangoFeatureState(id=2, feature=feature, enabled=False)
+
+
+@pytest.fixture()
+def django_feature_with_string_value(django_project):
+    return DjangoFeature(
+        id=3, project=django_project, name="enabled_feature_with_string_value"
+    )
+
+
+@pytest.fixture()
+def django_enabled_feature_state_with_string_value(django_feature_with_string_value):
+    return DjangoFeatureState(
+        id=3, feature=django_feature_with_string_value, enabled=True, value="foo"
+    )
+
+
+@pytest.fixture()
+def django_multivariate_feature_state(django_project):
+    feature = DjangoFeature(id=4, project=django_project, name="multivariate_feature")
+    return DjangoFeatureState(
+        id=4,
+        feature=feature,
+        enabled=True,
+        multivariate_feature_state_values=[
+            DjangoMultivariateFeatureStateValue(
+                id=1,
+                percentage_allocation=30.0,
+                multivariate_feature_option=DjangoMultivariateFeatureOption(
+                    value="foo"
+                ),
+            ),
+            DjangoMultivariateFeatureStateValue(
+                id=2,
+                percentage_allocation=30.0,
+                multivariate_feature_option=DjangoMultivariateFeatureOption(value=123),
+            ),
+        ],
+    )
+
+
+@pytest.fixture()
+def django_environment(
+    django_project,
+    django_enabled_feature_state,
+    django_disabled_feature_state,
+    django_multivariate_feature_state,
+    django_enabled_feature_state_with_string_value,
+):
+    return DjangoEnvironment(
+        id=1,
+        project=django_project,
+        feature_states=[
+            django_disabled_feature_state,
+            django_enabled_feature_state,
+            django_multivariate_feature_state,
+            django_enabled_feature_state_with_string_value,
+        ],
+    )
+
+
+@pytest.fixture()
+def django_identity(django_environment):
+    return Identity(
+        id=1, identifier="test-identity", environment_id=django_environment.id
+    )
 
 
 @pytest.fixture()

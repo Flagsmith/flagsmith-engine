@@ -81,4 +81,18 @@ class DjangoEnvironment:
         self.name = name
         self.api_key = api_key
         self.project = project
-        self.feature_states = DjangoFeatureStateRelatedManager(feature_states)
+        self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
+
+
+class DjangoIdentity:
+    def __init__(
+        self,
+        id: int,
+        identifier: str,
+        environment: DjangoEnvironment,
+        feature_states: typing.List[DjangoFeatureState] = None,
+    ):
+        self.id = id
+        self.identifier = identifier
+        self.environment = environment
+        self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])

@@ -5,26 +5,25 @@ from tests.helpers import (
     get_environment_feature_state_for_feature,
     get_environment_feature_state_for_feature_by_name,
 )
-
-from .mock_django_classes import DjangoEnvironment
+from tests.mock_django_classes import DjangoEnvironment
 
 
 def test_get_flags_for_environment_returns_feature_states_for_django_environment(
-    mock_project,
-    mock_disabled_feature_state,
-    mock_enabled_feature_state,
-    mock_enabled_feature_state_with_string_value,
-    enabled_feature_with_string_value,
+    django_project,
+    django_disabled_feature_state,
+    django_enabled_feature_state,
+    django_enabled_feature_state_with_string_value,
+    django_feature_with_string_value,
 ):
     # Given
     # a mock environment object to simulate a Django environment object
     django_environment = DjangoEnvironment(
         id=1,
-        project=mock_project,
+        project=django_project,
         feature_states=[
-            mock_disabled_feature_state,
-            mock_enabled_feature_state,
-            mock_enabled_feature_state_with_string_value,
+            django_disabled_feature_state,
+            django_enabled_feature_state,
+            django_enabled_feature_state_with_string_value,
         ],
     )
 
@@ -45,9 +44,9 @@ def test_get_flags_for_environment_returns_feature_states_for_django_environment
     # and the value is set correctly on the feature state which has a value
     assert (
         get_environment_feature_state_for_feature(
-            environment=environment_model, feature=enabled_feature_with_string_value
+            environment=environment_model, feature=django_feature_with_string_value
         ).get_value()
-        == mock_enabled_feature_state_with_string_value.get_feature_state_value()
+        == django_enabled_feature_state_with_string_value.get_feature_state_value()
     )
 
 
@@ -108,12 +107,12 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
 
 
 def test_build_environment_model_with_multivariate_flag(
-    mock_project, mock_multivariate_feature_state
+    django_project, django_multivariate_feature_state
 ):
     # Given
     # a mock environment object to simulate a Django environment object
     django_environment = DjangoEnvironment(
-        id=1, project=mock_project, feature_states=[mock_multivariate_feature_state]
+        id=1, project=django_project, feature_states=[django_multivariate_feature_state]
     )
 
     # When
