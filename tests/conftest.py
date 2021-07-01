@@ -14,6 +14,7 @@ from .mock_django_classes import (
     DjangoMultivariateFeatureOption,
     DjangoMultivariateFeatureStateValue,
     DjangoProject,
+    DjangoTrait,
 )
 
 segment_condition_property = "foo"
@@ -96,10 +97,23 @@ def django_environment(
 
 
 @pytest.fixture()
-def django_identity(django_environment):
-    return Identity(
-        id=1, identifier="test-identity", environment_id=django_environment.id
-    )
+def django_trait_string():
+    return DjangoTrait(trait_key="string_trait", trait_value="string_value")
+
+
+@pytest.fixture()
+def django_trait_integer():
+    return DjangoTrait(trait_key="integer_trait", trait_value=10)
+
+
+@pytest.fixture()
+def django_trait_float():
+    return DjangoTrait(trait_key="float_trait", trait_value=10.1)
+
+
+@pytest.fixture()
+def django_trait_boolean():
+    return DjangoTrait(trait_key="boolean_trait", trait_value=True)
 
 
 @pytest.fixture()

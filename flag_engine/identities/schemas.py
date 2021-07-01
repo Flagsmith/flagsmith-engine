@@ -2,11 +2,12 @@ from marshmallow import Schema, fields, post_load
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import Identity, Trait
+from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
 
 class TraitSchema(Schema):
-    key = fields.Str()
-    value = fields.Str()
+    trait_key = fields.Str()
+    trait_value = fields.Str()
 
     @post_load
     def make_trait(self, data, **kwargs):
@@ -20,9 +21,10 @@ class IdentitySchema(Schema):
     environment_id = fields.Method(
         serialize="serialize_environment_id", deserialize="deserialize_environment_id"
     )
-    environment_api_key = fields.Str()
-    traits = fields.List(fields.Nested(TraitSchema))
-    identity_flags = fields.List(fields.Nested(FeatureStateSchema))
+    traits = ListOrDjangoRelatedManagerField(fields.Nested(TraitSchema), required=False)
+    identity_features = ListOrDjangoRelatedManagerField(
+        fields.Nested(FeatureStateSchema), required=False
+    )
 
     @post_load
     def make_identity(self, data, **kwargs):

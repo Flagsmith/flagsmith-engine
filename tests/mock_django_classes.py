@@ -84,6 +84,20 @@ class DjangoEnvironment:
         self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
 
 
+@dataclass
+class DjangoTrait:
+    trait_key: str
+    trait_value: typing.Any
+
+
+@dataclass
+class DjangoTraitRelatedManager:
+    traits: typing.List[DjangoTrait]
+
+    def all(self):
+        return self.traits
+
+
 class DjangoIdentity:
     def __init__(
         self,
@@ -91,8 +105,10 @@ class DjangoIdentity:
         identifier: str,
         environment: DjangoEnvironment,
         feature_states: typing.List[DjangoFeatureState] = None,
+        traits: typing.List[DjangoTrait] = None,
     ):
         self.id = id
         self.identifier = identifier
         self.environment = environment
-        self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
+        self.identity_features = DjangoFeatureStateRelatedManager(feature_states or [])
+        self.traits = DjangoTraitRelatedManager(traits or [])

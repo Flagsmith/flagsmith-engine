@@ -19,7 +19,7 @@ class Identity:
     id: int
     identifier: str
     environment_id: int
-    feature_states: typing.List[FeatureState] = field(default_factory=list)
+    identity_features: typing.List[FeatureState] = field(default_factory=list)
     traits: typing.List[Trait] = field(default_factory=list)
 
     def get_all_feature_states(
@@ -36,7 +36,7 @@ class Identity:
             if self.in_segment(segment_override.segment):
                 all_feature_states[feature] = feature_state
 
-        for feature_state in self.feature_states:
+        for feature_state in self.identity_features:
             if feature_state.feature in all_feature_states:
                 all_feature_states[feature_state.feature] = feature_state
 
