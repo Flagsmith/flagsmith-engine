@@ -3,9 +3,17 @@ from dataclasses import dataclass, field
 
 
 @dataclass
+class DjangoOrganisation:
+    stop_serving_flags: bool = False
+    persist_trait_data: bool = True
+    feature_analytics: bool = True
+
+
+@dataclass
 class DjangoProject:
     id: int
     name: str
+    organisation: DjangoOrganisation
 
 
 @dataclass

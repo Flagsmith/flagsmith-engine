@@ -57,7 +57,15 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
     environment_dict = {
         "id": 1,
         "api_key": "api-key",
-        "project": {"id": 1, "name": "test project"},
+        "project": {
+            "id": 1,
+            "name": "test project",
+            "organisation": {
+                "stop_serving_flags": False,
+                "persist_trait_data": True,
+                "feature_analytics": True,
+            },
+        },
         "feature_states": [
             {
                 "id": 1,

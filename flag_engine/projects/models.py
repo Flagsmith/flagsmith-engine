@@ -1,6 +1,7 @@
 import typing
 from dataclasses import dataclass, field
 
+from flag_engine.organisations.models import OrganisationModel
 from flag_engine.segments.models import SegmentModel
 
 
@@ -8,4 +9,5 @@ from flag_engine.segments.models import SegmentModel
 class ProjectModel:
     id: int
     name: str
+    organisation: OrganisationModel
     segments: typing.List[SegmentModel] = field(default_factory=list)
