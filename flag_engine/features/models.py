@@ -8,6 +8,7 @@ from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 class FeatureModel:
     id: int
     name: str
+    type: str
 
     def __eq__(self, other):
         return self.id == other.id
