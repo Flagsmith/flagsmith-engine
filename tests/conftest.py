@@ -4,6 +4,7 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import MULTIVARIATE, STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.organisations.models import OrganisationModel
 from flag_engine.projects.models import ProjectModel
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
@@ -18,6 +19,7 @@ from .mock_django_classes import (
     DjangoFeatureState,
     DjangoMultivariateFeatureOption,
     DjangoMultivariateFeatureStateValue,
+    DjangoOrganisation,
     DjangoProject,
     DjangoTrait,
 )
@@ -27,8 +29,13 @@ segment_condition_string_value = "bar"
 
 
 @pytest.fixture()
-def django_project():
-    return DjangoProject(1, "Test Project")
+def django_organisation():
+    return DjangoOrganisation()
+
+
+@pytest.fixture()
+def django_project(django_organisation):
+    return DjangoProject(1, "Test Project", organisation=django_organisation)
 
 
 @pytest.fixture()
@@ -131,8 +138,15 @@ def django_trait_boolean():
 
 
 @pytest.fixture()
-def project():
-    return ProjectModel(id=1, name="Test Project")
+def organisation():
+    return OrganisationModel(
+        stop_serving_flags=False, persist_trait_data=True, feature_analytics=True
+    )
+
+
+@pytest.fixture()
+def project(organisation):
+    return ProjectModel(id=1, name="Test Project", organisation=organisation)
 
 
 @pytest.fixture()
