@@ -1,11 +1,4 @@
-from marshmallow import (
-    Schema,
-    ValidationError,
-    fields,
-    post_load,
-    validate,
-    validates_schema,
-)
+from marshmallow import Schema, fields, post_load, validate
 
 from flag_engine.segments import constants
 from flag_engine.segments.models import SegmentModel
@@ -26,13 +19,6 @@ class SegmentRuleSchema(Schema):
     conditions = ListOrDjangoRelatedManagerField(
         fields.Nested(SegmentConditionSchema), required=False
     )
-
-    @validates_schema()
-    def validate_not_rules_and_conditions(self, data, **kwargs):
-        if data.get("rules") and data.get("conditions"):
-            raise ValidationError(
-                "Segment rule must not have both rules and conditions"
-            )
 
 
 class SegmentSchema(Schema):

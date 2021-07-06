@@ -1,5 +1,6 @@
 from flag_engine.environments.builders import build_environment_model
 from flag_engine.environments.models import EnvironmentModel
+from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureStateModel,
     MultivariateFeatureStateValueModel,
@@ -69,19 +70,23 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
                 "id": 1,
                 "enabled": True,
                 "value": None,
-                "feature": {"id": 1, "name": "enabled_feature"},
+                "feature": {"id": 1, "name": "enabled_feature", "type": STANDARD},
             },
             {
                 "id": 2,
                 "enabled": False,
                 "value": None,
-                "feature": {"id": 2, "name": "disabled_feature"},
+                "feature": {"id": 2, "name": "disabled_feature", "type": STANDARD},
             },
             {
                 "id": 3,
                 "enabled": True,
                 "value": string_value,
-                "feature": {"id": 3, "name": feature_with_string_value_name},
+                "feature": {
+                    "id": 3,
+                    "name": feature_with_string_value_name,
+                    "type": STANDARD,
+                },
             },
         ],
     }

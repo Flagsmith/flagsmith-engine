@@ -1,6 +1,7 @@
 import pytest
 
 from flag_engine.environments.models import EnvironmentModel
+from flag_engine.features.constants import MULTIVARIATE, STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.projects.models import ProjectModel
@@ -32,20 +33,27 @@ def django_project():
 
 @pytest.fixture()
 def django_enabled_feature_state(django_project):
-    feature = DjangoFeature(id=1, project=django_project, name="enabled_feature")
+    feature = DjangoFeature(
+        id=1, project=django_project, name="enabled_feature", type=STANDARD
+    )
     return DjangoFeatureState(id=1, feature=feature, enabled=True)
 
 
 @pytest.fixture()
 def django_disabled_feature_state(django_project):
-    feature = DjangoFeature(id=2, project=django_project, name="disabled_feature")
+    feature = DjangoFeature(
+        id=2, project=django_project, name="disabled_feature", type=STANDARD
+    )
     return DjangoFeatureState(id=2, feature=feature, enabled=False)
 
 
 @pytest.fixture()
 def django_feature_with_string_value(django_project):
     return DjangoFeature(
-        id=3, project=django_project, name="enabled_feature_with_string_value"
+        id=3,
+        project=django_project,
+        name="enabled_feature_with_string_value",
+        type=STANDARD,
     )
 
 
@@ -58,7 +66,9 @@ def django_enabled_feature_state_with_string_value(django_feature_with_string_va
 
 @pytest.fixture()
 def django_multivariate_feature_state(django_project):
-    feature = DjangoFeature(id=4, project=django_project, name="multivariate_feature")
+    feature = DjangoFeature(
+        id=4, project=django_project, name="multivariate_feature", type=MULTIVARIATE
+    )
     return DjangoFeatureState(
         id=4,
         feature=feature,
@@ -127,12 +137,12 @@ def project():
 
 @pytest.fixture()
 def feature_1():
-    return FeatureModel(id=1, name="feature_1")
+    return FeatureModel(id=1, name="feature_1", type=STANDARD)
 
 
 @pytest.fixture()
 def feature_2():
-    return FeatureModel(id=2, name="feature_2")
+    return FeatureModel(id=2, name="feature_2", type=STANDARD)
 
 
 @pytest.fixture()

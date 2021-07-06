@@ -74,7 +74,7 @@ segment_multiple_conditions_any = SegmentModel(
         )
     ],
 )
-segment_nested_rules_all = SegmentModel(
+segment_nested_rules = SegmentModel(
     id=5,
     name="segment_nested_rules_all",
     rules=[
@@ -110,21 +110,23 @@ segment_nested_rules_all = SegmentModel(
         )
     ],
 )
-segment_nested_rules_any = SegmentModel(
+segment_conditions_and_nested_rules = SegmentModel(
     id=6,
-    name="segment_nested_rules_all",
+    name="segment_multiple_conditions_all_and_nested_rules",
     rules=[
         SegmentRuleModel(
-            type=constants.ANY_RULE,
+            type=constants.ALL_RULE,
+            conditions=[
+                SegmentConditionModel(
+                    operator=constants.EQUAL,
+                    property_=trait_key_1,
+                    value=trait_value_1,
+                )
+            ],
             rules=[
                 SegmentRuleModel(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentConditionModel(
-                            operator=constants.EQUAL,
-                            property_=trait_key_1,
-                            value=trait_value_1,
-                        ),
                         SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_2,

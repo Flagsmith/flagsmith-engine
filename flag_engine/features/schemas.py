@@ -14,7 +14,7 @@ from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 class FeatureSchema(Schema):
     id = fields.Int()
     name = fields.Str()
-    type = fields.Str(required=False, allow_none=True)
+    type = fields.Str()
 
     @post_load()
     def make_feature(self, data, **kwargs) -> FeatureModel:

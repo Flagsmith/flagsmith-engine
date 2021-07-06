@@ -1,3 +1,4 @@
+from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_model
 from flag_engine.identities.models import IdentityModel, TraitModel
@@ -98,6 +99,7 @@ def test_build_identity_model_from_dictionary_with_feature_states(
                 "feature": {
                     "id": 1,
                     "name": "test_feature",
+                    "type": STANDARD,
                 },
                 "enabled": True,
                 "_value": "some-value",
