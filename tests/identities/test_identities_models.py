@@ -1,15 +1,16 @@
 import pytest
 
+from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.segments.models import SegmentOverrideModel
 from tests.helpers import get_environment_feature_state_for_feature
 from tests.identities.fixtures import (
     empty_segment,
+    segment_conditions_and_nested_rules,
     segment_multiple_conditions_all,
     segment_multiple_conditions_any,
-    segment_nested_rules_all,
-    segment_nested_rules_any,
+    segment_nested_rules,
     segment_single_condition,
     trait_key_1,
     trait_key_2,
@@ -24,7 +25,7 @@ def test_identity_get_all_feature_states_no_segments(
     feature_1, feature_2, environment, identity
 ):
     # Given
-    overridden_feature = FeatureModel(id=3, name="overridden_feature")
+    overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
 
     # set the state of the feature to False in the environment configuration
     environment.feature_states.append(
@@ -59,7 +60,7 @@ def test_identity_get_all_feature_states_segments_only(
 ):
     # Given
     # a feature which we can override
-    overridden_feature = FeatureModel(id=3, name="overridden_feature")
+    overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
 
     # which is given a default value of False in the environment configuration
     environment.feature_states.append(
@@ -139,14 +140,14 @@ def test_identity_get_all_feature_states_segments_only(
             ],
             True,
         ),
-        (segment_nested_rules_all, [], False),
+        (segment_nested_rules, [], False),
         (
-            segment_nested_rules_all,
+            segment_nested_rules,
             [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             False,
         ),
         (
-            segment_nested_rules_all,
+            segment_nested_rules,
             [
                 TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
                 TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
@@ -154,23 +155,19 @@ def test_identity_get_all_feature_states_segments_only(
             ],
             True,
         ),
-        (segment_nested_rules_any, [], False),
+        (segment_conditions_and_nested_rules, [], False),
         (
-            segment_nested_rules_any,
+            segment_conditions_and_nested_rules,
             [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             False,
         ),
         (
-            segment_nested_rules_any,
+            segment_conditions_and_nested_rules,
             [
                 TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
                 TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
+                TraitModel(trait_key=trait_key_3, trait_value=trait_value_3),
             ],
-            True,
-        ),
-        (
-            segment_nested_rules_any,
-            [TraitModel(trait_key=trait_key_3, trait_value=trait_value_3)],
             True,
         ),
     ),

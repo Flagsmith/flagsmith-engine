@@ -13,6 +13,7 @@ class DjangoFeature:
     id: int
     name: str
     project: DjangoProject
+    type: str
 
 
 @dataclass

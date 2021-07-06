@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 
+from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
@@ -40,7 +41,7 @@ def test_feature_state_get_value_mv_values(
 ):
     # Given
     # a feature
-    my_feature = FeatureModel(id=1, name="mv_feature")
+    my_feature = FeatureModel(id=1, name="mv_feature", type=STANDARD)
 
     # with some multivariate feature options
     mv_feature_option_1 = MultivariateFeatureOptionModel(value=mv_feature_value_1)

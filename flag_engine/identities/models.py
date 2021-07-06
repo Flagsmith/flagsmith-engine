@@ -50,19 +50,19 @@ class IdentityModel:
         )
 
     def _matches_segment_rule(self, rule: SegmentRuleModel, segment_id: int) -> bool:
-        if rule.rules:
-            return rule.matching_function(
+        matches_conditions = (
+            rule.matching_function(
                 [
-                    self._matches_segment_rule(nested, segment_id)
-                    for nested in rule.rules
+                    self._matches_segment_condition(condition, segment_id)
+                    for condition in rule.conditions
                 ]
             )
+            if len(rule.conditions) > 0
+            else True
+        )
 
-        return rule.matching_function(
-            [
-                self._matches_segment_condition(condition, segment_id)
-                for condition in rule.conditions
-            ]
+        return matches_conditions and all(
+            [self._matches_segment_rule(rule, segment_id) for rule in rule.rules]
         )
 
     def _matches_segment_condition(
