@@ -1,6 +1,8 @@
+import json
+
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
-from flag_engine.identities.builders import build_identity_model
+from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.models import IdentityModel, TraitModel
 from tests.mock_django_classes import DjangoIdentity
 
@@ -114,3 +116,12 @@ def test_build_identity_model_from_dictionary_with_feature_states(
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 1
     assert isinstance(identity_model.identity_features[0], FeatureStateModel)
+
+
+def test_build_identity_dict(django_identity):
+    # When
+    identity_dict = build_identity_dict(django_identity)
+
+    # Then
+    assert isinstance(identity_dict, dict)
+    assert json.dumps(identity_dict)

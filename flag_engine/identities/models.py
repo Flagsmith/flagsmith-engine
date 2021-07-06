@@ -1,3 +1,4 @@
+import datetime
 import typing
 from dataclasses import dataclass, field
 
@@ -23,8 +24,9 @@ class IdentityModel:
     id: int
     identifier: str
     environment_id: int
+    created_date: datetime
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
-    traits: typing.List[TraitModel] = field(default_factory=list)
+    identity_traits: typing.List[TraitModel] = field(default_factory=list)
 
     def get_all_feature_states(
         self, environment: EnvironmentModel
