@@ -31,9 +31,6 @@ class IdentityModel:
     ) -> typing.List[FeatureStateModel]:
         all_feature_states = {fs.feature: fs for fs in environment.feature_states}
 
-        # TODO:
-        #  - multivariate
-
         for segment_override in environment.segment_overrides:
             feature_state = segment_override.feature_state
             feature = feature_state.feature
