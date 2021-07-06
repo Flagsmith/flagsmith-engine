@@ -106,10 +106,10 @@ class DjangoIdentity:
         identifier: str,
         environment: DjangoEnvironment,
         feature_states: typing.List[DjangoFeatureState] = None,
-        traits: typing.List[DjangoTrait] = None,
+        identity_traits: typing.List[DjangoTrait] = None,
     ):
         self.id = id
         self.identifier = identifier
         self.environment = environment
         self.identity_features = DjangoFeatureStateRelatedManager(feature_states or [])
-        self.traits = DjangoTraitRelatedManager(traits or [])
+        self.identity_traits = DjangoTraitRelatedManager(identity_traits or [])

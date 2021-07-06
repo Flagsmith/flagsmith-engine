@@ -20,8 +20,9 @@ class IdentitySchema(Schema):
     id = fields.Int()
     identifier = fields.Str()
     created_date = fields.AwareDateTime()
-    environment_id = fields.Method(
-        serialize="serialize_environment_id", deserialize="deserialize_environment_id"
+    environment_api_key = fields.Method(
+        serialize="serialize_environment_api_key",
+        deserialize="deserialize_environment_api_key",
     )
     identity_traits = ListOrDjangoRelatedManagerField(
         fields.Nested(TraitSchema), required=False
@@ -34,11 +35,11 @@ class IdentitySchema(Schema):
     def make_identity(self, data, **kwargs):
         return IdentityModel(**data)
 
-    def serialize_environment_id(self, obj: typing.Any) -> int:
+    def serialize_environment_api_key(self, obj: typing.Any) -> int:
         if hasattr(obj, "environment"):
-            return obj.environment.id
+            return obj.environment.api_key
 
-        return getattr(obj, "environment_id", None) or obj["environment_id"]
+        return getattr(obj, "environment_api_key", None) or obj["environment_api_key"]
 
-    def deserialize_environment_id(self, environment_id: int) -> int:
-        return environment_id
+    def deserialize_environment_api_key(self, environment_api_key: int) -> int:
+        return environment_api_key

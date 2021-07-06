@@ -175,7 +175,10 @@ def test_identity_get_all_feature_states_segments_only(
 def test_identity_in_segment(segment, identity_traits, expected_in_segment):
     assert (
         IdentityModel(
-            id=1, identifier="identity", environment_id=1, traits=identity_traits
+            id=1,
+            identifier="identity",
+            environment_api_key="api-key",
+            identity_traits=identity_traits,
         ).in_segment(segment)
         == expected_in_segment
     )

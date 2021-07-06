@@ -23,8 +23,8 @@ class TraitModel:
 class IdentityModel:
     id: int
     identifier: str
-    environment_id: int
-    created_date: datetime
+    environment_api_key: str
+    created_date: datetime = field(default_factory=datetime.datetime.now)
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
 
@@ -79,6 +79,7 @@ class IdentityModel:
         # TODO: regex
 
         trait = next(
-            filter(lambda t: t.trait_key == condition.property_, self.traits), None
+            filter(lambda t: t.trait_key == condition.property_, self.identity_traits),
+            None,
         )
         return condition.matches_trait_value(trait.trait_value) if trait else False

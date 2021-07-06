@@ -160,7 +160,9 @@ def environment(feature_1, feature_2, project):
 
 @pytest.fixture()
 def identity(environment):
-    return IdentityModel(id=1, identifier="identity_1", environment_id=environment.id)
+    return IdentityModel(
+        id=1, identifier="identity_1", environment_api_key=environment.api_key
+    )
 
 
 @pytest.fixture()
@@ -194,6 +196,6 @@ def identity_in_segment(trait_matching_segment, environment):
     return IdentityModel(
         id=2,
         identifier="identity_2",
-        environment_id=environment.id,
-        traits=[trait_matching_segment],
+        environment_api_key=environment.api_key,
+        identity_traits=[trait_matching_segment],
     )

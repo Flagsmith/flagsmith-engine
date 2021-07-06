@@ -19,7 +19,7 @@ def test_build_identity_model_from_django_no_feature_states(
         id=1,
         identifier="test-identity",
         environment=django_environment,
-        traits=[
+        identity_traits=[
             django_trait_string,
             django_trait_float,
             django_trait_integer,
@@ -33,8 +33,10 @@ def test_build_identity_model_from_django_no_feature_states(
     # Then
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 0
-    assert len(identity_model.traits) == 4
-    assert all(isinstance(trait, TraitModel) for trait in identity_model.traits)
+    assert len(identity_model.identity_traits) == 4
+    assert all(
+        isinstance(trait, TraitModel) for trait in identity_model.identity_traits
+    )
 
 
 def test_build_identity_model_from_dictionary_no_feature_states(django_environment):
@@ -42,8 +44,8 @@ def test_build_identity_model_from_dictionary_no_feature_states(django_environme
     identity = {
         "id": 1,
         "identifier": "test-identity",
-        "environment_id": 1,
-        "traits": [{"trait_key": "trait_key", "trait_value": "trait_value"}],
+        "environment_api_key": django_environment.api_key,
+        "identity_traits": [{"trait_key": "trait_key", "trait_value": "trait_value"}],
     }
 
     # When
@@ -52,7 +54,7 @@ def test_build_identity_model_from_dictionary_no_feature_states(django_environme
     # Then
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 0
-    assert len(identity_model.traits) == 1
+    assert len(identity_model.identity_traits) == 1
 
 
 def test_build_identity_model_from_django_with_feature_states(
@@ -94,7 +96,7 @@ def test_build_identity_model_from_dictionary_with_feature_states(
     identity_dict = {
         "id": 1,
         "identifier": "test-identity",
-        "environment_id": 1,
+        "environment_api_key": django_environment.api_key,
         "identity_features": [
             {
                 "id": 1,
