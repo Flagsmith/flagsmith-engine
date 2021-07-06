@@ -1,30 +1,34 @@
 import typing
 from dataclasses import dataclass, field
 
-from flag_engine.environments.models import Environment
-from flag_engine.features.models import FeatureState
+from flag_engine.environments.models import EnvironmentModel
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
-from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
+from flag_engine.segments.models import (
+    SegmentConditionModel,
+    SegmentModel,
+    SegmentRuleModel,
+)
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
 @dataclass
-class Trait:
+class TraitModel:
     trait_key: str
     trait_value: typing.Any
 
 
 @dataclass
-class Identity:
+class IdentityModel:
     id: int
     identifier: str
     environment_id: int
-    identity_features: typing.List[FeatureState] = field(default_factory=list)
-    traits: typing.List[Trait] = field(default_factory=list)
+    identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
+    traits: typing.List[TraitModel] = field(default_factory=list)
 
     def get_all_feature_states(
-        self, environment: Environment
-    ) -> typing.List[FeatureState]:
+        self, environment: EnvironmentModel
+    ) -> typing.List[FeatureStateModel]:
         all_feature_states = {fs.feature: fs for fs in environment.feature_states}
 
         # TODO:
@@ -42,13 +46,13 @@ class Identity:
 
         return list(all_feature_states.values())
 
-    def in_segment(self, segment: Segment) -> bool:
+    def in_segment(self, segment: SegmentModel) -> bool:
         return len(segment.rules) > 0 and all(
             self._matches_segment_rule(rule=rule, segment_id=segment.id)
             for rule in segment.rules
         )
 
-    def _matches_segment_rule(self, rule: SegmentRule, segment_id: int) -> bool:
+    def _matches_segment_rule(self, rule: SegmentRuleModel, segment_id: int) -> bool:
         if rule.rules:
             return rule.matching_function(
                 [
@@ -65,7 +69,7 @@ class Identity:
         )
 
     def _matches_segment_condition(
-        self, condition: SegmentCondition, segment_id: int
+        self, condition: SegmentConditionModel, segment_id: int
     ) -> bool:
         if condition.operator == constants.PERCENTAGE_SPLIT:
             return (

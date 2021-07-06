@@ -1,12 +1,12 @@
 import typing
 from dataclasses import dataclass, field
 
-from flag_engine.features.models import FeatureState
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
 
 
 @dataclass
-class SegmentCondition:
+class SegmentConditionModel:
     operator: str
     value: typing.Any
     property_: str = None
@@ -36,10 +36,10 @@ class SegmentCondition:
 
 
 @dataclass
-class SegmentRule:
+class SegmentRuleModel:
     type: str
-    rules: typing.List["SegmentRule"] = field(default_factory=list)
-    conditions: typing.List[SegmentCondition] = field(default_factory=list)
+    rules: typing.List["SegmentRuleModel"] = field(default_factory=list)
+    conditions: typing.List[SegmentConditionModel] = field(default_factory=list)
 
     @staticmethod
     def none(iterable: typing.Iterable) -> bool:
@@ -50,18 +50,18 @@ class SegmentRule:
         return {
             constants.ANY_RULE: any,
             constants.ALL_RULE: all,
-            constants.NONE_RULE: SegmentRule.none,
+            constants.NONE_RULE: SegmentRuleModel.none,
         }.get(self.type)
 
 
 @dataclass
-class Segment:
+class SegmentModel:
     id: int
     name: str
-    rules: typing.List[SegmentRule] = field(default_factory=list)
+    rules: typing.List[SegmentRuleModel] = field(default_factory=list)
 
 
 @dataclass
-class SegmentOverride:
-    segment: Segment
-    feature_state: FeatureState
+class SegmentOverrideModel:
+    segment: SegmentModel
+    feature_state: FeatureStateModel

@@ -1,11 +1,15 @@
 import pytest
 
-from flag_engine.environments.models import Environment
-from flag_engine.features.models import Feature, FeatureState
-from flag_engine.identities.models import Identity, Trait
-from flag_engine.projects.models import Project
+from flag_engine.environments.models import EnvironmentModel
+from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.projects.models import ProjectModel
 from flag_engine.segments import constants
-from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
+from flag_engine.segments.models import (
+    SegmentConditionModel,
+    SegmentModel,
+    SegmentRuleModel,
+)
 
 from .mock_django_classes import (
     DjangoEnvironment,
@@ -118,40 +122,40 @@ def django_trait_boolean():
 
 @pytest.fixture()
 def project():
-    return Project(id=1, name="Test Project")
+    return ProjectModel(id=1, name="Test Project")
 
 
 @pytest.fixture()
 def feature_1():
-    return Feature(id=1, name="feature_1")
+    return FeatureModel(id=1, name="feature_1")
 
 
 @pytest.fixture()
 def feature_2():
-    return Feature(id=2, name="feature_2")
+    return FeatureModel(id=2, name="feature_2")
 
 
 @pytest.fixture()
 def environment(feature_1, feature_2, project):
-    return Environment(
+    return EnvironmentModel(
         id=1,
         api_key="api-key",
         project=project,
         feature_states=[
-            FeatureState(id=1, feature=feature_1, enabled=True),
-            FeatureState(id=2, feature=feature_2, enabled=False),
+            FeatureStateModel(id=1, feature=feature_1, enabled=True),
+            FeatureStateModel(id=2, feature=feature_2, enabled=False),
         ],
     )
 
 
 @pytest.fixture()
 def identity(environment):
-    return Identity(id=1, identifier="identity_1", environment_id=environment.id)
+    return IdentityModel(id=1, identifier="identity_1", environment_id=environment.id)
 
 
 @pytest.fixture()
 def segment_condition():
-    return SegmentCondition(
+    return SegmentConditionModel(
         operator=constants.EQUAL,
         property_=segment_condition_property,
         value=segment_condition_string_value,
@@ -160,24 +164,24 @@ def segment_condition():
 
 @pytest.fixture()
 def segment_rule(segment_condition):
-    return SegmentRule(type=constants.ALL_RULE, conditions=[segment_condition])
+    return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
 
 
 @pytest.fixture()
 def segment(segment_rule):
-    return Segment(id=1, name="my_segment", rules=[segment_rule])
+    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
 
 
 @pytest.fixture()
 def trait_matching_segment(segment_condition):
-    return Trait(
+    return TraitModel(
         trait_key=segment_condition.property_, trait_value=segment_condition.value
     )
 
 
 @pytest.fixture()
 def identity_in_segment(trait_matching_segment, environment):
-    return Identity(
+    return IdentityModel(
         id=2,
         identifier="identity_2",
         environment_id=environment.id,

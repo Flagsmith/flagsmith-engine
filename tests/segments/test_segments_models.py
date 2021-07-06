@@ -1,7 +1,7 @@
 import pytest
 
 from flag_engine.segments import constants
-from flag_engine.segments.models import SegmentCondition, SegmentRule
+from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
 
 
 @pytest.mark.parametrize(
@@ -61,7 +61,7 @@ def test_segment_condition_matches_trait_value(
     operator, trait_value, condition_value, expected_result
 ):
     assert (
-        SegmentCondition(
+        SegmentConditionModel(
             operator=operator, property_="foo", value=condition_value
         ).matches_trait_value(trait_value=trait_value)
         == expected_result
@@ -79,7 +79,7 @@ def test_segment_condition_matches_trait_value(
     ),
 )
 def test_segment_rule_none(iterable, expected_result):
-    assert SegmentRule.none(iterable) is expected_result
+    assert SegmentRuleModel.none(iterable) is expected_result
 
 
 @pytest.mark.parametrize(
@@ -87,8 +87,8 @@ def test_segment_rule_none(iterable, expected_result):
     (
         (constants.ALL_RULE, all),
         (constants.ANY_RULE, any),
-        (constants.NONE_RULE, SegmentRule.none),
+        (constants.NONE_RULE, SegmentRuleModel.none),
     ),
 )
 def test_segment_rule_matching_function(rule_type, expected_function):
-    assert SegmentRule(type=rule_type).matching_function == expected_function
+    assert SegmentRuleModel(type=rule_type).matching_function == expected_function

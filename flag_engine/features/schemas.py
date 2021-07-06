@@ -3,10 +3,10 @@ import typing
 from marshmallow import Schema, fields, post_load, validate
 
 from flag_engine.features.models import (
-    Feature,
-    FeatureState,
-    MultivariateFeatureOption,
-    MultivariateFeatureStateValue,
+    FeatureModel,
+    FeatureStateModel,
+    MultivariateFeatureOptionModel,
+    MultivariateFeatureStateValueModel,
 )
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
@@ -17,8 +17,8 @@ class FeatureSchema(Schema):
     type = fields.Str(required=False, allow_none=True)
 
     @post_load()
-    def make_feature(self, data, **kwargs) -> Feature:
-        return Feature(**data)
+    def make_feature(self, data, **kwargs) -> FeatureModel:
+        return FeatureModel(**data)
 
 
 class MultivariateFeatureOptionSchema(Schema):
@@ -27,8 +27,8 @@ class MultivariateFeatureOptionSchema(Schema):
     @post_load()
     def make_multivariate_feature_option(
         self, data, **kwargs
-    ) -> MultivariateFeatureOption:
-        return MultivariateFeatureOption(**data)
+    ) -> MultivariateFeatureOptionModel:
+        return MultivariateFeatureOptionModel(**data)
 
 
 class MultivariateFeatureStateValueSchema(Schema):
@@ -39,8 +39,8 @@ class MultivariateFeatureStateValueSchema(Schema):
     @post_load()
     def make_multivariate_feature_state_value(
         self, data, **kwargs
-    ) -> MultivariateFeatureStateValue:
-        return MultivariateFeatureStateValue(**data)
+    ) -> MultivariateFeatureStateValueModel:
+        return MultivariateFeatureStateValueModel(**data)
 
 
 class FeatureStateSchema(Schema):
@@ -58,9 +58,9 @@ class FeatureStateSchema(Schema):
     )
 
     @post_load()
-    def make_feature_state(self, data, **kwargs) -> FeatureState:
+    def make_feature_state(self, data, **kwargs) -> FeatureStateModel:
         value = data.pop("value", None)
-        feature_state = FeatureState(**data)
+        feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
 

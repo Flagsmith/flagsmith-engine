@@ -8,7 +8,7 @@ from marshmallow import (
 )
 
 from flag_engine.segments import constants
-from flag_engine.segments.models import Segment
+from flag_engine.segments.models import SegmentModel
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
 
@@ -42,4 +42,4 @@ class SegmentSchema(Schema):
 
     @post_load()
     def make_segment(self, data, **kwargs):
-        return Segment(**data)
+        return SegmentModel(**data)

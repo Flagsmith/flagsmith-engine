@@ -1,8 +1,8 @@
 import pytest
 
-from flag_engine.features.models import Feature, FeatureState
-from flag_engine.identities.models import Identity, Trait
-from flag_engine.segments.models import SegmentOverride
+from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.segments.models import SegmentOverrideModel
 from tests.helpers import get_environment_feature_state_for_feature
 from tests.identities.fixtures import (
     empty_segment,
@@ -24,16 +24,16 @@ def test_identity_get_all_feature_states_no_segments(
     feature_1, feature_2, environment, identity
 ):
     # Given
-    overridden_feature = Feature(id=3, name="overridden_feature")
+    overridden_feature = FeatureModel(id=3, name="overridden_feature")
 
     # set the state of the feature to False in the environment configuration
     environment.feature_states.append(
-        FeatureState(id=3, feature=overridden_feature, enabled=False)
+        FeatureStateModel(id=3, feature=overridden_feature, enabled=False)
     )
 
     # but True for the identity
     identity.identity_features = [
-        FeatureState(id=4, feature=overridden_feature, enabled=True)
+        FeatureStateModel(id=4, feature=overridden_feature, enabled=True)
     ]
 
     # When
@@ -59,18 +59,20 @@ def test_identity_get_all_feature_states_segments_only(
 ):
     # Given
     # a feature which we can override
-    overridden_feature = Feature(id=3, name="overridden_feature")
+    overridden_feature = FeatureModel(id=3, name="overridden_feature")
 
     # which is given a default value of False in the environment configuration
     environment.feature_states.append(
-        FeatureState(id=3, feature=overridden_feature, enabled=False)
+        FeatureStateModel(id=3, feature=overridden_feature, enabled=False)
     )
 
     # but overridden to True for identities in the segment
     environment.segment_overrides.append(
-        SegmentOverride(
+        SegmentOverrideModel(
             segment=segment,
-            feature_state=FeatureState(id=4, feature=overridden_feature, enabled=True),
+            feature_state=FeatureStateModel(
+                id=4, feature=overridden_feature, enabled=True
+            ),
         )
     )
 
@@ -101,81 +103,81 @@ def test_identity_get_all_feature_states_segments_only(
         (segment_single_condition, [], False),
         (
             segment_single_condition,
-            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             True,
         ),
         (segment_multiple_conditions_all, [], False),
         (
             segment_multiple_conditions_all,
-            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             False,
         ),
         (
             segment_multiple_conditions_all,
             [
-                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
-                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
+                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
             ],
             True,
         ),
         (segment_multiple_conditions_any, [], False),
         (
             segment_multiple_conditions_any,
-            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             True,
         ),
         (
             segment_multiple_conditions_any,
-            [Trait(trait_key=trait_key_2, trait_value=trait_value_2)],
+            [TraitModel(trait_key=trait_key_2, trait_value=trait_value_2)],
             True,
         ),
         (
             segment_multiple_conditions_any,
             [
-                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
-                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
+                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
             ],
             True,
         ),
         (segment_nested_rules_all, [], False),
         (
             segment_nested_rules_all,
-            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             False,
         ),
         (
             segment_nested_rules_all,
             [
-                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
-                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
-                Trait(trait_key=trait_key_3, trait_value=trait_value_3),
+                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
+                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
+                TraitModel(trait_key=trait_key_3, trait_value=trait_value_3),
             ],
             True,
         ),
         (segment_nested_rules_any, [], False),
         (
             segment_nested_rules_any,
-            [Trait(trait_key=trait_key_1, trait_value=trait_value_1)],
+            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
             False,
         ),
         (
             segment_nested_rules_any,
             [
-                Trait(trait_key=trait_key_1, trait_value=trait_value_1),
-                Trait(trait_key=trait_key_2, trait_value=trait_value_2),
+                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
+                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
             ],
             True,
         ),
         (
             segment_nested_rules_any,
-            [Trait(trait_key=trait_key_3, trait_value=trait_value_3)],
+            [TraitModel(trait_key=trait_key_3, trait_value=trait_value_3)],
             True,
         ),
     ),
 )
 def test_identity_in_segment(segment, identity_traits, expected_in_segment):
     assert (
-        Identity(
+        IdentityModel(
             id=1, identifier="identity", environment_id=1, traits=identity_traits
         ).in_segment(segment)
         == expected_in_segment

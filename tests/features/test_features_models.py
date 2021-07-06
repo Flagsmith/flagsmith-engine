@@ -3,17 +3,17 @@ from unittest import mock
 import pytest
 
 from flag_engine.features.models import (
-    Feature,
-    FeatureState,
-    MultivariateFeatureOption,
-    MultivariateFeatureStateValue,
+    FeatureModel,
+    FeatureStateModel,
+    MultivariateFeatureOptionModel,
+    MultivariateFeatureStateValueModel,
 )
 
 
 def test_feature_state_get_value_no_mv_values(feature_1):
     # Given
     value = "foo"
-    feature_state = FeatureState(id=1, feature=feature_1, enabled=True)
+    feature_state = FeatureStateModel(id=1, feature=feature_1, enabled=True)
     feature_state.set_value(value)
 
     # Then
@@ -40,22 +40,22 @@ def test_feature_state_get_value_mv_values(
 ):
     # Given
     # a feature
-    my_feature = Feature(id=1, name="mv_feature")
+    my_feature = FeatureModel(id=1, name="mv_feature")
 
     # with some multivariate feature options
-    mv_feature_option_1 = MultivariateFeatureOption(value=mv_feature_value_1)
-    mv_feature_option_2 = MultivariateFeatureOption(value=mv_feature_value_2)
+    mv_feature_option_1 = MultivariateFeatureOptionModel(value=mv_feature_value_1)
+    mv_feature_option_2 = MultivariateFeatureOptionModel(value=mv_feature_value_2)
 
     # and associated values
-    mv_feature_state_value_1 = MultivariateFeatureStateValue(
+    mv_feature_state_value_1 = MultivariateFeatureStateValueModel(
         id=1, multivariate_feature_option=mv_feature_option_1, percentage_allocation=30
     )
-    mv_feature_state_value_2 = MultivariateFeatureStateValue(
+    mv_feature_state_value_2 = MultivariateFeatureStateValueModel(
         id=2, multivariate_feature_option=mv_feature_option_2, percentage_allocation=30
     )
 
     # and we assign the above to a feature state
-    mv_feature_state = FeatureState(
+    mv_feature_state = FeatureStateModel(
         id=1,
         feature=my_feature,
         enabled=True,

@@ -1,5 +1,9 @@
 from flag_engine.segments import constants
-from flag_engine.segments.models import Segment, SegmentCondition, SegmentRule
+from flag_engine.segments.models import (
+    SegmentConditionModel,
+    SegmentModel,
+    SegmentRuleModel,
+)
 
 trait_key_1 = "email"
 trait_value_1 = "user@example.com"
@@ -11,15 +15,15 @@ trait_key_3 = "date_joined"
 trait_value_3 = "2021-01-01"
 
 
-empty_segment = Segment(id=1, name="empty_segment")
-segment_single_condition = Segment(
+empty_segment = SegmentModel(id=1, name="empty_segment")
+segment_single_condition = SegmentModel(
     id=2,
     name="segment_one_condition",
     rules=[
-        SegmentRule(
+        SegmentRuleModel(
             type=constants.ALL_RULE,
             conditions=[
-                SegmentCondition(
+                SegmentConditionModel(
                     operator=constants.EQUAL,
                     property_=trait_key_1,
                     value=trait_value_1,
@@ -28,19 +32,19 @@ segment_single_condition = Segment(
         )
     ],
 )
-segment_multiple_conditions_all = Segment(
+segment_multiple_conditions_all = SegmentModel(
     id=3,
     name="segment_multiple_conditions_all",
     rules=[
-        SegmentRule(
+        SegmentRuleModel(
             type=constants.ALL_RULE,
             conditions=[
-                SegmentCondition(
+                SegmentConditionModel(
                     operator=constants.EQUAL,
                     property_=trait_key_1,
                     value=trait_value_1,
                 ),
-                SegmentCondition(
+                SegmentConditionModel(
                     operator=constants.EQUAL,
                     property_=trait_key_2,
                     value=trait_value_2,
@@ -49,19 +53,19 @@ segment_multiple_conditions_all = Segment(
         )
     ],
 )
-segment_multiple_conditions_any = Segment(
+segment_multiple_conditions_any = SegmentModel(
     id=4,
     name="segment_multiple_conditions_all",
     rules=[
-        SegmentRule(
+        SegmentRuleModel(
             type=constants.ANY_RULE,
             conditions=[
-                SegmentCondition(
+                SegmentConditionModel(
                     operator=constants.EQUAL,
                     property_=trait_key_1,
                     value=trait_value_1,
                 ),
-                SegmentCondition(
+                SegmentConditionModel(
                     operator=constants.EQUAL,
                     property_=trait_key_2,
                     value=trait_value_2,
@@ -70,32 +74,32 @@ segment_multiple_conditions_any = Segment(
         )
     ],
 )
-segment_nested_rules_all = Segment(
+segment_nested_rules_all = SegmentModel(
     id=5,
     name="segment_nested_rules_all",
     rules=[
-        SegmentRule(
+        SegmentRuleModel(
             type=constants.ALL_RULE,
             rules=[
-                SegmentRule(
+                SegmentRuleModel(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_1,
                             value=trait_value_1,
                         ),
-                        SegmentCondition(
+                        SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_2,
                             value=trait_value_2,
                         ),
                     ],
                 ),
-                SegmentRule(
+                SegmentRuleModel(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_3,
                             value=trait_value_3,
@@ -106,32 +110,32 @@ segment_nested_rules_all = Segment(
         )
     ],
 )
-segment_nested_rules_any = Segment(
+segment_nested_rules_any = SegmentModel(
     id=6,
     name="segment_nested_rules_all",
     rules=[
-        SegmentRule(
+        SegmentRuleModel(
             type=constants.ANY_RULE,
             rules=[
-                SegmentRule(
+                SegmentRuleModel(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_1,
                             value=trait_value_1,
                         ),
-                        SegmentCondition(
+                        SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_2,
                             value=trait_value_2,
                         ),
                     ],
                 ),
-                SegmentRule(
+                SegmentRuleModel(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        SegmentConditionModel(
                             operator=constants.EQUAL,
                             property_=trait_key_3,
                             value=trait_value_3,

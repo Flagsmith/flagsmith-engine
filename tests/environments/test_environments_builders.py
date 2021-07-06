@@ -1,6 +1,9 @@
 from flag_engine.environments.builders import build_environment_model
-from flag_engine.environments.models import Environment
-from flag_engine.features.models import FeatureState, MultivariateFeatureStateValue
+from flag_engine.environments.models import EnvironmentModel
+from flag_engine.features.models import (
+    FeatureStateModel,
+    MultivariateFeatureStateValueModel,
+)
 from tests.helpers import (
     get_environment_feature_state_for_feature,
     get_environment_feature_state_for_feature_by_name,
@@ -33,11 +36,11 @@ def test_get_flags_for_environment_returns_feature_states_for_django_environment
 
     # Then
     # the returned object is an Environment object
-    assert isinstance(environment_model, Environment)
+    assert isinstance(environment_model, EnvironmentModel)
 
     # and each of the feature states are FeatureState objects
     assert len(environment_model.feature_states) == 3 and all(
-        isinstance(feature_state, FeatureState)
+        isinstance(feature_state, FeatureStateModel)
         for feature_state in environment_model.feature_states
     )
 
@@ -89,11 +92,11 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
 
     # Then
     # the returned object is an Environment object
-    assert isinstance(environment_model, Environment)
+    assert isinstance(environment_model, EnvironmentModel)
 
     # and each of the feature states are FeatureState objects
     assert len(environment_model.feature_states) == 3 and all(
-        isinstance(feature_state, FeatureState)
+        isinstance(feature_state, FeatureStateModel)
         for feature_state in environment_model.feature_states
     )
 
@@ -119,12 +122,12 @@ def test_build_environment_model_with_multivariate_flag(
     environment_model = build_environment_model(django_environment)
 
     # Then
-    assert isinstance(environment_model, Environment)
+    assert isinstance(environment_model, EnvironmentModel)
     assert len(environment_model.feature_states) == 1
 
     fs = environment_model.feature_states[0]
     assert len(fs.multivariate_feature_state_values) == 2
     assert all(
-        isinstance(mvfs, MultivariateFeatureStateValue)
+        isinstance(mvfs, MultivariateFeatureStateValueModel)
         for mvfs in fs.multivariate_feature_state_values
     )

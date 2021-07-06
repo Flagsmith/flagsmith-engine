@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, post_load
 
-from flag_engine.environments.models import Environment
+from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.projects.schemas import ProjectSchema
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
@@ -13,5 +13,5 @@ class EnvironmentSchema(Schema):
     project = fields.Nested(ProjectSchema)
 
     @post_load()
-    def make_environment(self, data: dict, **kwargs) -> Environment:
-        return Environment(**data)
+    def make_environment(self, data: dict, **kwargs) -> EnvironmentModel:
+        return EnvironmentModel(**data)

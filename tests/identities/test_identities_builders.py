@@ -1,6 +1,6 @@
-from flag_engine.features.models import FeatureState
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_model
-from flag_engine.identities.models import Identity, Trait
+from flag_engine.identities.models import IdentityModel, TraitModel
 from tests.mock_django_classes import DjangoIdentity
 
 
@@ -28,10 +28,10 @@ def test_build_identity_model_from_django_no_feature_states(
     identity_model = build_identity_model(django_identity)
 
     # Then
-    assert isinstance(identity_model, Identity)
+    assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 0
     assert len(identity_model.traits) == 4
-    assert all(isinstance(trait, Trait) for trait in identity_model.traits)
+    assert all(isinstance(trait, TraitModel) for trait in identity_model.traits)
 
 
 def test_build_identity_model_from_dictionary_no_feature_states(django_environment):
@@ -47,7 +47,7 @@ def test_build_identity_model_from_dictionary_no_feature_states(django_environme
     identity_model = build_identity_model(identity)
 
     # Then
-    assert isinstance(identity_model, Identity)
+    assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 0
     assert len(identity_model.traits) == 1
 
@@ -74,9 +74,11 @@ def test_build_identity_model_from_django_with_feature_states(
     identity_model = build_identity_model(django_identity)
 
     # Then
-    assert isinstance(identity_model, Identity)
+    assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 3
-    assert all(isinstance(fs, FeatureState) for fs in identity_model.identity_features)
+    assert all(
+        isinstance(fs, FeatureStateModel) for fs in identity_model.identity_features
+    )
 
 
 def test_build_identity_model_from_dictionary_with_feature_states(
@@ -107,6 +109,6 @@ def test_build_identity_model_from_dictionary_with_feature_states(
     identity_model = build_identity_model(identity_dict)
 
     # Then
-    assert isinstance(identity_model, Identity)
+    assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 1
-    assert isinstance(identity_model.identity_features[0], FeatureState)
+    assert isinstance(identity_model.identity_features[0], FeatureStateModel)

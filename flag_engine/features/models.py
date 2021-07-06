@@ -5,7 +5,7 @@ from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
 @dataclass
-class Feature:
+class FeatureModel:
     id: int
     name: str
 
@@ -17,25 +17,25 @@ class Feature:
 
 
 @dataclass
-class MultivariateFeatureOption:
+class MultivariateFeatureOptionModel:
     value: typing.Any
 
 
 @dataclass
-class MultivariateFeatureStateValue:
+class MultivariateFeatureStateValueModel:
     id: int
-    multivariate_feature_option: MultivariateFeatureOption
+    multivariate_feature_option: MultivariateFeatureOptionModel
     percentage_allocation: float
 
 
 @dataclass
-class FeatureState:
+class FeatureStateModel:
     id: int
-    feature: Feature
+    feature: FeatureModel
     enabled: bool
     _value: typing.Any = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[
-        MultivariateFeatureStateValue
+        MultivariateFeatureStateValueModel
     ] = field(default_factory=list)
 
     def set_value(self, value: typing.Any):

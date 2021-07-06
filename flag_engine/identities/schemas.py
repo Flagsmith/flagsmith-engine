@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, post_load
 
 from flag_engine.features.schemas import FeatureStateSchema
-from flag_engine.identities.models import Identity, Trait
+from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
 
@@ -11,7 +11,7 @@ class TraitSchema(Schema):
 
     @post_load
     def make_trait(self, data, **kwargs):
-        return Trait(**data)
+        return TraitModel(**data)
 
 
 class IdentitySchema(Schema):
@@ -28,7 +28,7 @@ class IdentitySchema(Schema):
 
     @post_load
     def make_identity(self, data, **kwargs):
-        return Identity(**data)
+        return IdentityModel(**data)
 
     def serialize_environment_id(self, obj: object) -> int:
         if isinstance(obj, dict):
