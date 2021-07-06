@@ -65,6 +65,7 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
                 "persist_trait_data": True,
                 "feature_analytics": True,
             },
+            "hide_disabled_flags": False,
         },
         "feature_states": [
             {

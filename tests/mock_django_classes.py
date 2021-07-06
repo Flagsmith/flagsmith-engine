@@ -14,6 +14,7 @@ class DjangoProject:
     id: int
     name: str
     organisation: DjangoOrganisation
+    hide_disabled_flags: bool = False
 
 
 @dataclass

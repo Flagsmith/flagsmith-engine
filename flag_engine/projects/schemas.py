@@ -13,6 +13,7 @@ class ProjectSchema(Schema):
         fields.Nested(SegmentSchema), required=False
     )
     organisation = fields.Nested(OrganisationSchema)
+    hide_disabled_flags = fields.Bool()
 
     @post_load()
     def make_project(self, data, **kwargs) -> ProjectModel:

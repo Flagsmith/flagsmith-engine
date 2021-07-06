@@ -146,7 +146,9 @@ def organisation():
 
 @pytest.fixture()
 def project(organisation):
-    return ProjectModel(id=1, name="Test Project", organisation=organisation)
+    return ProjectModel(
+        id=1, name="Test Project", organisation=organisation, hide_disabled_flags=False
+    )
 
 
 @pytest.fixture()

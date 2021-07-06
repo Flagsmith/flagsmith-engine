@@ -10,4 +10,5 @@ class ProjectModel:
     id: int
     name: str
     organisation: OrganisationModel
+    hide_disabled_flags: bool
     segments: typing.List[SegmentModel] = field(default_factory=list)
