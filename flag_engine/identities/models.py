@@ -74,6 +74,8 @@ class IdentityModel:
                 <= condition.value
             )
 
+        # TODO: regex
+
         trait = next(
             filter(lambda t: t.trait_key == condition.property_, self.traits), None
         )
