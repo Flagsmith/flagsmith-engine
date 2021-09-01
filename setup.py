@@ -10,5 +10,7 @@ setup(
     license="LICENSE.txt",
     description="Flag engine for the Flagsmith API.",
     long_description=open("README.md").read(),
-    install_requires=["marshmallow", "dataclasses"],
+    install_requires=[
+        "marshmallow",
+    ],
 )
