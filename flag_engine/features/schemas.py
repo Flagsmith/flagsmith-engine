@@ -68,6 +68,9 @@ class FeatureStateSchema(Schema):
         if isinstance(instance, dict) and "value" in instance:
             return instance["value"]
 
+        if isinstance(instance, FeatureStateModel):
+            return instance.get_value()
+
         getter = getattr(instance, "get_feature_state_value", lambda *args: None)
         return getter()
 
