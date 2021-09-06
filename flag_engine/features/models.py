@@ -47,6 +47,10 @@ class FeatureStateModel:
             return self._get_multivariate_value(identity_id)
         return self._value
 
+    def get_feature_state_value(self):
+        """Mimick django method name to simplify serialization logic"""
+        return self.get_value()
+
     def _get_multivariate_value(self, identity_id: int) -> typing.Any:
         percentage_value = get_hashed_percentage_for_object_ids([self.id, identity_id])
 
