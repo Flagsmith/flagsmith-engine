@@ -29,7 +29,7 @@ class IdentityModel:
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
 
     @property
-    def pk(self):
+    def composite_key(self):
         return f"{self.environment_api_key}_{self.identifier}"
 
     def get_all_feature_states(
