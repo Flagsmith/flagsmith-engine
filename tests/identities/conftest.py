@@ -1,5 +1,5 @@
 import pytest
-
+from datetime import datetime
 from tests.mock_django_classes import DjangoIdentity
 
 
@@ -14,6 +14,7 @@ def django_identity(
     return DjangoIdentity(
         id=1,
         identifier="test-identity",
+        created_date=datetime.now(),
         environment=django_environment,
         feature_states=[
             django_enabled_feature_state,

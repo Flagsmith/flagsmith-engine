@@ -61,6 +61,8 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
             "id": 1,
             "name": "test project",
             "organisation": {
+                "id": 1,
+                "name": "Test Org",
                 "stop_serving_flags": False,
                 "persist_trait_data": True,
                 "feature_analytics": True,

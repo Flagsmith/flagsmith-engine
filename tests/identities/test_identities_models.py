@@ -55,6 +55,13 @@ def test_identity_get_all_feature_states_no_segments(
         assert feature_state.enabled is expected
 
 
+def test_identity_composite_key(identity):
+    assert (
+        identity.composite_key
+        == f"{identity.environment_api_key}_{identity.identifier}"
+    )
+
+
 def test_identity_get_all_feature_states_segments_only(
     feature_1, feature_2, environment, segment, identity_in_segment
 ):
