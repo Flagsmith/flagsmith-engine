@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
@@ -18,6 +18,7 @@ def test_build_identity_model_from_django_no_feature_states(
     django_identity = DjangoIdentity(
         id=1,
         identifier="test-identity",
+        created_date=datetime.now(),
         environment=django_environment,
         identity_traits=[
             django_trait_string,
@@ -45,6 +46,7 @@ def test_build_identity_model_from_dictionary_no_feature_states(django_environme
         "id": 1,
         "identifier": "test-identity",
         "environment_api_key": django_environment.api_key,
+        "created_date": "2021-08-22T06:25:23.406995Z",
         "identity_traits": [{"trait_key": "trait_key", "trait_value": "trait_value"}],
     }
 
@@ -66,6 +68,7 @@ def test_build_identity_model_from_django_with_feature_states(
     # Given
     django_identity = DjangoIdentity(
         id=1,
+        created_date=datetime.now(),
         identifier="test-identity",
         environment=django_environment,
         feature_states=[
@@ -97,6 +100,7 @@ def test_build_identity_model_from_dictionary_with_feature_states(
         "id": 1,
         "identifier": "test-identity",
         "environment_api_key": django_environment.api_key,
+        "created_date": "2021-08-22T06:25:23.406995Z",
         "identity_features": [
             {
                 "id": 1,

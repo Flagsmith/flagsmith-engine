@@ -28,6 +28,10 @@ class IdentityModel:
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
 
+    @property
+    def composite_key(self):
+        return f"{self.environment_api_key}_{self.identifier}"
+
     def get_all_feature_states(
         self, environment: EnvironmentModel
     ) -> typing.List[FeatureStateModel]:

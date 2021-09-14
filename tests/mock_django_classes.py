@@ -1,9 +1,12 @@
 import typing
 from dataclasses import dataclass, field
+from datetime import datetime
 
 
 @dataclass
 class DjangoOrganisation:
+    id: int
+    name: str
     stop_serving_flags: bool = False
     persist_trait_data: bool = True
     feature_analytics: bool = True
@@ -113,12 +116,14 @@ class DjangoIdentity:
         self,
         id: int,
         identifier: str,
+        created_date: datetime,
         environment: DjangoEnvironment,
         feature_states: typing.List[DjangoFeatureState] = None,
         identity_traits: typing.List[DjangoTrait] = None,
     ):
         self.id = id
         self.identifier = identifier
+        self.created_date = created_date
         self.environment = environment
         self.identity_features = DjangoFeatureStateRelatedManager(feature_states or [])
         self.identity_traits = DjangoTraitRelatedManager(identity_traits or [])

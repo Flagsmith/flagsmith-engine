@@ -1,5 +1,5 @@
 import pytest
-
+from datetime import datetime
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import MULTIVARIATE, STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
@@ -30,7 +30,7 @@ segment_condition_string_value = "bar"
 
 @pytest.fixture()
 def django_organisation():
-    return DjangoOrganisation()
+    return DjangoOrganisation(id=1, name="Test Org")
 
 
 @pytest.fixture()
@@ -140,7 +140,11 @@ def django_trait_boolean():
 @pytest.fixture()
 def organisation():
     return OrganisationModel(
-        stop_serving_flags=False, persist_trait_data=True, feature_analytics=True
+        id=1,
+        name="test Org",
+        stop_serving_flags=False,
+        persist_trait_data=True,
+        feature_analytics=True,
     )
 
 
@@ -177,7 +181,10 @@ def environment(feature_1, feature_2, project):
 @pytest.fixture()
 def identity(environment):
     return IdentityModel(
-        id=1, identifier="identity_1", environment_api_key=environment.api_key
+        id=1,
+        identifier="identity_1",
+        environment_api_key=environment.api_key,
+        created_date=datetime.now(),
     )
 
 
