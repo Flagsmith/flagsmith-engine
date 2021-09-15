@@ -1,6 +1,6 @@
 import typing
 
-from marshmallow import Schema, fields, post_load, utils
+from marshmallow import Schema, fields, post_load, utils, post_dump, EXCLUDE
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
@@ -19,6 +19,7 @@ class TraitSchema(Schema):
 class IdentitySchema(Schema):
     id = fields.Int()
     identifier = fields.Str()
+    composite_key = fields.Str(dump_only=True)
     created_date = fields.Method(
         serialize="serialize_created_date",
         deserialize="deserialize_created_date",
@@ -34,9 +35,18 @@ class IdentitySchema(Schema):
         fields.Nested(FeatureStateSchema), required=False
     )
 
+    class Meta:
+        # to exclude dump only fields, e.g: composite_key
+        unknown = EXCLUDE
+
     @post_load
     def make_identity(self, data, **kwargs):
         return IdentityModel(**data)
+
+    @post_dump
+    def generate_composite_key(self, data, **kwargs):
+        data["composite_key"] = f"{data['environment_api_key']}_{data['identifier']}"
+        return data
 
     def serialize_environment_api_key(self, obj: typing.Any) -> int:
         if hasattr(obj, "environment"):
