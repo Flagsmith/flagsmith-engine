@@ -127,7 +127,10 @@ def test_build_identity_model_from_dictionary_with_feature_states(
 def test_build_identity_dict(django_identity):
     # When
     identity_dict = build_identity_dict(django_identity)
-
     # Then
+    assert (
+        identity_dict["composite_key"]
+        == f"{django_identity.environment.api_key}_{django_identity.identifier}"
+    )
     assert isinstance(identity_dict, dict)
     assert json.dumps(identity_dict)
