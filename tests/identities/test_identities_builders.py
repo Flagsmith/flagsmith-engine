@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from unittest import mock
 
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
@@ -66,6 +67,7 @@ def test_build_identity_model_from_django_with_feature_states(
     django_enabled_feature_state,
     django_enabled_feature_state_with_string_value,
     django_multivariate_feature_state,
+    django_feature_state_with_identity_override,
 ):
     # Given
     django_identity = DjangoIdentity(
@@ -77,6 +79,7 @@ def test_build_identity_model_from_django_with_feature_states(
             django_enabled_feature_state,
             django_enabled_feature_state_with_string_value,
             django_multivariate_feature_state,
+            django_feature_state_with_identity_override,
         ],
     )
 
@@ -85,10 +88,32 @@ def test_build_identity_model_from_django_with_feature_states(
 
     # Then
     assert isinstance(identity_model, IdentityModel)
-    assert len(identity_model.identity_features) == 3
     assert all(
         isinstance(fs, FeatureStateModel) for fs in identity_model.identity_features
     )
+
+
+def test_identity_feature_states_are_filtered_correctly():
+    # Given
+    mock_feature_states = mock.MagicMock(spec=["filter"])
+    mock_feature_states.filter.return_value = []
+
+    mock_identity = mock.MagicMock(
+        identity_features=mock_feature_states,
+        created_date=datetime.now(),
+        spec=[
+            "id",
+            "identifier",
+            "environment",
+            "identity_features",
+            "identity_traits",
+        ],
+    )
+
+    build_identity_model(mock_identity)
+    mock_feature_states.filter.assert_called()
+
+    # Given
 
 
 def test_build_identity_model_from_dictionary_with_feature_states(

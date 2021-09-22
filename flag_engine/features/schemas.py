@@ -15,7 +15,7 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 class FeatureSchema(LoadToModelSchema):
     id = fields.Int()
     name = fields.Str()
-    type = fields.Str()
+    type = fields.Str(allow_none=True)
 
     class Meta:
         model_class = FeatureModel
@@ -41,7 +41,13 @@ class FeatureStateSchema(Schema):
     id = fields.Int()
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
-    value = fields.Method(
+    segment_id = fields.Method(
+        "serialize_segment_id",
+        deserialize="deserialize_segment_id",
+        allow_none=True,
+        required=False,
+    )
+    feature_state_value = fields.Method(
         serialize="serialize_value",
         deserialize="deserialize_value",
         allow_none=True,
@@ -53,14 +59,23 @@ class FeatureStateSchema(Schema):
 
     @post_load()
     def make_feature_state(self, data, **kwargs) -> FeatureStateModel:
-        value = data.pop("value", None)
+        value = data.pop("feature_state_value", None)
         feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
 
+    def deserialize_segment_id(self, value):
+        return int(value)
+
+    def serialize_segment_id(self, obj):
+        if isinstance(obj, dict):
+            return obj.get("segment_id", None)
+        if features_segment := getattr(obj, "feature_segment", None):
+            return features_segment.segment_id
+
     def serialize_value(self, instance: object) -> typing.Any:
-        if isinstance(instance, dict) and "value" in instance:
-            return instance["value"]
+        if isinstance(instance, dict) and "feature_state_value" in instance:
+            return instance["feature_state_value"]
 
         getter = getattr(instance, "get_feature_state_value", lambda *args: None)
         return getter()

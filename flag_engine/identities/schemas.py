@@ -32,7 +32,11 @@ class IdentitySchema(LoadToModelSchema):
         fields.Nested(TraitSchema), required=False
     )
     identity_features = ListOrDjangoRelatedManagerField(
-        fields.Nested(FeatureStateSchema), required=False
+        fields.Nested(FeatureStateSchema),
+        required=False,
+        metadata={
+            "filter_kwargs": {"feature_segment_id": None, "identity_id__isnull": None}
+        },
     )
 
     class Meta:
@@ -60,7 +64,9 @@ class IdentitySchema(LoadToModelSchema):
         return environment_api_key
 
     def serialize_created_date(self, obj: typing.Any) -> str:
-        created_date = getattr(obj, "created_date", None) or obj["created_date"]
+        created_date = getattr(obj, "created_date", None) or obj.get(
+            "created_date", datetime.now()
+        )
         if isinstance(created_date, str):
             return created_date
         return created_date.isoformat()

@@ -34,18 +34,20 @@ class FeatureStateModel:
     id: int
     feature: FeatureModel
     enabled: bool
-    _value: typing.Any = field(default=None, init=False)
+    segment_id: int = None
+
+    _feature_state_value: typing.Any = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[
         MultivariateFeatureStateValueModel
     ] = field(default_factory=list)
 
     def set_value(self, value: typing.Any):
-        self._value = value
+        self._feature_state_value = value
 
     def get_value(self, identity_id: int = None):
         if identity_id and len(self.multivariate_feature_state_values) > 0:
             return self._get_multivariate_value(identity_id)
-        return self._value
+        return self._feature_state_value
 
     def get_feature_state_value(self):
         """Mimick django method name to simplify serialization logic"""
@@ -71,4 +73,4 @@ class FeatureStateModel:
 
         # default to return the control value if no MV values found, although this
         # should never happen
-        return self._value
+        return self._feature_state_value

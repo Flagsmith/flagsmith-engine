@@ -3,7 +3,6 @@ import pytest
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
-from flag_engine.segments.models import SegmentOverrideModel
 from tests.helpers import get_environment_feature_state_for_feature
 from tests.identities.fixtures import (
     empty_segment,
@@ -19,6 +18,8 @@ from tests.identities.fixtures import (
     trait_value_2,
     trait_value_3,
 )
+from tests.conftest import segment_condition_property, segment_condition_string_value
+from copy import deepcopy
 
 
 def test_identity_get_all_feature_states_no_segments(
@@ -55,6 +56,44 @@ def test_identity_get_all_feature_states_no_segments(
         assert feature_state.enabled is expected
 
 
+def test_update_traits_remove_traits_with_none_value(identity_in_segment):
+    # Given
+    trait_key = identity_in_segment.identity_traits[0].trait_key
+    trait_to_remove = TraitModel(trait_key=trait_key, trait_value=None)
+
+    # When
+    identity_in_segment.update_traits([trait_to_remove])
+    # Then
+    assert identity_in_segment.identity_traits == []
+
+
+def test_update_traits_updates_trait_value(identity_in_segment):
+    # Given
+    trait_key = identity_in_segment.identity_traits[0].trait_key
+    trait_value = "updated_trait_value"
+    trait_to_update = TraitModel(trait_key=trait_key, trait_value=trait_value)
+
+    # When
+    identity_in_segment.update_traits([trait_to_update])
+    # Then
+
+    assert len(identity_in_segment.identity_traits) == 1
+    assert identity_in_segment.identity_traits[0] == trait_to_update
+
+
+def test_update_traits_adds_new_traits(identity_in_segment, trait):
+    # Given
+    given_traits = [trait]
+
+    # When
+    returned_traits = identity_in_segment.update_traits(given_traits)
+
+    # Then
+    assert identity_in_segment.identity_traits == returned_traits
+    assert len(identity_in_segment.identity_traits) == 2
+    assert identity_in_segment.identity_traits[1] == trait
+
+
 def test_identity_get_all_feature_states_segments_only(
     feature_1, feature_2, environment, segment, identity_in_segment
 ):
@@ -69,12 +108,9 @@ def test_identity_get_all_feature_states_segments_only(
 
     # but overridden to True for identities in the segment
     environment.segment_overrides.append(
-        SegmentOverrideModel(
-            segment=segment,
-            feature_state=FeatureStateModel(
-                id=4, feature=overridden_feature, enabled=True
-            ),
-        )
+        FeatureStateModel(
+            id=4, feature=overridden_feature, enabled=True, segment_id=segment.id
+        ),
     )
 
     # When
@@ -95,6 +131,21 @@ def test_identity_get_all_feature_states_segments_only(
             else environment_feature_state.enabled
         )
         assert feature_state.enabled is expected
+
+
+def test_get_all_feature_states_with_traits(
+    environment_with_segment_override, identity_in_segment, identity
+):
+    # Given
+    trait_models = TraitModel(
+        trait_key=segment_condition_property, trait_value=segment_condition_string_value
+    )
+    # When
+    all_feature_states = identity_in_segment.get_all_feature_states(
+        environment=environment_with_segment_override, traits=[trait_models]
+    )
+    # Then
+    assert all_feature_states[0].get_value() == "segment_override"
 
 
 @pytest.mark.parametrize(

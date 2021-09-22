@@ -1,9 +1,10 @@
 import datetime
 import typing
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FeatureStateModel
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
     SegmentConditionModel,
@@ -19,6 +20,23 @@ class TraitModel:
     trait_value: typing.Any
 
 
+@contextmanager
+def override_identity_traits(
+    identity_model: "IdentityModel", traits: typing.List[TraitModel]
+):
+    """
+    Used for overriding `identity_traits` attribute of `IdentityModel`
+    to support processing traits without having to save them on the `IdentityModel`
+    or passing them as additional argument to the function.
+    """
+    stored_traits = identity_model.identity_traits
+    identity_model.identity_traits = traits
+    try:
+        yield identity_model
+    finally:
+        identity_model.identity_traits = stored_traits
+
+
 @dataclass
 class IdentityModel:
     identifier: str
@@ -31,22 +49,54 @@ class IdentityModel:
     def composite_key(self):
         return self.generate_composite_key(self.environment_api_key, self.identifier)
 
-    def get_all_feature_states(
-        self, environment: EnvironmentModel
-    ) -> typing.List[FeatureStateModel]:
-        all_feature_states = {fs.feature: fs for fs in environment.feature_states}
+    def _get_env_feature_states_dict(
+        self,
+        environment: EnvironmentModel,
+        feature_name: str = None,
+    ) -> typing.Dict[FeatureModel, FeatureStateModel]:
+        feature_states = environment.feature_states
+        if feature_name:
+            feature_states = [environment.get_feature_state(feature_name)]
+        return {fs.feature: fs for fs in feature_states}
 
-        for segment_override in environment.segment_overrides:
-            feature_state = segment_override.feature_state
-            feature = feature_state.feature
-            if self.in_segment(segment_override.segment):
-                all_feature_states[feature] = feature_state
-
-        for feature_state in self.identity_features:
-            if feature_state.feature in all_feature_states:
+    def _update_feature_state_dict_with_segment_override(
+        self,
+        environment,
+        all_feature_states: typing.Dict[FeatureModel, FeatureStateModel],
+    ) -> None:
+        for feature_state in environment.segment_overrides:
+            segment = environment.get_segment(feature_state.segment_id)
+            if feature_state.feature in all_feature_states and self.in_segment(segment):
                 all_feature_states[feature_state.feature] = feature_state
 
-        return list(all_feature_states.values())
+    def _update_feature_state_dict_with_identity_override(
+        self, feature_states: typing.Dict[FeatureModel, FeatureStateModel]
+    ):
+        feature_states.update(
+            {
+                fs.feature: fs
+                for fs in self.identity_features
+                if fs.feature in feature_states
+            }
+        )
+
+    def get_all_feature_states(
+        self,
+        environment: EnvironmentModel,
+        *,
+        traits: typing.List[TraitModel] = None,
+        feature_name: str = None,
+    ) -> typing.List[FeatureStateModel]:
+        feature_states = self._get_env_feature_states_dict(environment, feature_name)
+        with override_identity_traits(self, traits or self.identity_traits):
+
+            # Override feature states with segment feature states
+            self._update_feature_state_dict_with_segment_override(
+                environment, feature_states
+            )
+            # Override feature states with identity feature states
+            self._update_feature_state_dict_with_identity_override(feature_states)
+        return list(feature_states.values())
 
     def in_segment(self, segment: SegmentModel) -> bool:
         return len(segment.rules) > 0 and all(
@@ -57,6 +107,45 @@ class IdentityModel:
     @staticmethod
     def generate_composite_key(env_key: str, identifier: str) -> str:
         return f"{env_key}_{identifier}"
+
+    def find_trait_index(self, trait_key: str) -> typing.Optional[int]:
+        # Returns the index of the trait with a given trait_key in identity_traits
+        trait_index = next(
+            (
+                index
+                for index, t in enumerate(self.identity_traits)
+                if t.trait_key == trait_key
+            ),
+            None,
+        )
+        return trait_index
+
+    def delete_trait(self, trait: TraitModel):
+        trait_index = self.find_trait_index(trait.trait_key)
+        if trait_index is not None:
+            self.identity_traits.pop(trait_index)
+
+    def add_or_update_trait(self, trait: TraitModel):
+        trait_index = self.find_trait_index(trait.trait_key)
+        if trait_index is not None:
+            self.identity_traits[trait_index] = trait
+        else:
+            self.identity_traits.append(trait)
+
+    def update_traits(self, traits: typing.List[TraitModel]):
+        identity_traits_dict = {
+            trait.trait_key: trait for trait in self.identity_traits
+        }
+        for trait in traits:
+            # Delete the trait if the value is None
+            if trait.trait_value is None:
+                identity_traits_dict.pop(trait.trait_key, None)
+                continue
+            # Add/update the trait
+            identity_traits_dict[trait.trait_key] = trait
+
+        self.identity_traits = [trait for trait in identity_traits_dict.values()]
+        return self.identity_traits
 
     def _matches_segment_rule(self, rule: SegmentRuleModel, segment_id: int) -> bool:
         matches_conditions = (
@@ -84,7 +173,6 @@ class IdentityModel:
             )
 
         # TODO: regex
-
         trait = next(
             filter(lambda t: t.trait_key == condition.property_, self.identity_traits),
             None,
