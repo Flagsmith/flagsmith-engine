@@ -83,6 +83,18 @@ class DjangoFeatureStateRelatedManager:
     def all(self):
         return self.feature_states
 
+    def filter(self, **kwargs):
+        # NOTE: we only implement __isnull = False
+        accepted_filters = {
+            "feature_segment_id": lambda x: x.feature_segment == None,
+            "identity_id": lambda x: x.identity == None,
+            "feature_segment_id__isnull": lambda x: x.feature_segment != None,
+            "identity_id__isnull": lambda x: x.identity != None,
+        }
+        filter_fs = self.feature_states
+        for k, v in kwargs.items():
+            filter_fs = filter(accepted_filters[k], filter_fs)
+        return filter_fs
 
 class DjangoEnvironment:
     def __init__(
