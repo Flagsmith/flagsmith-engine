@@ -1,7 +1,7 @@
 from unittest import mock
 
 import pytest
-from marshmallow import fields
+from marshmallow import fields, Schema
 
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
@@ -34,3 +34,17 @@ def test_list_or_django_related_manager_field_serialize(attribute):
     # Then
     # the result is always outputted the same as the list
     assert serialized_data == a_list
+
+
+def test_list_or_django_related_manager_field_filter_gets_called_with_correct_arguments():
+    # Given
+    object_to_seralize = mock.MagicMock()
+    field = ListOrDjangoRelatedManagerField(
+        fields.Int(), metadata={"filter_kwargs": {"id": None}}
+    )
+
+    # When
+    _ = field.serialize("my_attribute", obj=object_to_seralize)
+
+    # Then
+    object_to_seralize.__getitem__.return_value.filter.assert_called_with(id=None)
