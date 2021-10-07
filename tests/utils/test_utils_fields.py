@@ -7,7 +7,7 @@ from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 
 a_list = [1, 2, 3, 4]
 mock_related_manager_field = mock.MagicMock()
-mock_related_manager_field.all.return_value = a_list
+mock_related_manager_field.filter.return_value = a_list
 
 
 @pytest.mark.parametrize("attribute", (a_list, mock_related_manager_field))

@@ -10,7 +10,10 @@ from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 class EnvironmentSchema(Schema):
     id = fields.Int()
     api_key = fields.Str()
-    feature_states = ListOrDjangoRelatedManagerField(fields.Nested(FeatureStateSchema))
+    feature_states = ListOrDjangoRelatedManagerField(
+        fields.Nested(FeatureStateSchema),
+        metadata={"filter_kwargs": {"feature_segment_id": None, "identity_id": None}},
+    )
     project = fields.Nested(ProjectSchema)
 
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)

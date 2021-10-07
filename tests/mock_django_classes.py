@@ -44,6 +44,12 @@ class DjangoMultivariateFeatureStateValueRelatedManager:
     def all(self):
         return self.multivariate_feature_state_values
 
+    def filter(self, filter_kwargs=None):
+        if filter_kwargs:
+            raise NotImplementedError
+
+        return self.multivariate_feature_state_values
+
 
 class DjangoFeatureState:
     def __init__(
@@ -105,6 +111,11 @@ class DjangoTraitRelatedManager:
     traits: typing.List[DjangoTrait]
 
     def all(self):
+        return self.traits
+
+    def filter(self, filter_kwargs=None):
+        if filter_kwargs:
+            raise NotImplementedError
         return self.traits
 
 
