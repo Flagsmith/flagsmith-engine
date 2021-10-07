@@ -34,7 +34,7 @@ class MultivariateFeatureOptionSchema(Schema):
 class MultivariateFeatureStateValueSchema(Schema):
     id = fields.Int()
     multivariate_feature_option = fields.Nested(MultivariateFeatureOptionSchema)
-    percentage_allocation = fields.Float(validate=[validate.Range(0, 100)])
+    percentage_allocation = fields.Decimal(validate=[validate.Range(0, 100)])
 
     @post_load()
     def make_multivariate_feature_state_value(
