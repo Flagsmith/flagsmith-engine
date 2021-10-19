@@ -38,13 +38,12 @@ def test_list_or_django_related_manager_field_serialize(attribute):
 
 def test_list_or_django_related_manager_field_filter_gets_called_with_correct_arguments():
     # Given
-    object_to_seralize = mock.MagicMock()
+    object_to_serialize = mock.MagicMock()
     field = ListOrDjangoRelatedManagerField(
         fields.Int(), metadata={"filter_kwargs": {"id": None}}
     )
 
     # When
-    _ = field.serialize("my_attribute", obj=object_to_seralize)
-
+    field.serialize("my_attribute", obj=object_to_serialize)
     # Then
-    object_to_seralize.__getitem__.return_value.filter.assert_called_with(id=None)
+    object_to_serialize.__getitem__.return_value.filter.assert_called_with(id=None)
