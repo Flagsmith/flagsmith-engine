@@ -49,18 +49,33 @@ class DjangoMultivariateFeatureStateValueRelatedManager:
         return self.multivariate_feature_state_values
 
 
+@dataclass
+class DjangoSegment:
+    id: int
+
+
+@dataclass
+class DjangoFeatureSegment:
+    id: int
+    segment: DjangoSegment
+
+
 class DjangoFeatureState:
     def __init__(
         self,
         id: int,
         feature: DjangoFeature,
         enabled: bool,
+        feature_segment: DjangoFeatureSegment = None,
+        identity: "DjangoIdentity" = None,
         value: typing.Any = None,
         multivariate_feature_state_values: typing.List[
             DjangoMultivariateFeatureStateValue
         ] = None,
     ):
         self.id = id
+        self.feature_segment = feature_segment
+        self.identity = identity
         self.feature = feature
         self.enabled = enabled
         self.value = value
