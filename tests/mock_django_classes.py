@@ -44,8 +44,11 @@ class DjangoMultivariateFeatureStateValueRelatedManager:
     def all(self):
         return self.multivariate_feature_state_values
 
-    def filter(self, filter_kwargs=None):
-        assert filter_kwargs == None
+    def filter(self, **filter_kwargs):
+        if filter_kwargs:
+            raise NotImplementedError(
+                "Filtering mock classes is not currently supported"
+            )
         return self.multivariate_feature_state_values
 
 
@@ -136,8 +139,12 @@ class DjangoTrait:
 class DjangoTraitRelatedManager:
     traits: typing.List[DjangoTrait]
 
-    def filter(self, filter_kwargs=None):
-        assert filter_kwargs == None
+    def filter(self, **filter_kwargs):
+        if filter_kwargs:
+            raise NotImplementedError(
+                "Filtering mock classes is not currently supported"
+            )
+
         return self.traits
 
 
