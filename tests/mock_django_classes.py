@@ -41,9 +41,6 @@ class DjangoMultivariateFeatureStateValue:
 class DjangoMultivariateFeatureStateValueRelatedManager:
     multivariate_feature_state_values: typing.List = field(default_factory=list)
 
-    def all(self):
-        return self.multivariate_feature_state_values
-
     def filter(self, **filter_kwargs):
         if filter_kwargs:
             raise NotImplementedError(
@@ -95,9 +92,6 @@ class DjangoFeatureState:
 @dataclass
 class DjangoFeatureStateRelatedManager:
     feature_states: typing.List[DjangoFeatureState]
-
-    def all(self):
-        return self.feature_states
 
     def filter(self, **kwargs):
         # NOTE: we only implement __isnull = False
