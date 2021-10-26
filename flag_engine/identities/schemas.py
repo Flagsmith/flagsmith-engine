@@ -1,10 +1,11 @@
 import typing
+from datetime import datetime
 
-from marshmallow import Schema, fields, post_load, utils, post_dump, EXCLUDE
+from marshmallow import Schema, fields, post_dump, post_load, pre_load, utils
+
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
-from datetime import datetime
 
 
 class TraitSchema(Schema):
@@ -19,7 +20,7 @@ class TraitSchema(Schema):
 class IdentitySchema(Schema):
     id = fields.Int()
     identifier = fields.Str()
-    composite_key = fields.Str(dump_only=True)
+    composite_key = fields.Str()
     created_date = fields.Method(
         serialize="serialize_created_date",
         deserialize="deserialize_created_date",
@@ -35,14 +36,11 @@ class IdentitySchema(Schema):
         fields.Nested(FeatureStateSchema), required=False
     )
 
-    class Meta:
-        # to exclude dump only fields, e.g: composite_key
-        unknown = EXCLUDE
-
     @post_load
     def make_identity(self, data, **kwargs):
         return IdentityModel(**data)
 
+    @pre_load
     @post_dump
     def generate_composite_key(self, data, **kwargs):
         data["composite_key"] = f"{data['environment_api_key']}_{data['identifier']}"

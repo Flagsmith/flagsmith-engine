@@ -24,6 +24,7 @@ class IdentityModel:
     id: int
     identifier: str
     environment_api_key: str
+    composite_key: str = None
     created_date: datetime = field(default_factory=datetime.datetime.now)
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)

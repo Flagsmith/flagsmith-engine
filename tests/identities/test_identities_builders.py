@@ -1,12 +1,12 @@
 import json
 from datetime import datetime
+
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.models import IdentityModel, TraitModel
-from tests.mock_django_classes import DjangoIdentity
-
 from flag_engine.utils.json.encoders import DecimalEncoder
+from tests.mock_django_classes import DjangoIdentity
 
 
 def test_build_identity_model_from_django_no_feature_states(
@@ -136,3 +136,21 @@ def test_build_identity_dict(django_identity):
     )
     assert isinstance(identity_dict, dict)
     assert json.dumps(identity_dict, cls=DecimalEncoder)
+
+
+def test_identity_model_have_composite_key():
+    # Given
+    api_key = "test_api_key"
+    identifier = "test_identifier"
+    identity_dict = {
+        "id": 1,
+        "identifier": identifier,
+        "environment_api_key": api_key,
+        "created_date": "2021-08-22T06:25:23.406995Z",
+        "identity_features": [],
+    }
+    # When
+    identity_model = build_identity_model(identity_dict)
+
+    # Then
+    assert identity_model.composite_key == f"{api_key}_{identifier}"
