@@ -1,6 +1,6 @@
 import json
 from decimal import Decimal
-from flag_engine.utils.json_encoder import DecimalEncoder
+from flag_engine.utils.json.encoders import DecimalEncoder
 
 
 def test_decimal_encoder_converts_decimal():

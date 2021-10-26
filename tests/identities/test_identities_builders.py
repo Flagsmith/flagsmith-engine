@@ -6,7 +6,7 @@ from flag_engine.identities.builders import build_identity_dict, build_identity_
 from flag_engine.identities.models import IdentityModel, TraitModel
 from tests.mock_django_classes import DjangoIdentity
 
-from flag_engine.utils.json_encoder import DecimalEncoder
+from flag_engine.utils.json.encoders import DecimalEncoder
 
 
 def test_build_identity_model_from_django_no_feature_states(
