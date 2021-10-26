@@ -106,6 +106,11 @@ class DjangoEnvironment:
         api_key: str = "api-key",
         feature_states: typing.List[DjangoFeatureState] = None,
     ):
+        if feature_states:
+            assert not any(
+                fs.feature_segment or fs.identity for fs in feature_states
+            ), "FeatureStates for an environment must not have identity or segment"
+
         self.id = id
         self.name = name
         self.api_key = api_key
@@ -136,6 +141,11 @@ class DjangoIdentity:
         feature_states: typing.List[DjangoFeatureState] = None,
         identity_traits: typing.List[DjangoTrait] = None,
     ):
+        if feature_states:
+            assert not any(
+                fs.feature_segment for fs in feature_states
+            ), "FeatureStates for an identity cannot have a segment"
+
         self.id = id
         self.identifier = identifier
         self.environment = environment
