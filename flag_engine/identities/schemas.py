@@ -28,11 +28,7 @@ class IdentitySchema(Schema):
         fields.Nested(TraitSchema), required=False
     )
     identity_features = ListOrDjangoRelatedManagerField(
-        fields.Nested(FeatureStateSchema),
-        required=False,
-        metadata={
-            "filter_kwargs": {"feature_segment_id": None, "identity_id__isnull": None}
-        },
+        fields.Nested(FeatureStateSchema), required=False
     )
 
     @post_load

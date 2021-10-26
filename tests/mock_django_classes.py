@@ -39,13 +39,13 @@ class DjangoMultivariateFeatureStateValue:
 
 @dataclass
 class DjangoMultivariateFeatureStateValueRelatedManager:
-    multivariate_feature_state_values: typing.List = field(default_factory=list)
+    multivariate_feature_state_values: typing.List[
+        DjangoMultivariateFeatureStateValue
+    ] = field(default_factory=list)
 
-    def filter(self, **filter_kwargs):
-        if filter_kwargs:
-            raise NotImplementedError(
-                "Filtering mock classes is not currently supported"
-            )
+    def filter(
+        self, **filter_kwargs
+    ) -> typing.List[DjangoMultivariateFeatureStateValue]:
         return self.multivariate_feature_state_values
 
 
@@ -93,18 +93,8 @@ class DjangoFeatureState:
 class DjangoFeatureStateRelatedManager:
     feature_states: typing.List[DjangoFeatureState]
 
-    def filter(self, **kwargs):
-        # NOTE: we only implement __isnull = False
-        accepted_filters = {
-            "feature_segment_id": lambda x: x.feature_segment == None,
-            "identity_id": lambda x: x.identity == None,
-            "feature_segment_id__isnull": lambda x: x.feature_segment != None,
-            "identity_id__isnull": lambda x: x.identity != None,
-        }
-        filter_fs = self.feature_states
-        for k, v in kwargs.items():
-            filter_fs = filter(accepted_filters[k], filter_fs)
-        return filter_fs
+    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureState]:
+        return self.feature_states
 
 
 class DjangoEnvironment:
@@ -133,12 +123,7 @@ class DjangoTrait:
 class DjangoTraitRelatedManager:
     traits: typing.List[DjangoTrait]
 
-    def filter(self, **filter_kwargs):
-        if filter_kwargs:
-            raise NotImplementedError(
-                "Filtering mock classes is not currently supported"
-            )
-
+    def filter(self, **filter_kwargs) -> typing.List[DjangoTrait]:
         return self.traits
 
 
