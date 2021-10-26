@@ -1,4 +1,5 @@
 import json
+from unittest import mock
 
 from flag_engine.environments.builders import (
     build_environment_dict,
@@ -139,6 +140,25 @@ def test_build_environment_model_with_multivariate_flag(
     assert all(
         isinstance(mvfs, MultivariateFeatureStateValueModel)
         for mvfs in fs.multivariate_feature_state_values
+    )
+
+
+def test_environment_feature_states_are_filtered_correctly():
+    # Given
+    mock_feature_states = mock.MagicMock(spec=["filter"])
+    mock_feature_states.filter.return_value = []
+
+    mock_environment = mock.MagicMock(
+        feature_states=mock_feature_states,
+        spec=["id", "api_key", "feature_states", "project"],
+    )
+
+    # When
+    build_environment_model(mock_environment)
+
+    # Then
+    mock_feature_states.filter.assert_called_once_with(
+        feature_segment_id=None, identity_id=None
     )
 
 

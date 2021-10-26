@@ -42,10 +42,25 @@ class DjangoMultivariateFeatureStateValue:
 
 @dataclass
 class DjangoMultivariateFeatureStateValueRelatedManager:
-    multivariate_feature_state_values: typing.List = field(default_factory=list)
+    multivariate_feature_state_values: typing.List[
+        DjangoMultivariateFeatureStateValue
+    ] = field(default_factory=list)
 
-    def all(self):
+    def filter(
+        self, **filter_kwargs
+    ) -> typing.List[DjangoMultivariateFeatureStateValue]:
         return self.multivariate_feature_state_values
+
+
+@dataclass
+class DjangoSegment:
+    id: int
+
+
+@dataclass
+class DjangoFeatureSegment:
+    id: int
+    segment: DjangoSegment
 
 
 class DjangoFeatureState:
@@ -54,12 +69,16 @@ class DjangoFeatureState:
         id: int,
         feature: DjangoFeature,
         enabled: bool,
+        feature_segment: DjangoFeatureSegment = None,
+        identity: "DjangoIdentity" = None,
         value: typing.Any = None,
         multivariate_feature_state_values: typing.List[
             DjangoMultivariateFeatureStateValue
         ] = None,
     ):
         self.id = id
+        self.feature_segment = feature_segment
+        self.identity = identity
         self.feature = feature
         self.enabled = enabled
         self.value = value
@@ -77,7 +96,7 @@ class DjangoFeatureState:
 class DjangoFeatureStateRelatedManager:
     feature_states: typing.List[DjangoFeatureState]
 
-    def all(self):
+    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureState]:
         return self.feature_states
 
 
@@ -90,6 +109,11 @@ class DjangoEnvironment:
         api_key: str = "api-key",
         feature_states: typing.List[DjangoFeatureState] = None,
     ):
+        if feature_states:
+            assert not any(
+                fs.feature_segment or fs.identity for fs in feature_states
+            ), "FeatureStates for an environment must not have identity or segment"
+
         self.id = id
         self.name = name
         self.api_key = api_key
@@ -107,7 +131,7 @@ class DjangoTrait:
 class DjangoTraitRelatedManager:
     traits: typing.List[DjangoTrait]
 
-    def all(self):
+    def filter(self, **filter_kwargs) -> typing.List[DjangoTrait]:
         return self.traits
 
 
@@ -121,6 +145,11 @@ class DjangoIdentity:
         feature_states: typing.List[DjangoFeatureState] = None,
         identity_traits: typing.List[DjangoTrait] = None,
     ):
+        if feature_states:
+            assert not any(
+                fs.feature_segment for fs in feature_states
+            ), "FeatureStates for an identity cannot have a segment"
+
         self.id = id
         self.identifier = identifier
         self.created_date = created_date
