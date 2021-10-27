@@ -1,13 +1,15 @@
-from marshmallow import Schema, fields, post_load
+from marshmallow import fields
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.projects.schemas import ProjectSchema
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 
-class EnvironmentSchema(Schema):
+class EnvironmentSchema(LoadToModelSchema):
+    model_class = EnvironmentModel
     id = fields.Int()
     api_key = fields.Str()
     feature_states = ListOrDjangoRelatedManagerField(
@@ -20,7 +22,3 @@ class EnvironmentSchema(Schema):
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
-
-    @post_load()
-    def make_environment(self, data: dict, **kwargs) -> EnvironmentModel:
-        return EnvironmentModel(**data)

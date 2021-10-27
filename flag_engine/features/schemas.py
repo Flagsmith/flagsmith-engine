@@ -9,38 +9,26 @@ from flag_engine.features.models import (
     MultivariateFeatureStateValueModel,
 )
 from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 
-class FeatureSchema(Schema):
+class FeatureSchema(LoadToModelSchema):
+    model_class = FeatureModel
     id = fields.Int()
     name = fields.Str()
     type = fields.Str()
 
-    @post_load()
-    def make_feature(self, data, **kwargs) -> FeatureModel:
-        return FeatureModel(**data)
 
-
-class MultivariateFeatureOptionSchema(Schema):
+class MultivariateFeatureOptionSchema(LoadToModelSchema):
+    model_class = MultivariateFeatureOptionModel
     value = fields.Field(allow_none=True)
 
-    @post_load()
-    def make_multivariate_feature_option(
-        self, data, **kwargs
-    ) -> MultivariateFeatureOptionModel:
-        return MultivariateFeatureOptionModel(**data)
 
-
-class MultivariateFeatureStateValueSchema(Schema):
+class MultivariateFeatureStateValueSchema(LoadToModelSchema):
+    model_class = MultivariateFeatureStateValueModel
     id = fields.Int()
     multivariate_feature_option = fields.Nested(MultivariateFeatureOptionSchema)
     percentage_allocation = fields.Decimal(validate=[validate.Range(0, 100)])
-
-    @post_load()
-    def make_multivariate_feature_state_value(
-        self, data, **kwargs
-    ) -> MultivariateFeatureStateValueModel:
-        return MultivariateFeatureStateValueModel(**data)
 
 
 class FeatureStateSchema(Schema):
