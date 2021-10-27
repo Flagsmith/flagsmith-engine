@@ -5,7 +5,7 @@ from marshmallow import EXCLUDE, fields, post_dump, utils
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
-from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
 from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 

@@ -8,7 +8,7 @@ from flag_engine.features.models import (
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
-from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
 from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 

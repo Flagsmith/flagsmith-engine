@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 from marshmallow import fields
 
-from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
 
 a_list = [1, 2, 3, 4]
 mock_related_manager_field = mock.MagicMock()
