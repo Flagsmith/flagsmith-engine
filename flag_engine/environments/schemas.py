@@ -9,7 +9,6 @@ from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 
 class EnvironmentSchema(LoadToModelSchema):
-    model_class = EnvironmentModel
     id = fields.Int()
     api_key = fields.Str()
     feature_states = ListOrDjangoRelatedManagerField(
@@ -22,3 +21,6 @@ class EnvironmentSchema(LoadToModelSchema):
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+
+    class Meta:
+        model_class = EnvironmentModel

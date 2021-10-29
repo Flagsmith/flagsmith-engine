@@ -11,8 +11,10 @@ class DummyModel:
 
 
 class DummySchema(LoadToModelSchema):
-    model_class = DummyModel
     id = fields.Int()
+
+    class Meta:
+        model_class = DummyModel
 
 
 def test_load_schema_to_model():

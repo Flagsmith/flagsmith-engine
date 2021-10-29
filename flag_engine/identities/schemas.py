@@ -10,13 +10,14 @@ from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 
 class TraitSchema(LoadToModelSchema):
-    model_class = TraitModel
     trait_key = fields.Str()
     trait_value = fields.Str()
 
+    class Meta:
+        model_class = TraitModel
+
 
 class IdentitySchema(LoadToModelSchema):
-    model_class = IdentityModel
     id = fields.Int()
     identifier = fields.Str()
     composite_key = fields.Str(dump_only=True)
@@ -38,6 +39,7 @@ class IdentitySchema(LoadToModelSchema):
     class Meta:
         # to exclude dump only fields, e.g: composite_key
         unknown = EXCLUDE
+        model_class = IdentityModel
 
     @post_dump
     def generate_composite_key(self, data, **kwargs):

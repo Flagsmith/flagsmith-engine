@@ -13,22 +13,28 @@ from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 
 class FeatureSchema(LoadToModelSchema):
-    model_class = FeatureModel
     id = fields.Int()
     name = fields.Str()
     type = fields.Str()
 
+    class Meta:
+        model_class = FeatureModel
+
 
 class MultivariateFeatureOptionSchema(LoadToModelSchema):
-    model_class = MultivariateFeatureOptionModel
     value = fields.Field(allow_none=True)
+
+    class Meta:
+        model_class = MultivariateFeatureOptionModel
 
 
 class MultivariateFeatureStateValueSchema(LoadToModelSchema):
-    model_class = MultivariateFeatureStateValueModel
     id = fields.Int()
     multivariate_feature_option = fields.Nested(MultivariateFeatureOptionSchema)
     percentage_allocation = fields.Decimal(validate=[validate.Range(0, 100)])
+
+    class Meta:
+        model_class = MultivariateFeatureStateValueModel
 
 
 class FeatureStateSchema(Schema):

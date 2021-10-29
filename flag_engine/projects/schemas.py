@@ -8,7 +8,6 @@ from flag_engine.utils.marshmallow.schema import LoadToModelSchema
 
 
 class ProjectSchema(LoadToModelSchema):
-    model_class = ProjectModel
     id = fields.Int()
     name = fields.Str()
     segments = ListOrDjangoRelatedManagerField(
@@ -16,3 +15,6 @@ class ProjectSchema(LoadToModelSchema):
     )
     organisation = fields.Nested(OrganisationSchema)
     hide_disabled_flags = fields.Bool()
+
+    class Meta:
+        model_class = ProjectModel
