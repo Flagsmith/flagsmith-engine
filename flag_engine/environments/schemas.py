@@ -5,7 +5,7 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.projects.schemas import ProjectSchema
 from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
-from flag_engine.utils.marshmallow.schema import LoadToModelSchema
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
 class EnvironmentSchema(LoadToModelSchema):

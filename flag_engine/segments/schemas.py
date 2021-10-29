@@ -7,7 +7,7 @@ from flag_engine.segments.models import (
     SegmentRuleModel,
 )
 from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
-from flag_engine.utils.marshmallow.schema import LoadToModelSchema
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
 class SegmentConditionSchema(LoadToModelSchema):

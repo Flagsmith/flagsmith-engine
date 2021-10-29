@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from marshmallow import fields
 
-from flag_engine.utils.marshmallow.schema import LoadToModelSchema
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
 @dataclass

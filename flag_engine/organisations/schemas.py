@@ -1,7 +1,7 @@
 from marshmallow import fields
 
 from flag_engine.organisations.models import OrganisationModel
-from flag_engine.utils.marshmallow.schema import LoadToModelSchema
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
 class OrganisationSchema(LoadToModelSchema):
