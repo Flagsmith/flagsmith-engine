@@ -29,5 +29,5 @@ class LoadToModelSchema(Schema):
     @post_load()
     def make_instance(self, data, **kwargs) -> object:
         if not self.opts.model_class:
-            raise ValueError("model_class options is not set not Meta class")
+            raise ValueError("`model_class` attribute is not set in Meta class.")
         return self.opts.model_class(**data)
