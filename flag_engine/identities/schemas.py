@@ -1,23 +1,23 @@
 import typing
 from datetime import datetime
 
-from marshmallow import Schema, fields, post_dump, post_load, pre_load, utils
+from marshmallow import EXCLUDE, fields, post_dump, pre_load, utils
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
-from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
-class TraitSchema(Schema):
+class TraitSchema(LoadToModelSchema):
     trait_key = fields.Str()
     trait_value = fields.Str()
 
-    @post_load
-    def make_trait(self, data, **kwargs):
-        return TraitModel(**data)
+    class Meta:
+        model_class = TraitModel
 
 
-class IdentitySchema(Schema):
+class IdentitySchema(LoadToModelSchema):
     id = fields.Int()
     identifier = fields.Str()
     composite_key = fields.Str()
@@ -36,9 +36,10 @@ class IdentitySchema(Schema):
         fields.Nested(FeatureStateSchema), required=False
     )
 
-    @post_load
-    def make_identity(self, data, **kwargs):
-        return IdentityModel(**data)
+    class Meta:
+        # to exclude dump only fields, e.g: composite_key
+        unknown = EXCLUDE
+        model_class = IdentityModel
 
     @pre_load
     @post_dump

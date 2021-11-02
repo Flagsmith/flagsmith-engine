@@ -1,15 +1,15 @@
-from marshmallow import Schema, fields, post_load
+from marshmallow import fields
 
 from flag_engine.organisations.models import OrganisationModel
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
-class OrganisationSchema(Schema):
+class OrganisationSchema(LoadToModelSchema):
     id = fields.Int()
     name = fields.Str()
     stop_serving_flags = fields.Boolean()
     persist_trait_data = fields.Boolean()
     feature_analytics = fields.Boolean()
 
-    @post_load()
-    def make_organisation(self, data, **kwargs) -> OrganisationModel:
-        return OrganisationModel(**data)
+    class Meta:
+        model_class = OrganisationModel
