@@ -1,7 +1,7 @@
 import typing
 from datetime import datetime
 
-from marshmallow import EXCLUDE, fields, post_dump, pre_load, utils
+from marshmallow import EXCLUDE, fields, post_dump, utils
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
@@ -20,7 +20,7 @@ class TraitSchema(LoadToModelSchema):
 class IdentitySchema(LoadToModelSchema):
     id = fields.Int()
     identifier = fields.Str()
-    composite_key = fields.Str()
+    composite_key = fields.Str(dump_only=True)
     created_date = fields.Method(
         serialize="serialize_created_date",
         deserialize="deserialize_created_date",
@@ -41,10 +41,14 @@ class IdentitySchema(LoadToModelSchema):
         unknown = EXCLUDE
         model_class = IdentityModel
 
-    @pre_load
     @post_dump
-    def generate_composite_key(self, data, **kwargs):
-        data["composite_key"] = f"{data['environment_api_key']}_{data['identifier']}"
+    def generate_composite_key(self, data: typing.Dict[str, typing.Any], **kwargs):
+        data.setdefault(
+            "composite_key",
+            IdentityModel.generate_composite_key(
+                env_key=data["environment_api_key"], identifier=data["identifier"]
+            ),
+        )
         return data
 
     def serialize_environment_api_key(self, obj: typing.Any) -> int:

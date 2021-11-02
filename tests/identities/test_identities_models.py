@@ -182,3 +182,29 @@ def test_identity_in_segment(segment, identity_traits, expected_in_segment):
         ).in_segment(segment)
         == expected_in_segment
     )
+
+
+def test_composite_key():
+    # Given
+    environment_api_key = "abc123"
+    identifier = "identity"
+    identity_model = IdentityModel(
+        id=1, environment_api_key=environment_api_key, identifier=identifier
+    )
+
+    # Then
+    assert identity_model.composite_key == f"{environment_api_key}_{identifier}"
+
+
+def test_generate_composite_key():
+    # Given
+    environment_api_key = "abc123"
+    identifier = "identity"
+
+    # Then
+    assert (
+        IdentityModel.generate_composite_key(
+            env_key=environment_api_key, identifier=identifier
+        )
+        == f"{environment_api_key}_{identifier}"
+    )

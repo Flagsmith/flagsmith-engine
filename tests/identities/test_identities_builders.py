@@ -136,21 +136,3 @@ def test_build_identity_dict(django_identity):
     )
     assert isinstance(identity_dict, dict)
     assert json.dumps(identity_dict, cls=DecimalEncoder)
-
-
-def test_identity_model_have_composite_key():
-    # Given
-    api_key = "test_api_key"
-    identifier = "test_identifier"
-    identity_dict = {
-        "id": 1,
-        "identifier": identifier,
-        "environment_api_key": api_key,
-        "created_date": "2021-08-22T06:25:23.406995Z",
-        "identity_features": [],
-    }
-    # When
-    identity_model = build_identity_model(identity_dict)
-
-    # Then
-    assert identity_model.composite_key == f"{api_key}_{identifier}"
