@@ -1,22 +1,23 @@
 import typing
-
-from marshmallow import Schema, fields, post_load, utils, post_dump, EXCLUDE
-from flag_engine.features.schemas import FeatureStateSchema
-from flag_engine.identities.models import IdentityModel, TraitModel
-from flag_engine.utils.fields import ListOrDjangoRelatedManagerField
 from datetime import datetime
 
+from marshmallow import EXCLUDE, fields, post_dump, utils
 
-class TraitSchema(Schema):
+from flag_engine.features.schemas import FeatureStateSchema
+from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
+from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
+
+
+class TraitSchema(LoadToModelSchema):
     trait_key = fields.Str()
     trait_value = fields.Str()
 
-    @post_load
-    def make_trait(self, data, **kwargs):
-        return TraitModel(**data)
+    class Meta:
+        model_class = TraitModel
 
 
-class IdentitySchema(Schema):
+class IdentitySchema(LoadToModelSchema):
     id = fields.Int()
     identifier = fields.Str()
     composite_key = fields.Str(dump_only=True)
@@ -38,10 +39,7 @@ class IdentitySchema(Schema):
     class Meta:
         # to exclude dump only fields, e.g: composite_key
         unknown = EXCLUDE
-
-    @post_load
-    def make_identity(self, data, **kwargs):
-        return IdentityModel(**data)
+        model_class = IdentityModel
 
     @post_dump
     def generate_composite_key(self, data, **kwargs):
