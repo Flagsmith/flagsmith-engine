@@ -1,12 +1,12 @@
 import json
 from datetime import datetime
+
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.models import IdentityModel, TraitModel
-from tests.mock_django_classes import DjangoIdentity
-
 from flag_engine.utils.json.encoders import DecimalEncoder
+from tests.mock_django_classes import DjangoIdentity
 
 
 def test_build_identity_model_from_django_no_feature_states(

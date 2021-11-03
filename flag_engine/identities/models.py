@@ -28,6 +28,10 @@ class IdentityModel:
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
 
+    @property
+    def composite_key(self):
+        return self.generate_composite_key(self.environment_api_key, self.identifier)
+
     def get_all_feature_states(
         self, environment: EnvironmentModel
     ) -> typing.List[FeatureStateModel]:
@@ -50,6 +54,10 @@ class IdentityModel:
             self._matches_segment_rule(rule=rule, segment_id=segment.id)
             for rule in segment.rules
         )
+
+    @staticmethod
+    def generate_composite_key(env_key: str, identifier: str) -> str:
+        return f"{env_key}_{identifier}"
 
     def _matches_segment_rule(self, rule: SegmentRuleModel, segment_id: int) -> bool:
         matches_conditions = (

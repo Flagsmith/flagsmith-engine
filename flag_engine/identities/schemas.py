@@ -42,8 +42,13 @@ class IdentitySchema(LoadToModelSchema):
         model_class = IdentityModel
 
     @post_dump
-    def generate_composite_key(self, data, **kwargs):
-        data["composite_key"] = f"{data['environment_api_key']}_{data['identifier']}"
+    def generate_composite_key(self, data: typing.Dict[str, typing.Any], **kwargs):
+        data.setdefault(
+            "composite_key",
+            IdentityModel.generate_composite_key(
+                env_key=data["environment_api_key"], identifier=data["identifier"]
+            ),
+        )
         return data
 
     def serialize_environment_api_key(self, obj: typing.Any) -> int:
