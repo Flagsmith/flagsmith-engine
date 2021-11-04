@@ -1,5 +1,7 @@
-import pytest
 from datetime import datetime
+
+import pytest
+
 from tests.mock_django_classes import DjangoIdentity
 
 

@@ -1,5 +1,7 @@
-import pytest
 from datetime import datetime
+
+import pytest
+
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import MULTIVARIATE, STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
