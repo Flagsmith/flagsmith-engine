@@ -175,7 +175,6 @@ def test_identity_get_all_feature_states_segments_only(
 def test_identity_in_segment(segment, identity_traits, expected_in_segment):
     assert (
         IdentityModel(
-            id=1,
             identifier="identity",
             environment_api_key="api-key",
             identity_traits=identity_traits,
@@ -189,7 +188,7 @@ def test_composite_key():
     environment_api_key = "abc123"
     identifier = "identity"
     identity_model = IdentityModel(
-        id=1, environment_api_key=environment_api_key, identifier=identifier
+        environment_api_key=environment_api_key, identifier=identifier
     )
 
     # Then
