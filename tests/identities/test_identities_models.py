@@ -3,7 +3,6 @@ import pytest
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
-from flag_engine.segments.models import SegmentOverrideModel
 from tests.helpers import get_environment_feature_state_for_feature
 from tests.identities.fixtures import (
     empty_segment,
@@ -69,12 +68,9 @@ def test_identity_get_all_feature_states_segments_only(
 
     # but overridden to True for identities in the segment
     environment.segment_overrides.append(
-        SegmentOverrideModel(
-            segment=segment,
-            feature_state=FeatureStateModel(
-                id=4, feature=overridden_feature, enabled=True
-            ),
-        )
+        FeatureStateModel(
+            id=4, feature=overridden_feature, enabled=True, segment_id=segment.id
+        ),
     )
 
     # When

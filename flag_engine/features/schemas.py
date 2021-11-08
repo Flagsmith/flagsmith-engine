@@ -47,6 +47,12 @@ class FeatureStateSchema(Schema):
         allow_none=True,
         required=False,
     )
+    segment_id = fields.Method(
+        "serialize_segment_id",
+        deserialize="deserialize_segment_id",
+        allow_none=True,
+        required=False,
+    )
     multivariate_feature_state_values = ListOrDjangoRelatedManagerField(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
@@ -57,6 +63,15 @@ class FeatureStateSchema(Schema):
         feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
+
+    def deserialize_segment_id(self, value):
+        return int(value)
+
+    def serialize_segment_id(self, obj):
+        if isinstance(obj, dict):
+            return obj.get("segment_id", None)
+        if features_segment := getattr(obj, "feature_segment", None):
+            return features_segment.segment_id
 
     def serialize_value(self, instance: object) -> typing.Any:
         if isinstance(instance, dict) and "value" in instance:

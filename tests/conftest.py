@@ -140,6 +140,25 @@ def django_trait_boolean():
 
 
 @pytest.fixture()
+def segment_condition():
+    return SegmentConditionModel(
+        operator=constants.EQUAL,
+        property_=segment_condition_property,
+        value=segment_condition_string_value,
+    )
+
+
+@pytest.fixture()
+def segment_rule(segment_condition):
+    return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
+
+
+@pytest.fixture()
+def segment(segment_rule):
+    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
+
+
+@pytest.fixture()
 def organisation():
     return OrganisationModel(
         id=1,
@@ -151,9 +170,13 @@ def organisation():
 
 
 @pytest.fixture()
-def project(organisation):
+def project(organisation, segment):
     return ProjectModel(
-        id=1, name="Test Project", organisation=organisation, hide_disabled_flags=False
+        id=1,
+        name="Test Project",
+        organisation=organisation,
+        hide_disabled_flags=False,
+        segments=[segment],
     )
 
 
@@ -187,25 +210,6 @@ def identity(environment):
         environment_api_key=environment.api_key,
         created_date=datetime.now(),
     )
-
-
-@pytest.fixture()
-def segment_condition():
-    return SegmentConditionModel(
-        operator=constants.EQUAL,
-        property_=segment_condition_property,
-        value=segment_condition_string_value,
-    )
-
-
-@pytest.fixture()
-def segment_rule(segment_condition):
-    return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
-
-
-@pytest.fixture()
-def segment(segment_rule):
-    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
 
 
 @pytest.fixture()
