@@ -57,6 +57,9 @@ class FeatureStateSchema(Schema):
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
 
+    segment_id = fields.Int(allow_none=True)
+    identity_id = fields.Int(allow_none=True)
+
     @post_load()
     def make_feature_state(self, data, **kwargs) -> FeatureStateModel:
         value = data.pop("value", None)

@@ -40,6 +40,11 @@ class FeatureStateModel:
         MultivariateFeatureStateValueModel
     ] = field(default_factory=list)
 
+    # TODO: these probably need to be excluded when we return the feature states
+    #  via the API.
+    segment_id: int = None
+    identity_id: int = None
+
     def set_value(self, value: typing.Any):
         self._value = value
 

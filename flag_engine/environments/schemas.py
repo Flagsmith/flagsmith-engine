@@ -11,9 +11,8 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 class EnvironmentSchema(LoadToModelSchema):
     id = fields.Int()
     api_key = fields.Str()
-    feature_states = ListOrDjangoRelatedManagerField(
-        fields.Nested(FeatureStateSchema),
-        metadata={"filter_kwargs": {"feature_segment_id": None, "identity_id": None}},
+    _all_feature_states = ListOrDjangoRelatedManagerField(
+        fields.Nested(FeatureStateSchema)
     )
     project = fields.Nested(ProjectSchema)
     segment_overrides = ListOrDjangoRelatedManagerField(
