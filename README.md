@@ -17,5 +17,5 @@ python -m pip install -r requirements-dev.txt
 
 ## Design
 
-* Marshmallow Schemas
-* Plain Python
+- Marshmallow Schemas
+- Plain Python
