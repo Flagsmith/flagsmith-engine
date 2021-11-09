@@ -39,6 +39,9 @@ jobs:
             - name: Check flake8 linting
               run: flake8 .
 
+            - name: Check isort imports
+              run: isort --check .
+
             - name: Run Tests
               run: |
                   pytest -p no:warnings
