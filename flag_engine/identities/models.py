@@ -21,7 +21,6 @@ class TraitModel:
 
 @dataclass
 class IdentityModel:
-    id: int
     identifier: str
     environment_api_key: str
     created_date: datetime = field(default_factory=datetime.datetime.now)

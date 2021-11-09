@@ -18,7 +18,6 @@ class TraitSchema(LoadToModelSchema):
 
 
 class IdentitySchema(LoadToModelSchema):
-    id = fields.Int()
     identifier = fields.Str()
     composite_key = fields.Str(dump_only=True)
     created_date = fields.Method(
