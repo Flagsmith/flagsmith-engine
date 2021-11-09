@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="Flagsmith Flag Engine",
-    version="0.1.0",
+    version="0.1.1",
     author="Matthew Elwell",
     author_email="matthew.elwell@flagsmith.com",
     packages=find_packages(include=["flag_engine", "flag_engine.*"]),
