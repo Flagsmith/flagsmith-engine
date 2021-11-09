@@ -1,5 +1,6 @@
 import json
 from decimal import Decimal
+
 from flag_engine.utils.json.encoders import DecimalEncoder
 
 
