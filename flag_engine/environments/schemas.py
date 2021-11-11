@@ -1,4 +1,4 @@
-from marshmallow import fields, pre_dump
+from marshmallow import Schema, fields, pre_dump
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
 from flag_engine.environments.models import EnvironmentModel
@@ -8,11 +8,12 @@ from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
 from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
-class EnvironmentSchema(LoadToModelSchema):
+class EnvironmentSchemaDump(Schema):
     id = fields.Int()
     api_key = fields.Str()
     _all_feature_states = ListOrDjangoRelatedManagerField(
-        fields.Nested(FeatureStateSchema)
+        fields.Nested(FeatureStateSchema),
+        attribute="feature_states",
     )
     project = fields.Nested(ProjectSchema)
     segment_overrides = ListOrDjangoRelatedManagerField(
@@ -29,8 +30,11 @@ class EnvironmentSchema(LoadToModelSchema):
     class Meta:
         model_class = EnvironmentModel
 
-    @pre_dump()
-    def add_segment_overrides(self, obj, *args, **kwargs):
-        if hasattr(obj, "feature_states"):
-            obj.segment_overrides = obj.feature_states
-        return obj
+
+class EnvironmentSchemaLoad(EnvironmentSchemaDump, LoadToModelSchema):
+    _all_feature_states = ListOrDjangoRelatedManagerField(
+        fields.Nested(FeatureStateSchema),
+    )
+
+    class Meta:
+        model_class = EnvironmentModel

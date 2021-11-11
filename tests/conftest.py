@@ -196,7 +196,7 @@ def environment(feature_1, feature_2, project):
         id=1,
         api_key="api-key",
         project=project,
-        feature_states=[
+        _all_feature_states=[
             FeatureStateModel(id=1, feature=feature_1, enabled=True),
             FeatureStateModel(id=2, feature=feature_2, enabled=False),
         ],
