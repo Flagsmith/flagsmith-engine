@@ -56,13 +56,13 @@ class IdentityModel:
                 all_feature_states[feature_state.feature] = feature_state
         return all_feature_states
 
-    def get_all_feature_states(
+    def _get_feature_states(
         self,
         environment: EnvironmentModel,
         *,
         traits: typing.List[TraitModel] = None,
         feature_name: str = None,
-    ) -> typing.List[FeatureStateModel]:
+    ):
         with override_identity_traits(self, traits or self.identity_traits):
             # Get feature states with segment override
             feature_states = self._get_all_feature_state_dict_with_segment_override(
@@ -77,6 +77,23 @@ class IdentityModel:
                 }
             )
         return list(feature_states.values())
+
+    def get_feature_state(
+        self,
+        environment: EnvironmentModel,
+        feature_name: str,
+        traits: typing.List[TraitModel] = None,
+    ) -> typing.List[FeatureStateModel]:
+        return self._get_feature_states(
+            environment, traits=traits, feature_name=feature_name
+        )[0]
+
+    def get_all_feature_states(
+        self,
+        environment: EnvironmentModel,
+        traits: typing.List[TraitModel] = None,
+    ) -> typing.List[FeatureStateModel]:
+        return self._get_feature_states(environment, traits=traits)
 
     def in_segment(self, segment: SegmentModel) -> bool:
         return len(segment.rules) > 0 and all(

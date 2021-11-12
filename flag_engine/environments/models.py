@@ -5,6 +5,7 @@ from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.projects.models import ProjectModel
 from flag_engine.segments.models import SegmentModel
+from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
 @dataclass
@@ -23,3 +24,12 @@ class EnvironmentModel:
         return next(
             filter(lambda segment: segment.id == segment_id, self.project.segments)
         )
+
+    def get_feature_state(self, feature_name: str) -> FeatureStateModel:
+        try:
+            return next(
+                filter(lambda f: f.feature.name == feature_name, self.feature_states)
+            )
+
+        except StopIteration:
+            raise FeatureStateNotFound()

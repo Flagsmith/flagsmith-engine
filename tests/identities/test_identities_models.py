@@ -21,6 +21,15 @@ from tests.identities.fixtures import (
 )
 
 
+def test_identity_get_feature_state_without_any_override(
+    environment, identity, feature_1
+):
+    # When
+    feature_state = identity.get_feature_state(environment, feature_1.name)
+    # Then
+    assert feature_state.feature == feature_1
+
+
 def test_identity_get_all_feature_states_no_segments(
     feature_1, feature_2, environment, identity
 ):
@@ -94,7 +103,7 @@ def test_identity_get_all_feature_states_segments_only(
         assert feature_state.enabled is expected
 
 
-def test_get_all_feature_states_with_traits(
+def test_identity_get_all_feature_states_with_traits(
     environment_with_segment_override, identity_in_segment, identity
 ):
     # Given
