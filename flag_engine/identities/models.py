@@ -37,6 +37,16 @@ def override_identity_traits(
         identity_model.identity_traits = stored_traits
 
 
+def _get_env_feature_states_dict(
+    environment: EnvironmentModel,
+    feature_name: str = None,
+) -> typing.Dict[FeatureModel, FeatureStateModel]:
+    feature_states = environment.feature_states
+    if feature_name:
+        feature_states = [environment.get_feature_state(feature_name)]
+    return {fs.feature: fs for fs in feature_states}
+
+
 @dataclass
 class IdentityModel:
     identifier: str
@@ -49,36 +59,18 @@ class IdentityModel:
     def composite_key(self):
         return self.generate_composite_key(self.environment_api_key, self.identifier)
 
-    def _get_env_feature_states_dict(
-        self,
-        environment: EnvironmentModel,
-        feature_name: str = None,
-    ) -> typing.Dict[FeatureModel, FeatureStateModel]:
-        feature_states = environment.feature_states
-        if feature_name:
-            feature_states = [environment.get_feature_state(feature_name)]
-        return {fs.feature: fs for fs in feature_states}
-
-    def _update_feature_state_dict_with_segment_override(
+    def _get_all_feature_state_dict_with_segment_override(
         self,
         environment,
-        all_feature_states: typing.Dict[FeatureModel, FeatureStateModel],
+        feature_name: str = None,
     ) -> None:
+
+        all_feature_states = _get_env_feature_states_dict(environment, feature_name)
         for feature_state in environment.segment_overrides:
             segment = environment.get_segment(feature_state.segment_id)
             if feature_state.feature in all_feature_states and self.in_segment(segment):
                 all_feature_states[feature_state.feature] = feature_state
-
-    def _update_feature_state_dict_with_identity_override(
-        self, feature_states: typing.Dict[FeatureModel, FeatureStateModel]
-    ):
-        feature_states.update(
-            {
-                fs.feature: fs
-                for fs in self.identity_features
-                if fs.feature in feature_states
-            }
-        )
+        return all_feature_states
 
     def get_all_feature_states(
         self,
@@ -87,15 +79,19 @@ class IdentityModel:
         traits: typing.List[TraitModel] = None,
         feature_name: str = None,
     ) -> typing.List[FeatureStateModel]:
-        feature_states = self._get_env_feature_states_dict(environment, feature_name)
         with override_identity_traits(self, traits or self.identity_traits):
-
-            # Override feature states with segment feature states
-            self._update_feature_state_dict_with_segment_override(
-                environment, feature_states
+            # Get feature states with segment override
+            feature_states = self._get_all_feature_state_dict_with_segment_override(
+                environment, feature_name
             )
             # Override feature states with identity feature states
-            self._update_feature_state_dict_with_identity_override(feature_states)
+            feature_states.update(
+                {
+                    fs.feature: fs
+                    for fs in self.identity_features
+                    if fs.feature in feature_states
+                }
+            )
         return list(feature_states.values())
 
     def in_segment(self, segment: SegmentModel) -> bool:
