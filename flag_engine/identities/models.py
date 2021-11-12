@@ -1,6 +1,5 @@
 import datetime
 import typing
-from contextlib import contextmanager
 from dataclasses import dataclass, field
 
 from flag_engine.environments.models import EnvironmentModel
@@ -13,28 +12,13 @@ from flag_engine.segments.models import (
 )
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
+from .context_managers import override_identity_traits
+
 
 @dataclass
 class TraitModel:
     trait_key: str
     trait_value: typing.Any
-
-
-@contextmanager
-def override_identity_traits(
-    identity_model: "IdentityModel", traits: typing.List[TraitModel]
-):
-    """
-    Used for overriding `identity_traits` attribute of `IdentityModel`
-    to support processing traits without having to save them on the `IdentityModel`
-    or passing them as additional argument to the function.
-    """
-    stored_traits = identity_model.identity_traits
-    identity_model.identity_traits = traits
-    try:
-        yield identity_model
-    finally:
-        identity_model.identity_traits = stored_traits
 
 
 def _get_env_feature_states_dict(
