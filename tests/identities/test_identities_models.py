@@ -3,6 +3,7 @@ import pytest
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
+from tests.conftest import segment_condition_property, segment_condition_string_value
 from tests.helpers import get_environment_feature_state_for_feature
 from tests.identities.fixtures import (
     empty_segment,
@@ -91,6 +92,21 @@ def test_identity_get_all_feature_states_segments_only(
             else environment_feature_state.enabled
         )
         assert feature_state.enabled is expected
+
+
+def test_get_all_feature_states_with_traits(
+    environment_with_segment_override, identity_in_segment, identity
+):
+    # Given
+    trait_models = TraitModel(
+        trait_key=segment_condition_property, trait_value=segment_condition_string_value
+    )
+    # When
+    all_feature_states = identity_in_segment.get_all_feature_states(
+        environment=environment_with_segment_override, traits=[trait_models]
+    )
+    # Then
+    assert all_feature_states[0].get_value() == "segment_override"
 
 
 @pytest.mark.parametrize(

@@ -226,3 +226,21 @@ def identity_in_segment(trait_matching_segment, environment):
         environment_api_key=environment.api_key,
         identity_traits=[trait_matching_segment],
     )
+
+
+@pytest.fixture()
+def segment_override_fs(segment, feature_1):
+    fs = FeatureStateModel(
+        id=4,
+        feature=feature_1,
+        enabled=False,
+        segment_id=segment.id,
+    )
+    fs.set_value("segment_override")
+    return fs
+
+
+@pytest.fixture()
+def environment_with_segment_override(environment, segment_override_fs):
+    environment.segment_overrides.append(segment_override_fs)
+    return environment
