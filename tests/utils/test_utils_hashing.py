@@ -33,6 +33,17 @@ def test_percentage_value_is_unique_for_different_identities():
     assert result_1 != result_2
 
 
+def test_percentage_value_works_for_non_integer_ids():
+    # Given
+    ids = ["foo", "bar"]
+
+    # When
+    result = get_hashed_percentage_for_object_ids(ids)
+
+    # Then
+    assert 0 <= result < 100
+
+
 def test_get_hashed_percentage_for_object_ids_should_be_evenly_distributed():
     """
     This test checks if the percentage value returned by the helper function returns
