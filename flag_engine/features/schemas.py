@@ -71,8 +71,7 @@ class FeatureStateSchema(Schema):
         if isinstance(obj, dict):
             return obj.get("segment_id", None)
         feature_segment = getattr(obj, "feature_segment", None)
-        if feature_segment:
-            return feature_segment.segment_id
+        return getattr(feature_segment, "segment_id", None)
 
     def serialize_value(self, instance: object) -> typing.Any:
         if isinstance(instance, dict) and "value" in instance:
