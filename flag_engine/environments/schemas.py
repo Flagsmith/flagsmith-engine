@@ -1,4 +1,4 @@
-from marshmallow import fields
+from marshmallow import fields, pre_dump
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
 from flag_engine.environments.models import EnvironmentModel
@@ -16,7 +16,12 @@ class EnvironmentSchema(LoadToModelSchema):
         metadata={"filter_kwargs": {"feature_segment_id": None, "identity_id": None}},
     )
     project = fields.Nested(ProjectSchema)
-
+    segment_overrides = ListOrDjangoRelatedManagerField(
+        fields.Nested(FeatureStateSchema),
+        metadata={
+            "filter_kwargs": {"feature_segment_id__isnull": False, "identity_id": None}
+        },
+    )
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
@@ -24,3 +29,9 @@ class EnvironmentSchema(LoadToModelSchema):
 
     class Meta:
         model_class = EnvironmentModel
+
+    @pre_dump()
+    def add_segment_overrides(self, obj, *args, **kwargs):
+        if hasattr(obj, "feature_states"):
+            obj.segment_overrides = obj.feature_states
+        return obj
