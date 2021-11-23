@@ -47,18 +47,18 @@ class FeatureStateSchema(Schema):
         allow_none=True,
         required=False,
     )
+
     segment_id = fields.Method(
         "serialize_segment_id",
         deserialize="deserialize_segment_id",
         allow_none=True,
         required=False,
     )
+    identity_id = fields.Int(allow_none=True)
+
     multivariate_feature_state_values = ListOrDjangoRelatedManagerField(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
-
-    segment_id = fields.Int(allow_none=True)
-    identity_id = fields.Int(allow_none=True)
 
     @post_load()
     def make_feature_state(self, data, **kwargs) -> FeatureStateModel:

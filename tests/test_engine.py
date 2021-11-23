@@ -22,7 +22,7 @@ def test_identity_get_all_feature_states_no_segments(
     overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
 
     # set the state of the feature to False in the environment configuration
-    environment.add_feature_state(
+    environment.add_feature_states(
         FeatureStateModel(id=3, feature=overridden_feature, enabled=False)
     )
 
@@ -58,13 +58,10 @@ def test_identity_get_all_feature_states_segments_only(
     # a feature which we can override
     overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
 
-    # which is given a default value of False in the environment configuration
-    environment.add_feature_state(
-        FeatureStateModel(id=3, feature=overridden_feature, enabled=False)
-    )
-
-    # but overridden to True for identities in the segment
-    environment.add_feature_state(
+    environment.add_feature_states(
+        # which is given a default value of False in the environment configuration
+        FeatureStateModel(id=3, feature=overridden_feature, enabled=False),
+        # but overridden to True for identities in the segment
         FeatureStateModel(
             id=4, feature=overridden_feature, enabled=True, segment_id=segment.id
         ),

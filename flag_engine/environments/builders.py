@@ -14,5 +14,5 @@ def build_environment_dict(environment_obj: typing.Any) -> dict:
     return environment_schema_dump.dump(environment_obj)
 
 
-def build_environment_model(environment_obj: object) -> EnvironmentModel:
+def build_environment_model(environment_obj: typing.Any) -> EnvironmentModel:
     return environment_schema_load.load(build_environment_dict(environment_obj))

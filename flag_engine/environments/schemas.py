@@ -16,12 +16,6 @@ class EnvironmentSchemaDump(Schema):
         attribute="feature_states",
     )
     project = fields.Nested(ProjectSchema)
-    segment_overrides = ListOrDjangoRelatedManagerField(
-        fields.Nested(FeatureStateSchema),
-        metadata={
-            "filter_kwargs": {"feature_segment_id__isnull": False, "identity_id": None}
-        },
-    )
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
