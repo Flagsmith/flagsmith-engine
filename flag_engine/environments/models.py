@@ -50,3 +50,6 @@ class EnvironmentModel:
 
         except StopIteration:
             raise FeatureStateNotFound()
+
+    def add_feature_state(self, feature_state: FeatureStateModel) -> None:
+        self._all_feature_states.append(feature_state)

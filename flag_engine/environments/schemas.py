@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, pre_dump
+from marshmallow import Schema, fields
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
 from flag_engine.environments.models import EnvironmentModel

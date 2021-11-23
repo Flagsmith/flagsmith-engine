@@ -242,5 +242,5 @@ def segment_override_fs(segment, feature_1):
 
 @pytest.fixture()
 def environment_with_segment_override(environment, segment_override_fs):
-    environment.segment_overrides.append(segment_override_fs)
+    environment.add_feature_state(segment_override_fs)
     return environment
