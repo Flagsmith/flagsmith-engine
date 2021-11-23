@@ -191,14 +191,26 @@ def feature_2():
 
 
 @pytest.fixture()
-def environment(feature_1, feature_2, project):
+def enabled_feature_state_for_feature_1(feature_1):
+    return FeatureStateModel(id=1, feature=feature_1, enabled=True)
+
+
+@pytest.fixture()
+def disabled_feature_state_for_feature_2(feature_2):
+    return FeatureStateModel(id=1, feature=feature_2, enabled=False)
+
+
+@pytest.fixture()
+def environment(
+    enabled_feature_state_for_feature_1, disabled_feature_state_for_feature_2, project
+):
     return EnvironmentModel(
         id=1,
         api_key="api-key",
         project=project,
         _all_feature_states=[
-            FeatureStateModel(id=1, feature=feature_1, enabled=True),
-            FeatureStateModel(id=2, feature=feature_2, enabled=False),
+            enabled_feature_state_for_feature_1,
+            disabled_feature_state_for_feature_2,
         ],
     )
 
@@ -242,5 +254,5 @@ def segment_override_fs(segment, feature_1):
 
 @pytest.fixture()
 def environment_with_segment_override(environment, segment_override_fs):
-    environment.add_feature_state(segment_override_fs)
+    environment.add_feature_states(segment_override_fs)
     return environment

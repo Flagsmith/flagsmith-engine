@@ -8,14 +8,6 @@ from flag_engine.segments.models import SegmentModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
-def environment_feature_state_filter(feature_state: FeatureStateModel) -> bool:
-    return feature_state.segment_id is None and feature_state.identity_id is None
-
-
-def segment_override_feature_state_filter(feature_state: FeatureStateModel) -> bool:
-    return feature_state.segment_id is not None
-
-
 @dataclass
 class EnvironmentModel:
     id: int
@@ -29,12 +21,12 @@ class EnvironmentModel:
 
     @property
     def feature_states(self) -> typing.List[FeatureStateModel]:
-        return list(filter(environment_feature_state_filter, self._all_feature_states))
+        return list(filter(_environment_feature_state_filter, self._all_feature_states))
 
     @property
     def segment_overrides(self) -> typing.List[FeatureStateModel]:
         return list(
-            filter(segment_override_feature_state_filter, self._all_feature_states)
+            filter(_segment_override_feature_state_filter, self._all_feature_states)
         )
 
     def get_segment(self, segment_id: int) -> SegmentModel:
@@ -51,5 +43,13 @@ class EnvironmentModel:
         except StopIteration:
             raise FeatureStateNotFound()
 
-    def add_feature_state(self, feature_state: FeatureStateModel) -> None:
-        self._all_feature_states.append(feature_state)
+    def add_feature_states(self, *feature_states: FeatureStateModel) -> None:
+        self._all_feature_states.extend(feature_states)
+
+
+def _environment_feature_state_filter(feature_state: FeatureStateModel) -> bool:
+    return feature_state.segment_id is None and feature_state.identity_id is None
+
+
+def _segment_override_feature_state_filter(feature_state: FeatureStateModel) -> bool:
+    return feature_state.segment_id is not None
