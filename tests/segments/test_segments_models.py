@@ -55,6 +55,8 @@ from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
         (constants.NOT_CONTAINS, "bar", "b", False),
         (constants.NOT_CONTAINS, "bar", "bar", False),
         (constants.NOT_CONTAINS, "bar", "baz", True),
+        (constants.REGEX, "foo", r"[a-z]+", True),
+        (constants.REGEX, "FOO", r"[a-z]+", False),
     ),
 )
 def test_segment_condition_matches_trait_value(
