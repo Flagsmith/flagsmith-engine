@@ -1,3 +1,5 @@
+import typing
+
 from marshmallow import fields, validate
 
 from flag_engine.segments import constants
@@ -12,11 +14,20 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 class SegmentConditionSchema(LoadToModelSchema):
     operator = fields.Str(validate=validate.OneOf(constants.CONDITION_OPERATORS))
-    property_ = fields.Str(attribute="property")
+    property_ = fields.Method(
+        serialize="serialize_property",
+        deserialize="deserialize_property",
+    )
     value = fields.Field()
 
     class Meta:
         model_class = SegmentConditionModel
+
+    def serialize_property(self, obj: typing.Any) -> str:
+        return getattr(obj, "property", None) or obj["property_"]
+
+    def deserialize_property(self, value: str):
+        return value
 
 
 class SegmentRuleSchema(LoadToModelSchema):

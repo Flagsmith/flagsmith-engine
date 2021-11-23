@@ -1,0 +1,2 @@
+class FeatureStateNotFound(Exception):
+    pass

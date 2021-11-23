@@ -140,6 +140,25 @@ def django_trait_boolean():
 
 
 @pytest.fixture()
+def segment_condition():
+    return SegmentConditionModel(
+        operator=constants.EQUAL,
+        property_=segment_condition_property,
+        value=segment_condition_string_value,
+    )
+
+
+@pytest.fixture()
+def segment_rule(segment_condition):
+    return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
+
+
+@pytest.fixture()
+def segment(segment_rule):
+    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
+
+
+@pytest.fixture()
 def organisation():
     return OrganisationModel(
         id=1,
@@ -151,9 +170,13 @@ def organisation():
 
 
 @pytest.fixture()
-def project(organisation):
+def project(organisation, segment):
     return ProjectModel(
-        id=1, name="Test Project", organisation=organisation, hide_disabled_flags=False
+        id=1,
+        name="Test Project",
+        organisation=organisation,
+        hide_disabled_flags=False,
+        segments=[segment],
     )
 
 
@@ -190,25 +213,6 @@ def identity(environment):
 
 
 @pytest.fixture()
-def segment_condition():
-    return SegmentConditionModel(
-        operator=constants.EQUAL,
-        property_=segment_condition_property,
-        value=segment_condition_string_value,
-    )
-
-
-@pytest.fixture()
-def segment_rule(segment_condition):
-    return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
-
-
-@pytest.fixture()
-def segment(segment_rule):
-    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
-
-
-@pytest.fixture()
 def trait_matching_segment(segment_condition):
     return TraitModel(
         trait_key=segment_condition.property_, trait_value=segment_condition.value
@@ -222,3 +226,21 @@ def identity_in_segment(trait_matching_segment, environment):
         environment_api_key=environment.api_key,
         identity_traits=[trait_matching_segment],
     )
+
+
+@pytest.fixture()
+def segment_override_fs(segment, feature_1):
+    fs = FeatureStateModel(
+        id=4,
+        feature=feature_1,
+        enabled=False,
+        segment_id=segment.id,
+    )
+    fs.set_value("segment_override")
+    return fs
+
+
+@pytest.fixture()
+def environment_with_segment_override(environment, segment_override_fs):
+    environment.segment_overrides.append(segment_override_fs)
+    return environment
