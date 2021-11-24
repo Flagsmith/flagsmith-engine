@@ -9,6 +9,20 @@ from flag_engine.utils.json.encoders import DecimalEncoder
 from tests.mock_django_classes import DjangoIdentity
 
 
+def test_build_identity_dict(django_identity):
+    # When
+    identity_dict = build_identity_dict(django_identity)
+
+    # Then
+    assert (
+        identity_dict["composite_key"]
+        == f"{django_identity.environment.api_key}_{django_identity.identifier}"
+    )
+    assert isinstance(identity_dict, dict)
+    assert json.dumps(identity_dict, cls=DecimalEncoder)
+    assert identity_dict["django_id"] == django_identity.id
+
+
 def test_build_identity_model_from_django_no_feature_states(
     django_environment,
     django_trait_boolean,
@@ -29,9 +43,10 @@ def test_build_identity_model_from_django_no_feature_states(
             django_trait_boolean,
         ],
     )
+    identity_dict = build_identity_dict(django_identity)
 
     # When
-    identity_model = build_identity_model(django_identity)
+    identity_model = build_identity_model(identity_dict)
 
     # Then
     assert isinstance(identity_model, IdentityModel)
@@ -79,9 +94,10 @@ def test_build_identity_model_from_django_with_feature_states(
             django_multivariate_feature_state,
         ],
     )
+    identity_dict = build_identity_dict(django_identity)
 
     # When
-    identity_model = build_identity_model(django_identity)
+    identity_model = build_identity_model(identity_dict)
 
     # Then
     assert isinstance(identity_model, IdentityModel)
@@ -112,7 +128,7 @@ def test_build_identity_model_from_dictionary_with_feature_states(
                     "type": STANDARD,
                 },
                 "enabled": True,
-                "_value": "some-value",
+                "value": "some-value",
             }
         ],
     }
@@ -124,16 +140,3 @@ def test_build_identity_model_from_dictionary_with_feature_states(
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 1
     assert isinstance(identity_model.identity_features[0], FeatureStateModel)
-
-
-def test_build_identity_dict(django_identity):
-    # When
-    identity_dict = build_identity_dict(django_identity)
-    # Then
-    assert (
-        identity_dict["composite_key"]
-        == f"{django_identity.environment.api_key}_{django_identity.identifier}"
-    )
-    assert isinstance(identity_dict, dict)
-    assert json.dumps(identity_dict, cls=DecimalEncoder)
-    assert identity_dict["django_id"] == django_identity.id
