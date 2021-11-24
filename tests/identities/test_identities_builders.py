@@ -136,3 +136,4 @@ def test_build_identity_dict(django_identity):
     )
     assert isinstance(identity_dict, dict)
     assert json.dumps(identity_dict, cls=DecimalEncoder)
+    assert identity_dict["django_id"] == django_identity.id
