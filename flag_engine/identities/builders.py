@@ -1,14 +1,15 @@
 import typing
 
 from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.schemas import IdentitySchema
+from flag_engine.identities.schemas import IdentitySchemaDump, IdentitySchemaLoad
 
-identity_schema = IdentitySchema()
+identity_schema_load = IdentitySchemaLoad()
+identity_schema_dump = IdentitySchemaDump()
 
 
 def build_identity_dict(identity_obj: typing.Any) -> dict:
-    return identity_schema.dump(identity_obj)
+    return identity_schema_dump.dump(identity_obj)
 
 
 def build_identity_model(identity_obj: typing.Any) -> IdentityModel:
-    return identity_schema.load(build_identity_dict(identity_obj))
+    return identity_schema_load.load(build_identity_dict(identity_obj))

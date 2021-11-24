@@ -17,9 +17,8 @@ class TraitSchema(LoadToModelSchema):
         model_class = TraitModel
 
 
-class IdentitySchema(LoadToModelSchema):
+class IdentitySchemaLoad(LoadToModelSchema):
     identifier = fields.Str()
-    composite_key = fields.Str(dump_only=True)
     created_date = fields.Method(
         serialize="serialize_created_date",
         deserialize="deserialize_created_date",
@@ -36,7 +35,6 @@ class IdentitySchema(LoadToModelSchema):
     )
 
     class Meta:
-        # to exclude dump only fields, e.g: composite_key
         unknown = EXCLUDE
         model_class = IdentityModel
 
@@ -67,3 +65,12 @@ class IdentitySchema(LoadToModelSchema):
 
     def deserialize_created_date(self, created_date: str) -> datetime:
         return utils.from_iso_datetime(created_date)
+
+
+class IdentitySchemaDump(IdentitySchemaLoad):
+    class Meta:
+        unknown = EXCLUDE
+        model_class = IdentityModel
+
+    composite_key = fields.Str(dump_only=True)
+    django_id = fields.Int(required=False, attribute="id", dump_only=True)
