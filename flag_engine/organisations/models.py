@@ -8,3 +8,6 @@ class OrganisationModel:
     feature_analytics: bool
     stop_serving_flags: bool
     persist_trait_data: bool
+
+    def get_unique_slug(self):
+        return str(self.id) + "-" + self.name
