@@ -1,3 +1,4 @@
+import re
 import typing
 from dataclasses import dataclass, field
 
@@ -6,11 +7,23 @@ from flag_engine.segments import constants
 
 @dataclass
 class SegmentConditionModel:
+    EXCEPTION_OPERATOR_METHODS = {
+        constants.NOT_CONTAINS: "evaluate_not_contains",
+        constants.REGEX: "evaluate_regex",
+    }
+
     operator: str
     value: typing.Any
     property_: str = None
 
     def matches_trait_value(self, trait_value: typing.Any) -> bool:
+        # TODO: move this logic to the evaluator module
+        if self.operator in self.EXCEPTION_OPERATOR_METHODS:
+            evaluator_function = getattr(
+                self, self.EXCEPTION_OPERATOR_METHODS.get(self.operator)
+            )
+            return evaluator_function(trait_value)
+
         matching_function_name = {
             constants.EQUAL: "__eq__",
             constants.GREATER_THAN: "__gt__",
@@ -19,19 +32,18 @@ class SegmentConditionModel:
             constants.LESS_THAN_INCLUSIVE: "__le__",
             constants.NOT_EQUAL: "__ne__",
             constants.CONTAINS: "__contains__",
-            constants.NOT_CONTAINS: "__contains__",
         }.get(self.operator)
 
         matching_function = getattr(
             trait_value, matching_function_name, lambda v: False
         )
-        result = matching_function(self.value)
+        return matching_function(self.value)
 
-        if self.operator == constants.NOT_CONTAINS:
-            # negate the contains result as there is no built in method for notcontains
-            return not result
+    def evaluate_not_contains(self, trait_value: typing.Iterable) -> bool:
+        return self.value not in trait_value
 
-        return result
+    def evaluate_regex(self, trait_value: str) -> bool:
+        return re.compile(str(self.value)).match(trait_value) is not None
 
 
 @dataclass
