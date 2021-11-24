@@ -48,7 +48,7 @@ class FeatureStateSchema(Schema):
         required=False,
     )
     segment_id = fields.Method(
-        "serialize_segment_id",
+        serialize="serialize_segment_id",
         deserialize="deserialize_segment_id",
         allow_none=True,
         required=False,
@@ -68,15 +68,10 @@ class FeatureStateSchema(Schema):
         return int(value)
 
     def serialize_segment_id(self, obj):
-        if isinstance(obj, dict):
-            return obj.get("segment_id", None)
         feature_segment = getattr(obj, "feature_segment", None)
         return getattr(feature_segment, "segment_id", None)
 
     def serialize_value(self, instance: object) -> typing.Any:
-        if isinstance(instance, dict) and "value" in instance:
-            return instance["value"]
-
         getter = getattr(instance, "get_feature_state_value", lambda *args: None)
         return getter()
 

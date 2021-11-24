@@ -1,7 +1,6 @@
 import typing
-from datetime import datetime
 
-from marshmallow import EXCLUDE, fields, post_dump, utils
+from marshmallow import EXCLUDE, fields, post_dump
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
@@ -19,10 +18,7 @@ class TraitSchema(LoadToModelSchema):
 
 class IdentitySchemaLoad(LoadToModelSchema):
     identifier = fields.Str()
-    created_date = fields.Method(
-        serialize="serialize_created_date",
-        deserialize="deserialize_created_date",
-    )
+    created_date = fields.DateTime()
     environment_api_key = fields.Method(
         serialize="serialize_environment_api_key",
         deserialize="deserialize_environment_api_key",
@@ -52,19 +48,10 @@ class IdentitySchemaLoad(LoadToModelSchema):
         if hasattr(obj, "environment"):
             return obj.environment.api_key
 
-        return getattr(obj, "environment_api_key", None) or obj["environment_api_key"]
+        return getattr(obj, "environment_api_key", None)
 
-    def deserialize_environment_api_key(self, environment_api_key: int) -> int:
+    def deserialize_environment_api_key(self, environment_api_key: str) -> str:
         return environment_api_key
-
-    def serialize_created_date(self, obj: typing.Any) -> str:
-        created_date = getattr(obj, "created_date", None) or obj["created_date"]
-        if isinstance(created_date, str):
-            return created_date
-        return created_date.isoformat()
-
-    def deserialize_created_date(self, created_date: str) -> datetime:
-        return utils.from_iso_datetime(created_date)
 
 
 class IdentitySchemaDump(IdentitySchemaLoad):
