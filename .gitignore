@@ -17,6 +17,7 @@ checkstyle.txt
 **/.pytest_cache/
 .tox
 *egg-info
+dist/
 
 # These get baked into the docker container on build
 src/CI_COMMIT_REF_NAME
