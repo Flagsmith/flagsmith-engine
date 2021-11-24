@@ -2,6 +2,7 @@ import re
 import typing
 from dataclasses import dataclass, field
 
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
 
 
@@ -70,3 +71,4 @@ class SegmentModel:
     id: int
     name: str
     rules: typing.List[SegmentRuleModel] = field(default_factory=list)
+    feature_states: typing.List[FeatureStateModel] = field(default_factory=list)

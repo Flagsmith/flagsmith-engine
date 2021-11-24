@@ -4,6 +4,91 @@ from datetime import datetime
 
 
 @dataclass
+class DjangoSegmentCondition:
+    operator: str
+    property: str
+    value: typing.Any
+
+
+@dataclass
+class DjangoSegmentConditionRelatedObjectManager:
+    conditions: typing.List[DjangoSegmentCondition]
+
+    def filter(self, **filter_kwargs) -> typing.List[DjangoSegmentCondition]:
+        return self.conditions
+
+
+class DjangoSegmentRule:
+    type: str
+    rules: "DjangoSegmentRuleRelatedObjectManager" = None
+    conditions: DjangoSegmentConditionRelatedObjectManager = field(default_factory=list)
+
+    def __init__(
+        self,
+        type: str,
+        rules: typing.List["DjangoSegmentRule"] = None,
+        conditions: typing.List[DjangoSegmentCondition] = None,
+    ):
+        self.type = type
+        self.rules = DjangoSegmentRuleRelatedObjectManager(rules or [])
+        self.conditions = DjangoSegmentConditionRelatedObjectManager(conditions or [])
+
+
+@dataclass
+class DjangoSegmentRuleRelatedObjectManager:
+    rules: typing.List[DjangoSegmentRule]
+
+    def filter(self, **filter_kwargs) -> typing.List[DjangoSegmentRule]:
+        return self.rules
+
+    def all(self) -> typing.List[DjangoSegmentRule]:
+        return self.rules
+
+
+class DjangoSegment:
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        rules: typing.List[DjangoSegmentRule] = None,
+        feature_segments: typing.List["DjangoFeatureSegment"] = None,
+    ):
+        self.id = id
+        self.name = name
+        self.rules = DjangoSegmentRuleRelatedObjectManager(rules or [])
+        self.feature_segments = DjangoFeatureSegmentRelatedObjectManager(
+            feature_segments or []
+        )
+
+
+@dataclass
+class DjangoSegmentRelatedObjectManager:
+    segments: typing.List[DjangoSegment]
+
+    def filter(self, **filter_kwargs) -> typing.List[DjangoSegment]:
+        return self.segments
+
+
+class DjangoFeatureSegment:
+    def __init__(self, feature_states: typing.List["DjangoFeatureState"] = None):
+        self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
+
+
+@dataclass
+class DjangoFeatureSegmentRelatedObjectManager:
+    feature_segments: typing.List[DjangoFeatureSegment]
+
+    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureSegment]:
+        return self.feature_segments
+
+    def all(self) -> typing.List[DjangoFeatureSegment]:
+        return self.feature_segments
+
+    def order_by(self, *args) -> "DjangoFeatureSegmentRelatedObjectManager":
+        return self
+
+
+@dataclass
 class DjangoOrganisation:
     id: int
     name: str
@@ -12,12 +97,20 @@ class DjangoOrganisation:
     feature_analytics: bool = True
 
 
-@dataclass
 class DjangoProject:
-    id: int
-    name: str
-    organisation: DjangoOrganisation
-    hide_disabled_flags: bool = False
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        organisation: DjangoOrganisation,
+        hide_disabled_flags: bool = False,
+        segments: typing.List[DjangoSegment] = None,
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.organisation = organisation
+        self.hide_disabled_flags = hide_disabled_flags
+        self.segments = DjangoSegmentRelatedObjectManager(segments or [])
 
 
 @dataclass
@@ -50,17 +143,6 @@ class DjangoMultivariateFeatureStateValueRelatedManager:
         self, **filter_kwargs
     ) -> typing.List[DjangoMultivariateFeatureStateValue]:
         return self.multivariate_feature_state_values
-
-
-@dataclass
-class DjangoSegment:
-    id: int
-
-
-@dataclass
-class DjangoFeatureSegment:
-    id: int
-    segment: DjangoSegment
 
 
 class DjangoFeatureState:
@@ -97,6 +179,9 @@ class DjangoFeatureStateRelatedManager:
     feature_states: typing.List[DjangoFeatureState]
 
     def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureState]:
+        return self.feature_states
+
+    def all(self) -> typing.List[DjangoFeatureState]:
         return self.feature_states
 
 
