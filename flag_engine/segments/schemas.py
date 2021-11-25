@@ -24,7 +24,7 @@ class SegmentConditionSchema(LoadToModelSchema):
         model_class = SegmentConditionModel
 
     def serialize_property(self, obj: typing.Any) -> str:
-        return getattr(obj, "property", None) or obj["property_"]
+        return getattr(obj, "property", None) or getattr(obj, "property_")
 
     def deserialize_property(self, value: str):
         return value
