@@ -1,7 +1,7 @@
 from flag_engine.organisations.models import OrganisationModel
 
 
-def test_get_unique_slug():
+def test_unique_slug_property():
     # Given
     org_id = 1
     org_name = "test"
@@ -14,4 +14,4 @@ def test_get_unique_slug():
     )
 
     # Then
-    assert org_model.get_unique_slug == f"{org_id}-{org_name}"
+    assert org_model.unique_slug == f"{org_id}-{org_name}"

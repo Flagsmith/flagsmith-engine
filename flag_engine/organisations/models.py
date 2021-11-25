@@ -10,5 +10,5 @@ class OrganisationModel:
     persist_trait_data: bool
 
     @property
-    def get_unique_slug(self):
+    def unique_slug(self):
         return str(self.id) + "-" + self.name
