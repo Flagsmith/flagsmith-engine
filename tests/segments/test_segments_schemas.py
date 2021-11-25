@@ -114,7 +114,7 @@ def test_dict_to_segment_model():
                 "id": 1,
                 "segment_id": None,
                 "enabled": True,
-                "value": None,
+                "feature_state_value": None,
                 "feature": {"id": 1, "name": "my_feature", "type": "STANDARD"},
             }
         ],

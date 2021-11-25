@@ -4,6 +4,7 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.segments.evaluator import get_identity_segments
+from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
 def get_identity_feature_states(
@@ -47,8 +48,13 @@ def get_identity_feature_state(
         environment, identity, override_traits
     )
     matching_feature = next(
-        filter(lambda feature: feature.name == feature_name, feature_states.keys())
+        filter(lambda feature: feature.name == feature_name, feature_states.keys()),
+        None,
     )
+
+    if not matching_feature:
+        raise FeatureStateNotFound()
+
     return feature_states[matching_feature]
 
 

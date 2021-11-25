@@ -128,7 +128,7 @@ def test_build_identity_model_from_dictionary_with_feature_states(
                     "type": STANDARD,
                 },
                 "enabled": True,
-                "value": "some-value",
+                "feature_state_value": "some-value",
             }
         ],
     }
