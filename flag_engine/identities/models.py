@@ -26,3 +26,14 @@ class IdentityModel:
     @staticmethod
     def generate_composite_key(env_key: str, identifier: str) -> str:
         return f"{env_key}_{identifier}"
+
+    def update_traits(self, traits: typing.List[TraitModel]) -> None:
+        existing_traits = {trait.trait_key: trait for trait in self.identity_traits}
+
+        for trait in traits:
+            if trait.trait_value is None:
+                existing_traits.pop(trait.trait_key, None)
+            else:
+                existing_traits[trait.trait_key] = trait
+
+        self.identity_traits = list(existing_traits.values())

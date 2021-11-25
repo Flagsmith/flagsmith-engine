@@ -97,11 +97,13 @@ def test_identity_get_all_feature_states_with_traits(
     trait_models = TraitModel(
         trait_key=segment_condition_property, trait_value=segment_condition_string_value
     )
+
     # When
     all_feature_states = get_identity_feature_states(
         environment=environment_with_segment_override,
         identity=identity_in_segment,
         override_traits=[trait_models],
     )
+
     # Then
     assert all_feature_states[0].get_value() == "segment_override"
