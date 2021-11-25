@@ -14,4 +14,4 @@ def test_get_unique_slug():
     )
 
     # Then
-    assert org_model.get_unique_slug() == f"{org_id}-{org_name}"
+    assert org_model.get_unique_slug == f"{org_id}-{org_name}"
