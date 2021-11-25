@@ -41,9 +41,9 @@ class FeatureStateSchema(Schema):
     id = fields.Int()
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
-    value = fields.Method(
-        serialize="serialize_value",
-        deserialize="deserialize_value",
+    feature_state_value = fields.Method(
+        serialize="serialize_feature_state_value",
+        deserialize="deserialize_feature_state_value",
         allow_none=True,
         required=False,
     )
@@ -59,7 +59,7 @@ class FeatureStateSchema(Schema):
 
     @post_load()
     def make_feature_state(self, data, **kwargs) -> FeatureStateModel:
-        value = data.pop("value", None)
+        value = data.pop("feature_state_value", None)
         feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
@@ -71,9 +71,9 @@ class FeatureStateSchema(Schema):
         feature_segment = getattr(obj, "feature_segment", None)
         return getattr(feature_segment, "segment_id", None)
 
-    def serialize_value(self, instance: object) -> typing.Any:
+    def serialize_feature_state_value(self, instance: object) -> typing.Any:
         getter = getattr(instance, "get_feature_state_value", lambda *args: None)
         return getter()
 
-    def deserialize_value(self, value: typing.Any) -> typing.Any:
+    def deserialize_feature_state_value(self, value: typing.Any) -> typing.Any:
         return value
