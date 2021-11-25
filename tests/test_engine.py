@@ -64,10 +64,10 @@ def test_identity_get_all_feature_states_segments_only(
     )
 
     # but overridden to True for identities in the segment
-    environment.segment_overrides.append(
+    segment.feature_states.append(
         FeatureStateModel(
             id=4, feature=overridden_feature, enabled=True, segment_id=segment.id
-        ),
+        )
     )
 
     # When

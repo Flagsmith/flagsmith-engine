@@ -3,7 +3,7 @@ import typing
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel, TraitModel
-from flag_engine.segments.evaluator import evaluate_identity_in_segment
+from flag_engine.segments.evaluator import get_identity_segments
 
 
 def get_identity_feature_states(
@@ -61,11 +61,12 @@ def _get_identity_feature_states_dict(
     feature_states = {fs.feature: fs for fs in environment.feature_states}
 
     # Override with any feature states defined by matching segments
-    for feature_state in environment.segment_overrides:
-        segment = environment.get_segment(feature_state.segment_id)
-        if feature_state.feature in feature_states and evaluate_identity_in_segment(
-            identity, segment, override_traits
-        ):
+    identity_segments = get_identity_segments(environment, identity, override_traits)
+    for matching_segment in identity_segments:
+        for feature_state in matching_segment.feature_states:
+            # note that feature states are stored on the segment in descending priority
+            # order so we only care that the last one is added
+            # TODO: can we optimise this?
             feature_states[feature_state.feature] = feature_state
 
     # Override with any feature states defined directly the identity

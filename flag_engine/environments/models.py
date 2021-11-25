@@ -14,7 +14,6 @@ class EnvironmentModel:
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
-    segment_overrides: typing.List[FeatureStateModel] = field(default_factory=list)
     amplitude_config: IntegrationModel = None
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None

@@ -2,6 +2,7 @@ import typing
 
 from marshmallow import fields, validate
 
+from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
     SegmentConditionModel,
@@ -47,6 +48,25 @@ class SegmentSchema(LoadToModelSchema):
     id = fields.Int()
     name = fields.Str()
     rules = ListOrDjangoRelatedManagerField(fields.Nested(SegmentRuleSchema))
+    feature_states = fields.Method(
+        serialize="serialize_feature_states", deserialize="deserialize_feature_states"
+    )
 
     class Meta:
         model_class = SegmentModel
+
+    def serialize_feature_states(self, instance: typing.Any) -> typing.List[dict]:
+        if hasattr(instance, "feature_segments"):
+            schema = FeatureStateSchema()
+            feature_states = []
+            # Django datamodel incorrectly uses a foreign key for the
+            # FeatureState -> FeatureSegment relationship so we have to recursively
+            # build the list like this
+            queryset = instance.feature_segments.order_by("feature", "-priority").all()
+            for feature_segment in queryset:
+                feature_states.extend(feature_segment.feature_states.all())
+            return schema.dump(feature_states, many=True)
+        return getattr(instance, "feature_states", [])
+
+    def deserialize_feature_states(self, value: typing.List[dict]) -> typing.List[dict]:
+        return value

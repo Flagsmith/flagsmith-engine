@@ -3,8 +3,22 @@ import typing
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
+from ..environments.models import EnvironmentModel
 from . import constants
 from .models import SegmentConditionModel, SegmentModel, SegmentRuleModel
+
+
+def get_identity_segments(
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+    override_traits: typing.Optional[typing.List[TraitModel]] = None,
+) -> typing.List[SegmentModel]:
+    return list(
+        filter(
+            lambda s: evaluate_identity_in_segment(identity, s, override_traits),
+            environment.project.segments,
+        )
+    )
 
 
 def evaluate_identity_in_segment(

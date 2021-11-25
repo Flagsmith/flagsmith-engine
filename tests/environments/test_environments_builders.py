@@ -171,14 +171,7 @@ def test_environment_feature_states_are_filtered_correctly():
     # When
     build_environment_model(environment_dict)
 
-    fs_call_without_segment_or_identity = mock.call(
-        feature_segment_id=None, identity_id=None
-    )
-    fs_call_with_segment_overrides = mock.call(
-        feature_segment_id__isnull=False, identity_id=None
-    )
     # Then
-    mock_feature_states.filter.assert_has_calls(
-        [fs_call_without_segment_or_identity, fs_call_with_segment_overrides],
-        any_order=True,
+    mock_feature_states.filter.assert_called_once_with(
+        feature_segment_id=None, identity_id=None
     )
