@@ -52,12 +52,15 @@ class SegmentSchema(LoadToModelSchema):
         serialize="serialize_feature_states", deserialize="deserialize_feature_states"
     )
 
+    def __init__(self, *args, **kwargs):
+        super(SegmentSchema, self).__init__(*args, **kwargs)
+        self.feature_state_schema = FeatureStateSchema()
+
     class Meta:
         model_class = SegmentModel
 
     def serialize_feature_states(self, instance: typing.Any) -> typing.List[dict]:
         if hasattr(instance, "feature_segments"):
-            schema = FeatureStateSchema()
             feature_states = []
             # Django datamodel incorrectly uses a foreign key for the
             # FeatureState -> FeatureSegment relationship so we have to recursively
@@ -65,8 +68,8 @@ class SegmentSchema(LoadToModelSchema):
             queryset = instance.feature_segments.order_by("feature", "-priority").all()
             for feature_segment in queryset:
                 feature_states.extend(feature_segment.feature_states.all())
-            return schema.dump(feature_states, many=True)
+            return self.feature_state_schema.dump(feature_states, many=True)
         return getattr(instance, "feature_states", [])
 
     def deserialize_feature_states(self, value: typing.List[dict]) -> typing.List[dict]:
-        return value
+        return self.feature_state_schema.load(value, many=True)
