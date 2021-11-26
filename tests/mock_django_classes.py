@@ -112,6 +112,9 @@ class DjangoProject:
         self.hide_disabled_flags = hide_disabled_flags
         self.segments = DjangoSegmentRelatedObjectManager(segments or [])
 
+    def add_segment(self, segment: DjangoSegment):
+        self.segments.segments.append(segment)
+
 
 @dataclass
 class DjangoFeature:

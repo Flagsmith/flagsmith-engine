@@ -15,8 +15,7 @@ from flag_engine.segments.models import (
     SegmentModel,
     SegmentRuleModel,
 )
-
-from .mock_django_classes import (
+from tests.mock_django_classes import (
     DjangoEnvironment,
     DjangoFeature,
     DjangoFeatureSegment,
