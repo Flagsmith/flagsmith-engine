@@ -1,19 +1,40 @@
 import typing
 
-from marshmallow import EXCLUDE, fields, post_dump
+from marshmallow import EXCLUDE, ValidationError, fields, post_dump
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
 from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
+from .constants import ACCEPTED_TRAIT_VALUE_TYPES, STRING, TRAIT_STRING_VALUE_MAX_LENGTH
+
 
 class TraitSchema(LoadToModelSchema):
     trait_key = fields.Str()
-    trait_value = fields.Str()
+    trait_value = fields.Method(
+        serialize="serialize_trait_value",
+        deserialize="deserialize_trait_value",
+        allow_none=True,
+    )
 
     class Meta:
         model_class = TraitModel
+
+    def serialize_trait_value(self, obj: typing.Any) -> int:
+        return getattr(obj, "trait_value")
+
+    def deserialize_trait_value(self, trait_value: typing.Any) -> typing.Any:
+        data_type = type(trait_value).__name__
+        if data_type not in ACCEPTED_TRAIT_VALUE_TYPES:
+            trait_value = str(trait_value)
+            data_type = STRING
+        if data_type == STRING and len(trait_value) > TRAIT_STRING_VALUE_MAX_LENGTH:
+            raise ValidationError(
+                f"Value string is too long. Must be less than\
+                {TRAIT_STRING_VALUE_MAX_LENGTH} character"
+            )
+        return trait_value
 
 
 class IdentitySchemaLoad(LoadToModelSchema):
