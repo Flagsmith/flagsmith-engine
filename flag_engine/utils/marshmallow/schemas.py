@@ -7,10 +7,9 @@ class LoadToModelSchemaOpts(SchemaOpts):
         self.model_class = getattr(meta, "model_class", None)
 
 
-class LoadToModelSchema(Schema):
-    """Base schema class that returns a model instance if model_class option is set
-    on Meta class after loading(using post load hook)
-
+class LoadToModelMixin:
+    """A mixin class,  that returns a model instance (using model_class option set
+    on Meta class) after loading(using post load hook)
     Example usage:
 
     .. code-block:: python
@@ -18,17 +17,23 @@ class LoadToModelSchema(Schema):
         class AModel:
             id: int
 
-        class ASchema(LoadToModelSchema):
+        class ASchema(LoadToModelSchema, Schema):
             id = fields.Int()
 
             class Meta:
                 model_class = AModel
+
+
+
     """
 
     OPTIONS_CLASS = LoadToModelSchemaOpts
 
     @post_load()
     def make_instance(self, data, **kwargs) -> object:
-        if not self.opts.model_class:
-            return data
         return self.opts.model_class(**data)
+
+
+class LoadToModelSchema(LoadToModelMixin, Schema):
+    """Base schema class that uses LoadToModelMixin to create schema classes that
+    can be loaded to a model"""
