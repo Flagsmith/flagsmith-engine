@@ -15,6 +15,7 @@ class TraitSchema(LoadToModelSchema):
     trait_value = fields.Method(
         serialize="serialize_trait_value",
         deserialize="deserialize_trait_value",
+        allow_none=True,
     )
 
     class Meta:
@@ -25,7 +26,6 @@ class TraitSchema(LoadToModelSchema):
 
     def deserialize_trait_value(self, trait_value: typing.Any) -> typing.Any:
         data_type = type(trait_value).__name__
-
         if data_type not in ACCEPTED_TRAIT_VALUE_TYPES:
             trait_value = str(trait_value)
             data_type = STRING
