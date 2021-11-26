@@ -8,7 +8,8 @@ class LoadToModelSchemaOpts(SchemaOpts):
 
 
 class LoadToModelSchema(Schema):
-    """Base schema class that returns a model instance after loading(using post load hook)
+    """Base schema class that returns a model instance if model_class option is set
+    on Meta class after loading(using post load hook)
 
     Example usage:
 
@@ -29,5 +30,5 @@ class LoadToModelSchema(Schema):
     @post_load()
     def make_instance(self, data, **kwargs) -> object:
         if not self.opts.model_class:
-            raise ValueError("`model_class` attribute is not set in Meta class.")
+            return data
         return self.opts.model_class(**data)
