@@ -1,6 +1,6 @@
 import typing
 
-from marshmallow import EXCLUDE, ValidationError, fields, post_dump
+from marshmallow import EXCLUDE, Schema, ValidationError, fields, post_dump
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel, TraitModel
@@ -10,7 +10,7 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 from .constants import ACCEPTED_TRAIT_VALUE_TYPES, STRING, TRAIT_STRING_VALUE_MAX_LENGTH
 
 
-class TraitSchema(LoadToModelSchema):
+class BaseTraitSchema(Schema):
     trait_key = fields.Str()
     trait_value = fields.Method(
         serialize="serialize_trait_value",
@@ -35,6 +35,11 @@ class TraitSchema(LoadToModelSchema):
                 {TRAIT_STRING_VALUE_MAX_LENGTH} character"
             )
         return trait_value
+
+
+class TraitSchema(LoadToModelSchema, BaseTraitSchema):
+    class Meta:
+        model_class = TraitModel
 
 
 class IdentitySchemaLoad(LoadToModelSchema):
