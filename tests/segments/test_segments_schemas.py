@@ -1,12 +1,12 @@
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
-from flag_engine.segments.constants import ALL_RULE, EQUAL
+from flag_engine.segments.constants import ALL_RULE, EQUAL, PERCENTAGE_SPLIT
 from flag_engine.segments.models import (
     SegmentConditionModel,
     SegmentModel,
     SegmentRuleModel,
 )
-from flag_engine.segments.schemas import SegmentSchema
+from flag_engine.segments.schemas import SegmentConditionSchema, SegmentSchema
 from tests.mock_django_classes import (
     DjangoFeature,
     DjangoFeatureSegment,
@@ -128,3 +128,19 @@ def test_dict_to_segment_model():
     assert segment_model.id == segment_dict["id"]
     assert len(segment_model.rules) == 1
     assert len(segment_model.feature_states) == 1
+
+
+def test_segment_condition_schema_dump_when_property_is_none():
+    # Given
+    schema = SegmentConditionSchema()
+    mock_django_segment_condition = DjangoSegmentCondition(
+        operator=PERCENTAGE_SPLIT, value=10
+    )
+
+    # When
+    data = schema.dump(mock_django_segment_condition)
+
+    # Then
+    assert data["value"] == mock_django_segment_condition.value
+    assert data["operator"] == mock_django_segment_condition.operator
+    assert data["property_"] is None

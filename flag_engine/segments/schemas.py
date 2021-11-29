@@ -25,7 +25,8 @@ class SegmentConditionSchema(LoadToModelSchema):
         model_class = SegmentConditionModel
 
     def serialize_property(self, obj: typing.Any) -> str:
-        return getattr(obj, "property", None) or getattr(obj, "property_")
+        # Note that property can be None for e.g. percentage split operator
+        return getattr(obj, "property", None) or getattr(obj, "property_", None)
 
     def deserialize_property(self, value: str):
         return value
