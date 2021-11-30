@@ -12,11 +12,11 @@ from flag_engine.features.models import (
     MultivariateFeatureStateValueModel,
 )
 from flag_engine.utils.json.encoders import DecimalEncoder
-from tests.helpers import (
+from tests.mock_django_classes import DjangoEnvironment
+from tests.unit.helpers import (
     get_environment_feature_state_for_feature,
     get_environment_feature_state_for_feature_by_name,
 )
-from tests.mock_django_classes import DjangoEnvironment
 
 
 def test_build_environment_dict(django_environment):

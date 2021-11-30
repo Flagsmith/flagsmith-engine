@@ -2,8 +2,11 @@ from flag_engine.engine import get_identity_feature_state, get_identity_feature_
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import TraitModel
-from tests.conftest import segment_condition_property, segment_condition_string_value
-from tests.helpers import get_environment_feature_state_for_feature
+from tests.unit.conftest import (
+    segment_condition_property,
+    segment_condition_string_value,
+)
+from tests.unit.helpers import get_environment_feature_state_for_feature
 
 
 def test_identity_get_feature_state_without_any_override(
