@@ -10,7 +10,7 @@ class DecimalEncoder(json.JSONEncoder):
 
     def default(self, obj):
         if isinstance(obj, decimal.Decimal):
-            if obj % 1 == 1:
+            if obj % 1 == 0:
                 return int(obj)
             return float(obj)
         return json.JSONEncoder.default(self, obj)

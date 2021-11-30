@@ -13,10 +13,14 @@ def test_decimal_encoder_converts_decimal():
     }
 
     # when
-    json_data = json.dumps(data, cls=DecimalEncoder)
+    json_data = json.loads(json.dumps(data, cls=DecimalEncoder))
 
     # Then
-    assert json.loads(json_data) == {
+    assert type(json_data["int_decimal"]) == int
+    assert type(json_data["float_decimal"]) == float
+    assert type(json_data["str_value"]) == str
+
+    assert json_data == {
         "int_decimal": 1,
         "float_decimal": 1.99,
         "str_value": "string",
