@@ -78,12 +78,12 @@ def _traits_match_segment_condition(
     identity_id: str,
 ) -> bool:
     if condition.operator == constants.PERCENTAGE_SPLIT:
+        float_value = float(condition.value)
         return (
             get_hashed_percentage_for_object_ids([segment_id, identity_id])
-            <= condition.value
+            <= float_value
         )
 
-    # TODO: regex
     trait = next(
         filter(lambda t: t.trait_key == condition.property_, identity_traits), None
     )
