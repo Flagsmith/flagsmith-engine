@@ -144,3 +144,17 @@ def test_segment_condition_schema_dump_when_property_is_none():
     assert data["value"] == mock_django_segment_condition.value
     assert data["operator"] == mock_django_segment_condition.operator
     assert data["property_"] is None
+
+
+def test_segment_condition_schema_load_when_property_is_none():
+    # Given
+    schema = SegmentConditionSchema()
+    data = {"operator": PERCENTAGE_SPLIT, "value": 10, "property_": None}
+
+    # When
+    segment_condition_model = schema.load(data)
+
+    # Then
+    assert segment_condition_model.value == data["value"]
+    assert segment_condition_model.operator == data["operator"]
+    assert segment_condition_model.property_ is None

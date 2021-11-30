@@ -18,6 +18,7 @@ class SegmentConditionSchema(LoadToModelSchema):
     property_ = fields.Method(
         serialize="serialize_property",
         deserialize="deserialize_property",
+        allow_none=True,
     )
     value = fields.Field()
 
