@@ -1,4 +1,4 @@
-from flag_engine.engine import get_identity_feature_state, get_identity_feature_states
+from flag_engine.engine import get_identity_flag, get_identity_flags
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import TraitModel
@@ -6,16 +6,24 @@ from tests.unit.conftest import (
     segment_condition_property,
     segment_condition_string_value,
 )
-from tests.unit.helpers import get_environment_feature_state_for_feature
+from tests.unit.helpers import (
+    get_environment_feature_state_for_feature,
+    get_environment_flag_for_feature,
+)
 
 
 def test_identity_get_feature_state_without_any_override(
     environment, identity, feature_1
 ):
+    # Given
+    default_flag = get_environment_flag_for_feature(environment, feature_1)
+
     # When
-    feature_state = get_identity_feature_state(environment, identity, feature_1.name)
+    flag = get_identity_flag(environment, identity, feature_1.name)
+
     # Then
-    assert feature_state.feature == feature_1
+    assert flag.feature == feature_1
+    assert flag.value == default_flag.value
 
 
 def test_identity_get_all_feature_states_no_segments(
@@ -35,23 +43,21 @@ def test_identity_get_all_feature_states_no_segments(
     ]
 
     # When
-    all_feature_states = get_identity_feature_states(
-        environment=environment, identity=identity
-    )
+    all_flags = get_identity_flags(environment=environment, identity=identity)
 
     # Then
-    assert len(all_feature_states) == 3
-    for feature_state in all_feature_states:
+    assert len(all_flags) == 3
+    for flag in all_flags:
         environment_feature_state = get_environment_feature_state_for_feature(
-            environment, feature_state.feature
+            environment, flag.feature
         )
 
         expected = (
             True
-            if feature_state.feature == overridden_feature
+            if flag.feature == overridden_feature
             else environment_feature_state.enabled
         )
-        assert feature_state.enabled is expected
+        assert flag.enabled is expected
 
 
 def test_identity_get_all_feature_states_segments_only(
@@ -74,23 +80,23 @@ def test_identity_get_all_feature_states_segments_only(
     )
 
     # When
-    all_feature_states = get_identity_feature_states(
+    all_flags = get_identity_flags(
         environment=environment, identity=identity_in_segment
     )
 
     # Then
-    assert len(all_feature_states) == 3
-    for feature_state in all_feature_states:
+    assert len(all_flags) == 3
+    for flag in all_flags:
         environment_feature_state = get_environment_feature_state_for_feature(
-            environment, feature_state.feature
+            environment, flag.feature
         )
 
         expected = (
             True
-            if feature_state.feature == overridden_feature
+            if flag.feature == overridden_feature
             else environment_feature_state.enabled
         )
-        assert feature_state.enabled is expected
+        assert flag.enabled is expected
 
 
 def test_identity_get_all_feature_states_with_traits(
@@ -102,11 +108,11 @@ def test_identity_get_all_feature_states_with_traits(
     )
 
     # When
-    all_feature_states = get_identity_feature_states(
+    all_flags = get_identity_flags(
         environment=environment_with_segment_override,
         identity=identity_in_segment,
         override_traits=[trait_models],
     )
 
     # Then
-    assert all_feature_states[0].get_value() == "segment_override"
+    assert all_flags[0].value == "segment_override"

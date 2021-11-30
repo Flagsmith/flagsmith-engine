@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flag_engine.engine import get_identity_feature_states
+from flag_engine.engine import get_identity_flags
 from flag_engine.environments.builders import (
     build_environment_dict,
     build_environment_model,
@@ -21,11 +21,11 @@ def test_environment_end_to_end(mock_django_environment):
     assert environment_model
 
     # Finally, we should be able to get the flags for this environment
-    assert environment_model.feature_states
+    assert environment_model.flags
     # and the feature states should be correct
-    assert len(environment_model.feature_states) == 1
-    assert environment_model.feature_states[0].enabled is True
-    assert environment_model.feature_states[0].get_feature_state_value() == "foobar"
+    assert len(environment_model.flags) == 1
+    assert environment_model.flags[0].enabled is True
+    assert environment_model.flags[0].value == "foobar"
 
 
 def test_identity_end_to_end(mock_django_environment, mock_django_feature):
@@ -70,9 +70,7 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
     environment_model = build_environment_model(
         build_environment_dict(mock_django_environment)
     )
-    feature_states = get_identity_feature_states(
-        environment=environment_model, identity=identity_model
-    )
-    assert feature_states
-    assert len(feature_states) == 1
-    assert feature_states[0].get_feature_state_value() == identity_feature_state_value
+    flags = get_identity_flags(environment=environment_model, identity=identity_model)
+    assert flags
+    assert len(flags) == 1
+    assert flags[0].value == identity_feature_state_value

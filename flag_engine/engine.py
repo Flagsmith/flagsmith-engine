@@ -2,16 +2,17 @@ import typing
 
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.flags.models import Flag
 from flag_engine.identities.models import IdentityModel, TraitModel
 from flag_engine.segments.evaluator import get_identity_segments
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
-def get_identity_feature_states(
+def get_identity_flags(
     environment: EnvironmentModel,
     identity: IdentityModel,
     override_traits: typing.List[TraitModel] = None,
-) -> typing.List[FeatureStateModel]:
+) -> typing.List[Flag]:
     """
     Get a list of feature states for a given identity in a given environment.
 
@@ -21,19 +22,20 @@ def get_identity_feature_states(
     :return: list of feature state models based on the environment, any matching
         segments and any specific identity overrides
     """
-    return list(
-        _get_identity_feature_states_dict(
+    return [
+        Flag.from_feature_state(feature_state, identity)
+        for feature_state in _get_identity_feature_states_dict(
             environment, identity, override_traits
         ).values()
-    )
+    ]
 
 
-def get_identity_feature_state(
+def get_identity_flag(
     environment: EnvironmentModel,
     identity: IdentityModel,
     feature_name: str,
     override_traits: typing.List[TraitModel] = None,
-):
+) -> Flag:
     """
     Get a specific feature state for a given identity in a given environment.
 
@@ -55,7 +57,7 @@ def get_identity_feature_state(
     if not matching_feature:
         raise FeatureStateNotFound()
 
-    return feature_states[matching_feature]
+    return Flag.from_feature_state(feature_states[matching_feature], identity)
 
 
 def _get_identity_feature_states_dict(

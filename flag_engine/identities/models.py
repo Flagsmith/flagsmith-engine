@@ -20,6 +20,7 @@ class IdentityModel:
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
     identity_uuid: str = field(default_factory=uuid.uuid4)
+    django_id: str = None
 
     @property
     def composite_key(self):

@@ -57,6 +57,7 @@ class IdentitySchemaLoad(LoadToModelSchema):
     identity_features = ListOrDjangoRelatedManagerField(
         fields.Nested(FeatureStateSchema), required=False
     )
+    django_id = fields.Int(required=False, allow_none=True)
 
     class Meta:
         unknown = EXCLUDE

@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.features.models import FeatureStateModel
+from flag_engine.flags.models import Flag
 from flag_engine.projects.models import ProjectModel
 from flag_engine.segments.models import SegmentModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
@@ -18,6 +19,13 @@ class EnvironmentModel:
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None
     heap_config: IntegrationModel = None
+
+    @property
+    def flags(self) -> typing.List[Flag]:
+        return [
+            Flag.from_feature_state(feature_state)
+            for feature_state in self.feature_states
+        ]
 
     def get_segment(self, segment_id: int) -> SegmentModel:
         return next(
