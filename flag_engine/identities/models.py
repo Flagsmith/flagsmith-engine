@@ -1,5 +1,6 @@
 import datetime
 import typing
+import uuid
 from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
@@ -18,6 +19,7 @@ class IdentityModel:
     created_date: datetime = field(default_factory=datetime.datetime.now)
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
+    identity_uuid: str = field(default_factory=uuid.uuid4)
 
     @property
     def composite_key(self):

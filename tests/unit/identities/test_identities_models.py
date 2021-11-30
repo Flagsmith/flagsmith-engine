@@ -13,6 +13,11 @@ def test_composite_key():
     assert identity_model.composite_key == f"{environment_api_key}_{identifier}"
 
 
+def test_identiy_model_creates_default_identity_uuid():
+    identity_model = IdentityModel(identifier="test", environment_api_key="some_key")
+    assert identity_model.identity_uuid is not None
+
+
 def test_generate_composite_key():
     # Given
     environment_api_key = "abc123"
