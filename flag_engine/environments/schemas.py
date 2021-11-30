@@ -25,7 +25,6 @@ class EnvironmentSchema(LoadToModelSchema):
         model_class = EnvironmentModel
 
     @pre_dump()
-    def add_segment_overrides(self, obj, *args, **kwargs):
-        if hasattr(obj, "feature_states"):
-            obj.segment_overrides = obj.feature_states
+    def set_environment_key_in_context(self, obj, *args, **kwargs):
+        self.context["environment_api_key"] = getattr(obj, "api_key", None)
         return obj

@@ -63,11 +63,19 @@ class SegmentSchema(LoadToModelSchema):
 
     def serialize_feature_states(self, instance: typing.Any) -> typing.List[dict]:
         if hasattr(instance, "feature_segments"):
-            feature_states = []
+            # Feature segments in the django data model are associated with a segment
+            # and an environment we need to make sure we only get the feature segments
+            # for the environment we are serializing. The api key is set in the context
+            # using a pre_dump method on the EnvironmentSchema.
+            environment_api_key = self.context.get("environment_api_key")
+            queryset = instance.feature_segments.order_by("feature", "-priority")
+            if environment_api_key:
+                queryset = queryset.filter(environment__api_key=environment_api_key)
+
             # Django datamodel incorrectly uses a foreign key for the
             # FeatureState -> FeatureSegment relationship so we have to recursively
             # build the list like this
-            queryset = instance.feature_segments.order_by("feature", "-priority").all()
+            feature_states = []
             for feature_segment in queryset:
                 feature_states.extend(feature_segment.feature_states.all())
             return self.feature_state_schema.dump(feature_states, many=True)

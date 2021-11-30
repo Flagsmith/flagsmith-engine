@@ -50,8 +50,10 @@ def test_segment_schema_django_object_to_dict(django_project):
         ],
     )
 
+    schema = SegmentSchema(context={"environment_api_key": "api-key"})
+
     # When
-    data = segment_schema.dump(segment)
+    data = schema.dump(segment)
 
     # Then
     assert data["id"] == segment.id
@@ -158,3 +160,44 @@ def test_segment_condition_schema_load_when_property_is_none():
     assert segment_condition_model.value == data["value"]
     assert segment_condition_model.operator == data["operator"]
     assert segment_condition_model.property_ is None
+
+
+def test_segment_schema_serialize_feature_states(mocker):
+    # Given
+    # a mock feature state schema object so we can confirm that dump is
+    # called correctly later on
+    mock_feature_state_schema_class = mocker.patch(
+        "flag_engine.segments.schemas.FeatureStateSchema"
+    )
+    mock_feature_state_schema = mock_feature_state_schema_class.return_value
+
+    # and we instantiate the segment schema with the environment_api_key in the context
+    environment_api_key = "api-key"
+    schema = SegmentSchema(context={"environment_api_key": environment_api_key})
+
+    # and we create some mock objects
+    mock_segment = mocker.MagicMock()
+    mock_feature_state = mocker.MagicMock()
+    mock_feature_segment = mocker.MagicMock()
+
+    # and set up the return values as per django queryset logic
+    order_by_response = mock_segment.feature_segments.order_by.return_value
+    mock_feature_segment.feature_states.all.return_value = [mock_feature_state]
+    order_by_response.filter.return_value = [mock_feature_segment]
+
+    # When
+    serialized_instance = schema.serialize_feature_states(mock_segment)
+
+    # Then
+    # The feature segments are filtered correctly by the environment
+    mock_segment.feature_segments.order_by.assert_called_once_with(
+        "feature", "-priority"
+    )
+    order_by_response.filter.assert_called_once_with(
+        environment__api_key=environment_api_key
+    )
+
+    # and the feature states are dumped and returned correctly
+    mock_feature_state_schema.dump.assert_called_once()
+    mock_feature_state_schema.dump.assert_called_with([mock_feature_state], many=True)
+    assert serialized_instance == mock_feature_state_schema.dump.return_value
