@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
+from flag_engine.utils.types import get_casting_function
 
 
 @dataclass
@@ -14,7 +15,7 @@ class SegmentConditionModel:
     }
 
     operator: str
-    value: typing.Any
+    value: str
     property_: str = None
 
     def matches_trait_value(self, trait_value: typing.Any) -> bool:
@@ -38,7 +39,8 @@ class SegmentConditionModel:
         matching_function = getattr(
             trait_value, matching_function_name, lambda v: False
         )
-        return matching_function(self.value)
+        to_same_type_as_trait_value = get_casting_function(trait_value)
+        return matching_function(to_same_type_as_trait_value(self.value))
 
     def evaluate_not_contains(self, trait_value: typing.Iterable) -> bool:
         return self.value not in trait_value
