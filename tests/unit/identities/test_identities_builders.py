@@ -21,6 +21,7 @@ def test_build_identity_dict(django_identity):
     assert isinstance(identity_dict, dict)
     assert json.dumps(identity_dict, cls=DecimalEncoder)
     assert identity_dict["django_id"] == django_identity.id
+    assert identity_dict["identity_uuid"] is not None
 
 
 def test_build_identity_model_from_django_no_feature_states(
@@ -74,6 +75,15 @@ def test_build_identity_model_from_dictionary_no_feature_states(django_environme
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 0
     assert len(identity_model.identity_traits) == 1
+
+
+def test_build_build_identity_model_from_dict_creates_identity_uuid():
+
+    identity_model = build_identity_model(
+        {"identifier": "test_user", "environment_api_key": "some_key"}
+    )
+
+    assert identity_model.identity_uuid is not None
 
 
 def test_build_identity_model_from_django_with_feature_states(

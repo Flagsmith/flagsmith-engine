@@ -1,4 +1,5 @@
 import typing
+import uuid
 
 from marshmallow import EXCLUDE, Schema, ValidationError, fields, post_dump
 
@@ -45,6 +46,7 @@ class TraitSchema(LoadToModelSchema, BaseTraitSchema):
 class IdentitySchemaLoad(LoadToModelSchema):
     identifier = fields.Str()
     created_date = fields.DateTime()
+    identity_uuid = fields.UUID(default=uuid.uuid4)
     environment_api_key = fields.Method(
         serialize="serialize_environment_api_key",
         deserialize="deserialize_environment_api_key",

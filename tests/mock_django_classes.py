@@ -6,7 +6,7 @@ from datetime import datetime
 @dataclass
 class DjangoSegmentCondition:
     operator: str
-    value: typing.Any
+    value: str
     property: str = None  # property can be none e.g. for % split operator
 
 
