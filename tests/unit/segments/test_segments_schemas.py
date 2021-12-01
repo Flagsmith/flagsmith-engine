@@ -114,7 +114,6 @@ def test_dict_to_segment_model():
             {
                 "multivariate_feature_state_values": [],
                 "id": 1,
-                "segment_id": None,
                 "enabled": True,
                 "feature_state_value": None,
                 "feature": {"id": 1, "name": "my_feature", "type": "STANDARD"},
