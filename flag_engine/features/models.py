@@ -35,7 +35,6 @@ class FeatureStateModel:
     feature: FeatureModel
     enabled: bool
     _value: typing.Any = field(default=None, init=False)
-    segment_id: int = None
     multivariate_feature_state_values: typing.List[
         MultivariateFeatureStateValueModel
     ] = field(default_factory=list)

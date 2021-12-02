@@ -71,7 +71,9 @@ class DjangoSegmentRelatedObjectManager:
 
 class DjangoFeatureSegment:
     def __init__(self, feature_states: typing.List["DjangoFeatureState"] = None):
-        self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
+        self.feature_states = DjangoFeatureSegmentFeatureStatesRelatedManager(
+            feature_states or []
+        )
 
 
 @dataclass
@@ -186,6 +188,15 @@ class DjangoFeatureStateRelatedManager:
 
     def all(self) -> typing.List[DjangoFeatureState]:
         return self.feature_states
+
+
+class DjangoFeatureSegmentFeatureStatesRelatedManager(DjangoFeatureStateRelatedManager):
+    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureState]:
+        if not filter_kwargs.get("environment__api_key"):
+            raise ValueError("Must provide environment__api_key filter arg")
+        return super(DjangoFeatureSegmentFeatureStatesRelatedManager, self).filter(
+            **filter_kwargs
+        )
 
 
 class DjangoEnvironment:
