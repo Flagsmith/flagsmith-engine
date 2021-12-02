@@ -1,6 +1,6 @@
 import typing
 
-from marshmallow import Schema, fields, post_load, validate
+from marshmallow import EXCLUDE, Schema, fields, post_load, validate
 
 from flag_engine.features.models import (
     FeatureModel,
@@ -47,15 +47,12 @@ class FeatureStateSchema(Schema):
         allow_none=True,
         required=False,
     )
-    segment_id = fields.Method(
-        serialize="serialize_segment_id",
-        deserialize="deserialize_segment_id",
-        allow_none=True,
-        required=False,
-    )
     multivariate_feature_state_values = ListOrDjangoRelatedManagerField(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
+
+    class Meta:
+        unknown = EXCLUDE
 
     @post_load()
     def make_feature_state(self, data, **kwargs) -> FeatureStateModel:
@@ -63,13 +60,6 @@ class FeatureStateSchema(Schema):
         feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
-
-    def deserialize_segment_id(self, value):
-        return int(value)
-
-    def serialize_segment_id(self, obj):
-        feature_segment = getattr(obj, "feature_segment", None)
-        return getattr(feature_segment, "segment_id", None)
 
     def serialize_feature_state_value(self, instance: object) -> typing.Any:
         getter = getattr(instance, "get_feature_state_value", lambda *args: None)

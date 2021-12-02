@@ -63,7 +63,9 @@ def mock_django_segment(mock_django_project, mock_django_feature):
 
 
 @pytest.fixture()
-def mock_django_environment(mock_django_project, mock_django_feature):
+def mock_django_environment(
+    mock_django_project, mock_django_feature, mock_django_segment
+):
     return DjangoEnvironment(
         id=1,
         project=mock_django_project,
