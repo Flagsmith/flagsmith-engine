@@ -1,9 +1,10 @@
 import typing
 
-from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.identities.models import IdentityModel
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 from ..environments.models import EnvironmentModel
+from ..identities.traits.models import TraitModel
 from . import constants
 from .models import SegmentConditionModel, SegmentModel, SegmentRuleModel
 
@@ -39,7 +40,7 @@ def evaluate_identity_in_segment(
         _traits_match_segment_rule(
             override_traits or identity.identity_traits,
             rule,
-            segment.id,
+            segment.django_id or segment.id,
             identity.composite_key,
         )
         for rule in segment.rules
@@ -49,8 +50,8 @@ def evaluate_identity_in_segment(
 def _traits_match_segment_rule(
     identity_traits: typing.List[TraitModel],
     rule: SegmentRuleModel,
-    segment_id: int,
-    identity_id: str,
+    segment_id: typing.Union[int, str],
+    identity_id: typing.Union[int, str],
 ) -> bool:
     matches_conditions = (
         rule.matching_function(
@@ -74,8 +75,8 @@ def _traits_match_segment_rule(
 def _traits_match_segment_condition(
     identity_traits: typing.List[TraitModel],
     condition: SegmentConditionModel,
-    segment_id: int,
-    identity_id: str,
+    segment_id: typing.Union[int, str],
+    identity_id: typing.Union[int, str],
 ) -> bool:
     if condition.operator == constants.PERCENTAGE_SPLIT:
         float_value = float(condition.value)

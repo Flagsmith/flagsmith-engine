@@ -9,7 +9,6 @@ from flag_engine.utils.exceptions import FeatureStateNotFound
 
 @dataclass
 class EnvironmentModel:
-    id: int
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)

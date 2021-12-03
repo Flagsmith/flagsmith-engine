@@ -1,7 +1,7 @@
 from flag_engine.engine import get_identity_feature_state, get_identity_feature_states
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
-from flag_engine.identities.models import TraitModel
+from flag_engine.identities.traits.models import TraitModel
 from tests.unit.conftest import (
     segment_condition_property,
     segment_condition_string_value,

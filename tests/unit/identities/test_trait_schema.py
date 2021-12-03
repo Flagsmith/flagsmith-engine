@@ -1,7 +1,7 @@
 import pytest
 
-from flag_engine.identities.models import TraitModel
-from flag_engine.identities.schemas import TraitSchema
+from flag_engine.identities.traits.models import TraitModel
+from flag_engine.identities.traits.schemas import TraitSchema
 
 
 @pytest.mark.parametrize(

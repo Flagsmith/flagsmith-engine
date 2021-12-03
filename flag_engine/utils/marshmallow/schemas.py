@@ -22,9 +22,6 @@ class LoadToModelMixin:
 
             class Meta:
                 model_class = AModel
-
-
-
     """
 
     OPTIONS_CLASS = LoadToModelSchemaOpts

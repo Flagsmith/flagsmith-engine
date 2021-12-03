@@ -4,12 +4,7 @@ import uuid
 from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
-
-
-@dataclass
-class TraitModel:
-    trait_key: str
-    trait_value: typing.Any
+from flag_engine.identities.traits.models import TraitModel
 
 
 @dataclass
@@ -20,6 +15,7 @@ class IdentityModel:
     identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
     identity_uuid: str = field(default_factory=uuid.uuid4)
+    django_id: int = None
 
     @property
     def composite_key(self):
