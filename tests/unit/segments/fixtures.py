@@ -9,15 +9,14 @@ trait_key_1 = "email"
 trait_value_1 = "user@example.com"
 
 trait_key_2 = "num_purchase"
-trait_value_2 = 12
+trait_value_2 = "12"
 
 trait_key_3 = "date_joined"
 trait_value_3 = "2021-01-01"
 
 
-empty_segment = SegmentModel(id=1, name="empty_segment")
+empty_segment = SegmentModel(name="empty_segment")
 segment_single_condition = SegmentModel(
-    id=2,
     name="segment_one_condition",
     rules=[
         SegmentRuleModel(
@@ -33,7 +32,6 @@ segment_single_condition = SegmentModel(
     ],
 )
 segment_multiple_conditions_all = SegmentModel(
-    id=3,
     name="segment_multiple_conditions_all",
     rules=[
         SegmentRuleModel(
@@ -54,7 +52,6 @@ segment_multiple_conditions_all = SegmentModel(
     ],
 )
 segment_multiple_conditions_any = SegmentModel(
-    id=4,
     name="segment_multiple_conditions_all",
     rules=[
         SegmentRuleModel(
@@ -75,7 +72,6 @@ segment_multiple_conditions_any = SegmentModel(
     ],
 )
 segment_nested_rules = SegmentModel(
-    id=5,
     name="segment_nested_rules_all",
     rules=[
         SegmentRuleModel(
@@ -111,7 +107,6 @@ segment_nested_rules = SegmentModel(
     ],
 )
 segment_conditions_and_nested_rules = SegmentModel(
-    id=6,
     name="segment_multiple_conditions_all_and_nested_rules",
     rules=[
         SegmentRuleModel(

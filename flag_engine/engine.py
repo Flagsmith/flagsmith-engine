@@ -2,7 +2,8 @@ import typing
 
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
-from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.identities.models import IdentityModel
+from flag_engine.identities.traits.models import TraitModel
 from flag_engine.segments.evaluator import get_identity_segments
 from flag_engine.utils.exceptions import FeatureStateNotFound
 

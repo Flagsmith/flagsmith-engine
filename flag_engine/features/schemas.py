@@ -1,5 +1,3 @@
-import typing
-
 from marshmallow import EXCLUDE, Schema, fields, post_load, validate
 
 from flag_engine.features.models import (
@@ -8,7 +6,6 @@ from flag_engine.features.models import (
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
-from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
 from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
@@ -37,17 +34,15 @@ class MultivariateFeatureStateValueSchema(LoadToModelSchema):
         model_class = MultivariateFeatureStateValueModel
 
 
-class FeatureStateSchema(Schema):
+class BaseFeatureStateSchema(Schema):
     id = fields.Int()
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
-    feature_state_value = fields.Method(
-        serialize="serialize_feature_state_value",
-        deserialize="deserialize_feature_state_value",
-        allow_none=True,
-        required=False,
-    )
-    multivariate_feature_state_values = ListOrDjangoRelatedManagerField(
+
+
+class FeatureStateSchema(BaseFeatureStateSchema):
+    feature_state_value = fields.Field(allow_none=True, required=False)
+    multivariate_feature_state_values = fields.List(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
 
@@ -60,10 +55,3 @@ class FeatureStateSchema(Schema):
         feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
-
-    def serialize_feature_state_value(self, instance: object) -> typing.Any:
-        getter = getattr(instance, "get_feature_state_value", lambda *args: None)
-        return getter()
-
-    def deserialize_feature_state_value(self, value: typing.Any) -> typing.Any:
-        return value

@@ -7,7 +7,6 @@ from flag_engine.segments.models import SegmentModel
 
 @dataclass
 class ProjectModel:
-    id: int
     name: str
     organisation: OrganisationModel
     hide_disabled_flags: bool
