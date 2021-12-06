@@ -1,4 +1,5 @@
-from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.identities.models import IdentityModel
+from flag_engine.identities.traits.models import TraitModel
 
 
 def test_composite_key():

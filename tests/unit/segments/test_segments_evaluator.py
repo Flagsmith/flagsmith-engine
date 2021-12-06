@@ -1,6 +1,7 @@
 import pytest
 
-from flag_engine.identities.models import IdentityModel, TraitModel
+from flag_engine.identities.models import IdentityModel
+from flag_engine.identities.traits.models import TraitModel
 from flag_engine.segments.constants import ALL_RULE, PERCENTAGE_SPLIT
 from flag_engine.segments.evaluator import evaluate_identity_in_segment
 from flag_engine.segments.models import (

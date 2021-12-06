@@ -1,30 +1,24 @@
-from marshmallow import fields, pre_dump
+from marshmallow import EXCLUDE, Schema, fields
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.projects.schemas import ProjectSchema
-from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
-from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
+from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
 
 
-class EnvironmentSchema(LoadToModelSchema):
-    id = fields.Int()
+class BaseEnvironmentSchema(Schema):
     api_key = fields.Str()
-    feature_states = ListOrDjangoRelatedManagerField(
-        fields.Nested(FeatureStateSchema),
-        metadata={"filter_kwargs": {"feature_segment_id": None, "identity_id": None}},
-    )
-    project = fields.Nested(ProjectSchema)
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
 
+
+class EnvironmentSchema(LoadToModelMixin, BaseEnvironmentSchema):
+    feature_states = fields.List(fields.Nested(FeatureStateSchema))
+    project = fields.Nested(ProjectSchema)
+
     class Meta:
         model_class = EnvironmentModel
-
-    @pre_dump()
-    def set_environment_key_in_context(self, obj, *args, **kwargs):
-        self.context["environment_api_key"] = getattr(obj, "api_key", None)
-        return obj
+        unknown = EXCLUDE

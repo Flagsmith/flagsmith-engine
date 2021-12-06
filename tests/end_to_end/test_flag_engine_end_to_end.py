@@ -1,18 +1,19 @@
 from datetime import datetime
 
-from flag_engine.engine import get_identity_feature_states
-from flag_engine.environments.builders import (
-    build_environment_dict,
-    build_environment_model,
+from flag_engine.django_transform.document_builders import (
+    build_environment_document,
+    build_identity_document,
 )
+from flag_engine.engine import get_identity_feature_states
+from flag_engine.environments.builders import build_environment_model
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
-from flag_engine.identities.models import TraitModel
+from flag_engine.identities.traits.models import TraitModel
 from tests.mock_django_classes import DjangoFeatureState, DjangoIdentity
 
 
 def test_environment_end_to_end(mock_django_environment):
     # First, we need to dump the environment as if we were sending it to DynamoDB
-    environment_dict = build_environment_dict(mock_django_environment)
+    environment_dict = build_environment_document(mock_django_environment)
     assert environment_dict
 
     # Then we should be able to load that data again as if we were grabbing the
@@ -48,7 +49,7 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
 
     # Now let's dump the identity as if we're sending it to dynamo from the django
     # application
-    identity_data_from_django = build_identity_dict(django_identity)
+    identity_data_from_django = build_identity_document(django_identity)
     assert identity_data_from_django
 
     # Then, let's check we can load it from this data to simulate loading it from dynamo
@@ -68,7 +69,7 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
     # Finally, let's check that we can get the feature states for the identity and that
     # they are correct
     environment_model = build_environment_model(
-        build_environment_dict(mock_django_environment)
+        build_environment_document(mock_django_environment)
     )
     feature_states = get_identity_feature_states(
         environment=environment_model, identity=identity_model

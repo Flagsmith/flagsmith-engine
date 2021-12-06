@@ -1,31 +1,30 @@
 from unittest import mock
 
-import pytest
 from marshmallow import fields
 
-from flag_engine.utils.marshmallow.fields import ListOrDjangoRelatedManagerField
-
-a_list = [1, 2, 3, 4]
-mock_related_manager_field = mock.MagicMock()
-mock_related_manager_field.filter.return_value = a_list
+from flag_engine.django_transform.fields import DjangoRelatedManagerField
 
 
-@pytest.mark.parametrize("attribute", (a_list, mock_related_manager_field))
-def test_list_or_django_related_manager_field_serialize(attribute):
+def test_django_related_manager_field_serialize():
     """
     Test to confirm that the custom field serializes the same when given a list
     or a django related manager.
     """
 
     # Given
-    # a dummy object with a single attribute that is defined by the parameterized test
+    # a mock to represent a related manager object
+    a_list = [1, 2, 3, 4]
+    mock_related_manager_field = mock.MagicMock()
+    mock_related_manager_field.filter.return_value = a_list
+
+    # a dummy object with the mock related manager as the only attribute
     class MyObject:
-        my_attribute = attribute
+        my_attribute = mock_related_manager_field
 
     my_object = MyObject()
 
     # and the field we want to test (arbitrarily instantiated with integer elements)
-    field = ListOrDjangoRelatedManagerField(fields.Int())
+    field = DjangoRelatedManagerField(fields.Int())
 
     # When
     # we serialize the attribute on the dummy object
@@ -36,7 +35,7 @@ def test_list_or_django_related_manager_field_serialize(attribute):
     assert serialized_data == a_list
 
 
-def test_list_or_django_related_manager_field_filter_called_with_correct_arguments():
+def test_django_related_manager_field_filter_called_with_correct_arguments():
     # Given
     attribute_name = "my_attribute"
     filters = {"id": None, "another_id__isnull": False}
@@ -46,9 +45,7 @@ def test_list_or_django_related_manager_field_filter_called_with_correct_argumen
     # to rely on the response from obj.__getattr__.return_value. See the code for
     # marshmallow.utils.get_value for more information on why.
     object_to_serialize = mock.MagicMock(spec=[attribute_name])
-    field = ListOrDjangoRelatedManagerField(
-        fields.Int(), metadata={"filter_kwargs": filters}
-    )
+    field = DjangoRelatedManagerField(fields.Int(), metadata={"filter_kwargs": filters})
 
     # When
     field.serialize(attribute_name, obj=object_to_serialize)
