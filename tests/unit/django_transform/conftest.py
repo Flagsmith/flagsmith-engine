@@ -152,13 +152,15 @@ def django_feature_segment(django_disabled_feature_state):
 
 
 @pytest.fixture()
-def django_segment(django_segment_rule, django_feature_segment):
-    return DjangoSegment(
+def django_segment(django_segment_rule, django_feature_segment, django_project):
+    segment = DjangoSegment(
         id=1,
         name="segment",
         rules=[django_segment_rule],
         feature_segments=[django_feature_segment],
     )
+    django_project.add_segment(segment)
+    return segment
 
 
 @pytest.fixture()
