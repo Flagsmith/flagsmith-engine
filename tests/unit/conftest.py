@@ -53,6 +53,7 @@ def organisation():
 @pytest.fixture()
 def project(organisation, segment):
     return ProjectModel(
+        id=1,
         name="Test Project",
         organisation=organisation,
         hide_disabled_flags=False,
