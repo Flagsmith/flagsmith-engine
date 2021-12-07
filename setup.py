@@ -12,7 +12,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     install_requires=[
-        "marshmallow",
+        "marshmallow>=3.14.1",
         "dataclasses;python_version<'3.7'",
     ],
     classifiers=[
