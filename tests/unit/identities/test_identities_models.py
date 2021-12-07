@@ -6,6 +6,7 @@ def test_composite_key():
     # Given
     environment_api_key = "abc123"
     identifier = "identity"
+
     identity_model = IdentityModel(
         environment_api_key=environment_api_key, identifier=identifier
     )
