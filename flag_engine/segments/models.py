@@ -1,6 +1,5 @@
 import re
 import typing
-import uuid
 from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
@@ -71,9 +70,7 @@ class SegmentRuleModel:
 
 @dataclass
 class SegmentModel:
+    id: int
     name: str
-
-    id: str = field(default_factory=uuid.uuid4)
     rules: typing.List[SegmentRuleModel] = field(default_factory=list)
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
-    django_id: int = None

@@ -35,12 +35,12 @@ class SegmentRuleSchema(LoadToModelMixin, BaseSegmentRuleSchema):
 
 
 class BaseSegmentSchema(Schema):
+    id = fields.Int()
     name = fields.Str()
     django_id = fields.Int(required=False, allow_none=True)
 
 
 class SegmentSchema(LoadToModelMixin, BaseSegmentSchema):
-    id = fields.UUID()
     rules = fields.List(fields.Nested(SegmentRuleSchema))
     feature_states = fields.List(fields.Nested(FeatureStateSchema))
 

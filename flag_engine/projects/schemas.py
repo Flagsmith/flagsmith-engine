@@ -7,6 +7,7 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
 
 
 class BaseProjectSchema(Schema):
+    id = fields.Int()
     name = fields.Str()
     organisation = fields.Nested(OrganisationSchema)
     hide_disabled_flags = fields.Bool()

@@ -1,5 +1,3 @@
-import uuid
-
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.segments.constants import ALL_RULE, EQUAL, PERCENTAGE_SPLIT
@@ -16,7 +14,7 @@ segment_schema = SegmentSchema()
 def test_segment_schema_engine_model_object_to_dict(project):
     # Given
     segment = SegmentModel(
-        django_id=1,
+        id=1,
         name="Segment",
         rules=[
             SegmentRuleModel(
@@ -43,7 +41,6 @@ def test_segment_schema_engine_model_object_to_dict(project):
     data = segment_schema.dump(segment)
 
     # Then
-    assert data["django_id"] == segment.django_id
     assert len(data["feature_states"]) == 1
     assert len(data["rules"]) == 1
 
@@ -51,7 +48,7 @@ def test_segment_schema_engine_model_object_to_dict(project):
 def test_dict_to_segment_model():
     # Given
     segment_dict = {
-        "id": uuid.uuid4(),
+        "id": 1,
         "name": "Segment",
         "rules": [
             {
