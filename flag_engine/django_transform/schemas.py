@@ -47,7 +47,6 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         fields.Nested(DjangoSegmentRuleSchema), dump_only=True
     )
     feature_states = fields.Method(serialize="serialize_feature_states")
-    django_id = fields.Int(attribute="id")
 
     def __init__(self, *args, **kwargs):
         super(DjangoSegmentSchema, self).__init__(*args, **kwargs)

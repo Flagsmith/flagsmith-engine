@@ -8,6 +8,7 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
 
 
 class BaseEnvironmentSchema(Schema):
+    id = fields.Int()
     api_key = fields.Str()
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)

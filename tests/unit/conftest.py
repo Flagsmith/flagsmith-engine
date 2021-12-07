@@ -36,7 +36,7 @@ def segment_rule(segment_condition):
 
 @pytest.fixture()
 def segment(segment_rule):
-    return SegmentModel(name="my_segment", rules=[segment_rule])
+    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
 
 
 @pytest.fixture()
@@ -73,6 +73,7 @@ def feature_2():
 @pytest.fixture()
 def environment(feature_1, feature_2, project):
     return EnvironmentModel(
+        id=1,
         api_key="api-key",
         project=project,
         feature_states=[
