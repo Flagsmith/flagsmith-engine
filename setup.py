@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="flagsmith-flag-engine",
-    version="1.4.0",
+    version="1.4.1",
     author="Flagsmith",
     author_email="support@flagsmith.com",
     packages=find_packages(include=["flag_engine", "flag_engine.*"]),
@@ -12,7 +12,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     install_requires=[
-        "marshmallow",
+        "marshmallow>=3.14.1",
         "dataclasses;python_version<'3.7'",
     ],
     classifiers=[

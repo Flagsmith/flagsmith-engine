@@ -1,6 +1,6 @@
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
-from flag_engine.identities.builders import build_identity_model
+from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.models import IdentityModel
 
 
@@ -58,3 +58,16 @@ def test_build_identity_model_from_dictionary_with_feature_states():
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 1
     assert isinstance(identity_model.identity_features[0], FeatureStateModel)
+
+
+def test_identity_dict_created_using_model_can_convert_back_to_model():
+    # Given
+    identity_model = IdentityModel(
+        environment_api_key="some_key", identifier="test_identifier"
+    )
+
+    # When
+    identity_dict = build_identity_dict(identity_model)
+
+    # Then
+    build_identity_model(identity_dict)
