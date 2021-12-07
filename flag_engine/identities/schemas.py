@@ -30,7 +30,7 @@ class BaseIdentitySchema(Schema):
 class IdentitySchema(LoadToModelMixin, BaseIdentitySchema):
     identity_traits = fields.List(fields.Nested(TraitSchema), required=False)
     identity_features = fields.List(fields.Nested(FeatureStateSchema), required=False)
-    django_id = fields.Int(required=False)
+    django_id = fields.Int(required=False, allow_none=True)
     composite_key = fields.Str(dump_only=True)
 
     class Meta:
