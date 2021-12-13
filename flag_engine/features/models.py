@@ -31,9 +31,9 @@ class MultivariateFeatureStateValueModel:
 
 @dataclass
 class FeatureStateModel:
-    id: int
     feature: FeatureModel
     enabled: bool
+    django_id: int = None
     _value: typing.Any = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[
         MultivariateFeatureStateValueModel

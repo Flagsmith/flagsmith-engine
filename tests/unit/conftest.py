@@ -78,8 +78,8 @@ def environment(feature_1, feature_2, project):
         api_key="api-key",
         project=project,
         feature_states=[
-            FeatureStateModel(id=1, feature=feature_1, enabled=True),
-            FeatureStateModel(id=2, feature=feature_2, enabled=False),
+            FeatureStateModel(django_id=1, feature=feature_1, enabled=True),
+            FeatureStateModel(django_id=2, feature=feature_2, enabled=False),
         ],
     )
 
@@ -112,7 +112,7 @@ def identity_in_segment(trait_matching_segment, environment):
 @pytest.fixture()
 def segment_override_fs(segment, feature_1):
     fs = FeatureStateModel(
-        id=4,
+        django_id=4,
         feature=feature_1,
         enabled=False,
     )

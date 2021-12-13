@@ -25,6 +25,8 @@ class DjangoFeatureStateSchema(BaseFeatureStateSchema):
         fields.Nested(MultivariateFeatureStateValueSchema), dump_only=True
     )
 
+    django_id = fields.Int(attribute="id")
+
     def serialize_feature_state_value(self, instance) -> typing.Any:
         return instance.get_feature_state_value()
 

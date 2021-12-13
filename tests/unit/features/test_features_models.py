@@ -14,7 +14,7 @@ from flag_engine.features.models import (
 def test_feature_state_get_value_no_mv_values(feature_1):
     # Given
     value = "foo"
-    feature_state = FeatureStateModel(id=1, feature=feature_1, enabled=True)
+    feature_state = FeatureStateModel(django_id=1, feature=feature_1, enabled=True)
     feature_state.set_value(value)
 
     # Then
@@ -57,7 +57,7 @@ def test_feature_state_get_value_mv_values(
 
     # and we assign the above to a feature state
     mv_feature_state = FeatureStateModel(
-        id=1,
+        django_id=1,
         feature=my_feature,
         enabled=True,
         multivariate_feature_state_values=[

@@ -26,7 +26,7 @@ def test_segment_schema_engine_model_object_to_dict(project):
         ],
         feature_states=[
             FeatureStateModel(
-                id=1,
+                django_id=1,
                 feature=FeatureModel(
                     id=1,
                     name="my_feature",

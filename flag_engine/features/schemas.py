@@ -35,7 +35,6 @@ class MultivariateFeatureStateValueSchema(LoadToModelSchema):
 
 
 class BaseFeatureStateSchema(Schema):
-    id = fields.Int()
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
 
