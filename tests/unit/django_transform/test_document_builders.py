@@ -55,5 +55,6 @@ def test_build_environment_document(
                 "enabled",
                 "django_id",
                 "feature",
+                "featurestate_uuid",
             )
         )

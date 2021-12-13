@@ -11,6 +11,11 @@ from flag_engine.features.models import (
 )
 
 
+def test_initializing_feature_state_creates_default_feautre_state_uuid(feature_1):
+    feature_state = FeatureStateModel(django_id=1, feature=feature_1, enabled=True)
+    assert feature_state.featurestate_uuid is not None
+
+
 def test_feature_state_get_value_no_mv_values(feature_1):
     # Given
     value = "foo"

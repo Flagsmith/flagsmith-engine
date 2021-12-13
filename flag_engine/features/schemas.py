@@ -1,3 +1,5 @@
+import uuid
+
 from marshmallow import EXCLUDE, Schema, fields, post_load, validate
 
 from flag_engine.features.models import (
@@ -35,6 +37,7 @@ class MultivariateFeatureStateValueSchema(LoadToModelSchema):
 
 
 class BaseFeatureStateSchema(Schema):
+    featurestate_uuid = fields.Str(dump_default=uuid.uuid4)
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
 
