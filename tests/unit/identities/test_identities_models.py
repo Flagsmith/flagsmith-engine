@@ -1,5 +1,9 @@
+import pytest
+
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
 def test_composite_key():
@@ -70,3 +74,25 @@ def test_update_traits_adds_new_traits(identity_in_segment):
     # Then
     assert len(identity_in_segment.identity_traits) == 2
     assert new_trait in identity_in_segment.identity_traits
+
+
+def test_add_feature_override_raises_duplicate_feature_state_if_fs_for_the_feature_already_exists(
+    identity, feature_1
+):
+    # Given
+    fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
+    fs_2 = FeatureStateModel(feature=feature_1, enabled=True)
+    identity.add_feature_override(fs_1)
+
+    # Then
+    with pytest.raises(DuplicateFeatureState):
+        identity.add_feature_override(fs_2)
+
+
+def test_add_feature_override_append_feature_state(identity, feature_1):
+    # Given
+    fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
+    # When
+    identity.add_feature_override(fs_1)
+    # Then
+    fs_1 in identity.identity_features

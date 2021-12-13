@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
 @dataclass
@@ -35,3 +36,11 @@ class IdentityModel:
                 existing_traits[trait.trait_key] = trait
 
         self.identity_traits = list(existing_traits.values())
+
+    def add_feature_override(self, feature_state: FeatureStateModel):
+        for fs in self.identity_features:
+            if fs.feature.id == feature_state.feature.id:
+                raise DuplicateFeatureState(
+                    "feature state for this feature already exists"
+                )
+        self.identity_features.append(feature_state)
