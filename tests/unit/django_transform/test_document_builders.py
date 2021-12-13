@@ -53,7 +53,8 @@ def test_build_environment_document(
                 "feature_state_value",
                 "multivariate_feature_state_values",
                 "enabled",
-                "id",
+                "django_id",
                 "feature",
+                "featurestate_uuid",
             )
         )
