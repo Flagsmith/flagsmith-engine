@@ -79,3 +79,48 @@ def test_feature_state_get_value_mv_values(
     # Then
     # the value of the feature state is correct based on the percentage value returned
     assert mv_feature_state.get_value(identity_id=1) == expected_value
+
+
+def test_get_value_uses_django_id_for_multivariate_value_calculation_if_not_none(
+    feature_1, mv_feature_state_value, mocker
+):
+    # Given
+    mocked_get_hashed_percentage = mocker.patch(
+        "flag_engine.features.models.get_hashed_percentage_for_object_ids",
+        return_value=10,
+    )
+    identity_id = 1
+    feature_state = FeatureStateModel(
+        django_id=1,
+        feature=feature_1,
+        enabled=True,
+        multivariate_feature_state_values=[mv_feature_state_value],
+    )
+    # When
+    feature_state.get_value(identity_id=identity_id)
+    # Then
+    mocked_get_hashed_percentage.assert_called_with(
+        [feature_state.django_id, identity_id]
+    )
+
+
+def test_get_value_uses_featuestate_uuid_for_multivariate_value_calculation_if_django_id_is_not_present(
+    feature_1, mv_feature_state_value, mocker
+):
+    # Given
+    mocked_get_hashed_percentage = mocker.patch(
+        "flag_engine.features.models.get_hashed_percentage_for_object_ids",
+        return_value=10,
+    )
+    identity_id = 1
+    feature_state = FeatureStateModel(
+        feature=feature_1,
+        enabled=True,
+        multivariate_feature_state_values=[mv_feature_state_value],
+    )
+    # When
+    feature_state.get_value(identity_id=identity_id)
+    # Then
+    mocked_get_hashed_percentage.assert_called_with(
+        [feature_state.featurestate_uuid, identity_id]
+    )

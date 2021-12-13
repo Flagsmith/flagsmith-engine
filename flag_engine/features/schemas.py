@@ -41,6 +41,9 @@ class BaseFeatureStateSchema(Schema):
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
 
+    class Meta:
+        unknown = EXCLUDE
+
 
 class FeatureStateSchema(BaseFeatureStateSchema):
     feature_state_value = fields.Field(allow_none=True, required=False)
