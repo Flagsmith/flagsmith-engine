@@ -76,7 +76,7 @@ def test_update_traits_adds_new_traits(identity_in_segment):
     assert new_trait in identity_in_segment.identity_traits
 
 
-def test_add_feature_override_raises_duplicate_feature_state_if_fs_for_the_feature_already_exists(
+def test_appending_feature_states_raises_duplicate_feature_state_if_fs_for_the_feature_already_exists(
     identity, feature_1
 ):
     # Given
@@ -89,7 +89,7 @@ def test_add_feature_override_raises_duplicate_feature_state_if_fs_for_the_featu
         identity.identity_features.append(fs_2)
 
 
-def test_add_feature_override_append_feature_state(identity, feature_1):
+def test_append_feature_state(identity, feature_1):
     # Given
     fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
     # When
