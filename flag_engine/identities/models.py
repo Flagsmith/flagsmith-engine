@@ -1,6 +1,7 @@
 import datetime
 import typing
 import uuid
+from collections import UserList
 from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
@@ -8,12 +9,22 @@ from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
+class IdentityFeaturesList(UserList):
+    def append(self, feature_state: FeatureStateModel):
+        if [fs for fs in self.data if fs.feature.id == feature_state.feature.id]:
+            raise DuplicateFeatureState("feature state for this feature already exists")
+
+        super().append(feature_state)
+
+
 @dataclass
 class IdentityModel:
     identifier: str
     environment_api_key: str
     created_date: datetime = field(default_factory=datetime.datetime.now)
-    identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
+    identity_features: IdentityFeaturesList[FeatureStateModel] = field(
+        default_factory=IdentityFeaturesList
+    )
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
     identity_uuid: str = field(default_factory=uuid.uuid4)
     django_id: int = None
@@ -36,11 +47,3 @@ class IdentityModel:
                 existing_traits[trait.trait_key] = trait
 
         self.identity_traits = list(existing_traits.values())
-
-    def add_feature_override(self, feature_state: FeatureStateModel):
-        for fs in self.identity_features:
-            if fs.feature.id == feature_state.feature.id:
-                raise DuplicateFeatureState(
-                    "feature state for this feature already exists"
-                )
-        self.identity_features.append(feature_state)

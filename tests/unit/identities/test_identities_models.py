@@ -82,17 +82,17 @@ def test_add_feature_override_raises_duplicate_feature_state_if_fs_for_the_featu
     # Given
     fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
     fs_2 = FeatureStateModel(feature=feature_1, enabled=True)
-    identity.add_feature_override(fs_1)
+    identity.identity_features.append(fs_1)
 
     # Then
     with pytest.raises(DuplicateFeatureState):
-        identity.add_feature_override(fs_2)
+        identity.identity_features.append(fs_2)
 
 
 def test_add_feature_override_append_feature_state(identity, feature_1):
     # Given
     fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
     # When
-    identity.add_feature_override(fs_1)
+    identity.identity_features.append(fs_1)
     # Then
     fs_1 in identity.identity_features
