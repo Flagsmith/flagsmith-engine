@@ -1,7 +1,15 @@
-from flag_engine.engine import get_identity_feature_state, get_identity_feature_states
+import pytest
+
+from flag_engine.engine import (
+    get_environment_feature_state,
+    get_environment_feature_states,
+    get_identity_feature_state,
+    get_identity_feature_states,
+)
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.utils.exceptions import FeatureStateNotFound
 from tests.unit.conftest import (
     segment_condition_property,
     segment_condition_string_value,
@@ -52,6 +60,18 @@ def test_identity_get_all_feature_states_no_segments(
             else environment_feature_state.enabled
         )
         assert feature_state.enabled is expected
+
+
+def test_get_identity_feature_states_hides_disabled_flags_if_enabled(
+    environment, identity
+):
+    # Enable hide disabled flags for the project
+    environment.project.hide_disabled_flags = True
+
+    feature_states = get_identity_feature_states(
+        environment=environment, identity=identity
+    )
+    assert not [fs for fs in feature_states if fs.enabled is False]
 
 
 def test_identity_get_all_feature_states_segments_only(
@@ -108,3 +128,37 @@ def test_identity_get_all_feature_states_with_traits(
 
     # Then
     assert all_feature_states[0].get_value() == "segment_override"
+
+
+def test_environment_get_all_feature_states(environment):
+    # When
+    feature_states = get_environment_feature_states(environment)
+
+    # Then
+    assert feature_states == environment.feature_states
+
+
+def test_environment_get_feature_states_hides_disabled_flags_if_enabled(environment):
+    # Given
+    # Enable hide disabled flags for the project
+    environment.project.hide_disabled_flags = True
+
+    # When
+    feature_states = get_environment_feature_states(environment)
+
+    # Then
+    assert feature_states != environment.feature_states
+    assert not [fs for fs in feature_states if fs.enabled is False]
+
+
+def test_environment_get_feature_state(environment, feature_1):
+    # When
+    feature_state = get_environment_feature_state(environment, feature_1.name)
+
+    # Then
+    assert feature_state.feature == feature_1
+
+
+def test_environment_get_feature_state_raises_feature_state_not_found(environment):
+    with pytest.raises(FeatureStateNotFound):
+        get_environment_feature_state(environment, "not_a_feature_name")

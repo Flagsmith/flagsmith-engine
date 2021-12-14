@@ -49,11 +49,14 @@ def get_identity_feature_states(
     :return: list of feature state models based on the environment, any matching
         segments and any specific identity overrides
     """
-    return list(
+    feature_states = list(
         _get_identity_feature_states_dict(
             environment, identity, override_traits
         ).values()
     )
+    if environment.project.hide_disabled_flags:
+        return [fs for fs in feature_states if fs.enabled]
+    return feature_states
 
 
 def get_identity_feature_state(
