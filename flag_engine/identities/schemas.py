@@ -13,7 +13,7 @@ from .traits.schemas import TraitSchema
 class BaseIdentitySchema(Schema):
     identifier = fields.Str()
     created_date = fields.DateTime()
-    identity_uuid = fields.UUID(default=uuid.uuid4)
+    identity_uuid = fields.UUID(dump_default=uuid.uuid4)
     environment_api_key = fields.Str()
 
     @post_dump
