@@ -3,8 +3,8 @@ import typing
 import uuid
 from dataclasses import dataclass, field
 
-from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.utils.collections import IdentityFeaturesList
 
 
 @dataclass
@@ -12,7 +12,9 @@ class IdentityModel:
     identifier: str
     environment_api_key: str
     created_date: datetime = field(default_factory=datetime.datetime.now)
-    identity_features: typing.List[FeatureStateModel] = field(default_factory=list)
+    identity_features: IdentityFeaturesList = field(
+        default_factory=IdentityFeaturesList
+    )
     identity_traits: typing.List[TraitModel] = field(default_factory=list)
     identity_uuid: str = field(default_factory=uuid.uuid4)
     django_id: int = None
