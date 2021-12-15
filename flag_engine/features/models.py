@@ -1,4 +1,5 @@
 import typing
+import uuid
 from dataclasses import dataclass, field
 
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
@@ -31,9 +32,10 @@ class MultivariateFeatureStateValueModel:
 
 @dataclass
 class FeatureStateModel:
-    id: int
     feature: FeatureModel
     enabled: bool
+    django_id: int = None
+    featurestate_uuid: str = field(default_factory=uuid.uuid4)
     _value: typing.Any = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[
         MultivariateFeatureStateValueModel
@@ -52,7 +54,9 @@ class FeatureStateModel:
         return self.get_value()
 
     def _get_multivariate_value(self, identity_id: int) -> typing.Any:
-        percentage_value = get_hashed_percentage_for_object_ids([self.id, identity_id])
+        percentage_value = get_hashed_percentage_for_object_ids(
+            [self.django_id or self.featurestate_uuid, identity_id]
+        )
 
         # Iterate over the mv options in order of id (so we get the same value each
         # time) to determine the correct value to return to the identity based on

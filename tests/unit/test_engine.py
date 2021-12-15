@@ -26,12 +26,12 @@ def test_identity_get_all_feature_states_no_segments(
 
     # set the state of the feature to False in the environment configuration
     environment.feature_states.append(
-        FeatureStateModel(id=3, feature=overridden_feature, enabled=False)
+        FeatureStateModel(django_id=3, feature=overridden_feature, enabled=False)
     )
 
     # but True for the identity
     identity.identity_features = [
-        FeatureStateModel(id=4, feature=overridden_feature, enabled=True)
+        FeatureStateModel(django_id=4, feature=overridden_feature, enabled=True)
     ]
 
     # When
@@ -63,12 +63,12 @@ def test_identity_get_all_feature_states_segments_only(
 
     # which is given a default value of False in the environment configuration
     environment.feature_states.append(
-        FeatureStateModel(id=3, feature=overridden_feature, enabled=False)
+        FeatureStateModel(django_id=3, feature=overridden_feature, enabled=False)
     )
 
     # but overridden to True for identities in the segment
     segment.feature_states.append(
-        FeatureStateModel(id=4, feature=overridden_feature, enabled=True)
+        FeatureStateModel(django_id=4, feature=overridden_feature, enabled=True)
     )
 
     # When

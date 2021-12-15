@@ -1,17 +1,37 @@
 import itertools
+import uuid
 from unittest import mock
+
+import pytest
 
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
-def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_exc():
-    assert 100 > get_hashed_percentage_for_object_ids([12, 93]) >= 0
+@pytest.mark.parametrize(
+    "object_ids",
+    (
+        [12, 93],
+        [str(uuid.uuid4()), 99],
+        [99, str(uuid.uuid4())],
+        [str(uuid.uuid4), str(uuid.uuid4())],
+    ),
+)
+def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_exc(
+    object_ids,
+):
+    assert 100 > get_hashed_percentage_for_object_ids(object_ids) >= 0
 
 
-def test_get_hashed_percentage_for_object_ids_is_the_same_each_time():
-    # Given
-    object_ids = [30, 73]
-
+@pytest.mark.parametrize(
+    "object_ids",
+    (
+        [12, 93],
+        [str(uuid.uuid4()), 99],
+        [99, str(uuid.uuid4())],
+        [str(uuid.uuid4), str(uuid.uuid4())],
+    ),
+)
+def test_get_hashed_percentage_for_object_ids_is_the_same_each_time(object_ids):
     # When
     result_1 = get_hashed_percentage_for_object_ids(object_ids)
     result_2 = get_hashed_percentage_for_object_ids(object_ids)
@@ -31,17 +51,6 @@ def test_percentage_value_is_unique_for_different_identities():
 
     # Then
     assert result_1 != result_2
-
-
-def test_percentage_value_works_for_non_integer_ids():
-    # Given
-    ids = ["foo", "bar"]
-
-    # When
-    result = get_hashed_percentage_for_object_ids(ids)
-
-    # Then
-    assert 0 <= result < 100
 
 
 def test_get_hashed_percentage_for_object_ids_should_be_evenly_distributed():

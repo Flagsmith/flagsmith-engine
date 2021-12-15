@@ -11,10 +11,15 @@ from flag_engine.features.models import (
 )
 
 
+def test_initializing_feature_state_creates_default_feature_state_uuid(feature_1):
+    feature_state = FeatureStateModel(django_id=1, feature=feature_1, enabled=True)
+    assert feature_state.featurestate_uuid is not None
+
+
 def test_feature_state_get_value_no_mv_values(feature_1):
     # Given
     value = "foo"
-    feature_state = FeatureStateModel(id=1, feature=feature_1, enabled=True)
+    feature_state = FeatureStateModel(django_id=1, feature=feature_1, enabled=True)
     feature_state.set_value(value)
 
     # Then
@@ -57,7 +62,7 @@ def test_feature_state_get_value_mv_values(
 
     # and we assign the above to a feature state
     mv_feature_state = FeatureStateModel(
-        id=1,
+        django_id=1,
         feature=my_feature,
         enabled=True,
         multivariate_feature_state_values=[
@@ -74,3 +79,48 @@ def test_feature_state_get_value_mv_values(
     # Then
     # the value of the feature state is correct based on the percentage value returned
     assert mv_feature_state.get_value(identity_id=1) == expected_value
+
+
+def test_get_value_uses_django_id_for_multivariate_value_calculation_if_not_none(
+    feature_1, mv_feature_state_value, mocker
+):
+    # Given
+    mocked_get_hashed_percentage = mocker.patch(
+        "flag_engine.features.models.get_hashed_percentage_for_object_ids",
+        return_value=10,
+    )
+    identity_id = 1
+    feature_state = FeatureStateModel(
+        django_id=1,
+        feature=feature_1,
+        enabled=True,
+        multivariate_feature_state_values=[mv_feature_state_value],
+    )
+    # When
+    feature_state.get_value(identity_id=identity_id)
+    # Then
+    mocked_get_hashed_percentage.assert_called_with(
+        [feature_state.django_id, identity_id]
+    )
+
+
+def test_get_value_uses_featuestate_uuid_for_multivariate_value_calculation_if_django_id_is_not_present(
+    feature_1, mv_feature_state_value, mocker
+):
+    # Given
+    mocked_get_hashed_percentage = mocker.patch(
+        "flag_engine.features.models.get_hashed_percentage_for_object_ids",
+        return_value=10,
+    )
+    identity_id = 1
+    feature_state = FeatureStateModel(
+        feature=feature_1,
+        enabled=True,
+        multivariate_feature_state_values=[mv_feature_state_value],
+    )
+    # When
+    feature_state.get_value(identity_id=identity_id)
+    # Then
+    mocked_get_hashed_percentage.assert_called_with(
+        [feature_state.featurestate_uuid, identity_id]
+    )
