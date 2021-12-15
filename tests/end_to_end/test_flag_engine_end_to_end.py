@@ -4,7 +4,10 @@ from flag_engine.django_transform.document_builders import (
     build_environment_document,
     build_identity_document,
 )
-from flag_engine.engine import get_identity_feature_states
+from flag_engine.engine import (
+    get_environment_feature_states,
+    get_identity_feature_states,
+)
 from flag_engine.environments.builders import build_environment_model
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.traits.models import TraitModel
@@ -22,11 +25,11 @@ def test_environment_end_to_end(mock_django_environment):
     assert environment_model
 
     # Finally, we should be able to get the flags for this environment
-    assert environment_model.feature_states
+    feature_states = get_environment_feature_states(environment_model)
     # and the feature states should be correct
-    assert len(environment_model.feature_states) == 1
-    assert environment_model.feature_states[0].enabled is True
-    assert environment_model.feature_states[0].get_feature_state_value() == "foobar"
+    assert len(feature_states) == 1
+    assert feature_states[0].enabled is True
+    assert feature_states[0].get_feature_state_value() == "foobar"
 
 
 def test_identity_end_to_end(mock_django_environment, mock_django_feature):

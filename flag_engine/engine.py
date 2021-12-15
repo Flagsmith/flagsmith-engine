@@ -8,6 +8,33 @@ from flag_engine.segments.evaluator import get_identity_segments
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
+def get_environment_feature_states(environment: EnvironmentModel):
+    """
+    Get a list of feature states for a given environment
+
+    :param environment: the environment model object
+    """
+    if environment.project.hide_disabled_flags:
+        return [fs for fs in environment.feature_states if fs.enabled]
+    return environment.feature_states
+
+
+def get_environment_feature_state(environment: EnvironmentModel, feature_name: str):
+    """
+    Get a specific feature state for a given feature_name in a given environment
+
+    :param environment: the environment model object
+    :param feature_name: the name of the feature to get the feature state for
+    """
+    try:
+        return next(
+            filter(lambda f: f.feature.name == feature_name, environment.feature_states)
+        )
+
+    except StopIteration:
+        raise FeatureStateNotFound()
+
+
 def get_identity_feature_states(
     environment: EnvironmentModel,
     identity: IdentityModel,
@@ -22,11 +49,14 @@ def get_identity_feature_states(
     :return: list of feature state models based on the environment, any matching
         segments and any specific identity overrides
     """
-    return list(
+    feature_states = list(
         _get_identity_feature_states_dict(
             environment, identity, override_traits
         ).values()
     )
+    if environment.project.hide_disabled_flags:
+        return [fs for fs in feature_states if fs.enabled]
+    return feature_states
 
 
 def get_identity_feature_state(
