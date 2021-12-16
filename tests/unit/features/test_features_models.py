@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from flag_engine.features.constants import STANDARD
+from flag_engine.features.constants import MULTIVARIATE, STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
@@ -124,3 +124,42 @@ def test_get_value_uses_featuestate_uuid_for_multivariate_value_calculation_if_d
     mocked_get_hashed_percentage.assert_called_with(
         [feature_state.featurestate_uuid, identity_id]
     )
+
+
+def test_identity_gets_same_mv_feature_on_multiple_requests(identity):
+    """
+    Test to confirm that, given a fixed set of variables, a given identity receives
+    the same value for a multivariate feature on all requests.
+    """
+
+    # Given
+    mv_feature = FeatureModel(id=3, name="mv_feature", type=MULTIVARIATE)
+
+    mv_values = []
+    for id_, value, percentage_allocation in (
+        (1, "foo", 30),
+        (2, "bar", 30),
+        (3, "baz", 40),
+    ):
+        mv_option = MultivariateFeatureOptionModel(value=value)
+        mv_feature_state_value_1 = MultivariateFeatureStateValueModel(
+            id=id_,
+            multivariate_feature_option=mv_option,
+            percentage_allocation=percentage_allocation,
+        )
+        mv_values.append(mv_feature_state_value_1)
+
+    mv_feature_state = FeatureStateModel(
+        feature=mv_feature,
+        featurestate_uuid="203a50e3-b6ad-44b4-b0b9-03b29db5cc8a",
+        django_id=78986,
+        enabled=True,
+        multivariate_feature_state_values=mv_values,
+    )
+
+    # When
+    values = [mv_feature_state.get_value(identity.identifier) for _ in range(50)]
+
+    # Then
+    assert len(set(values)) == 1
+    assert values[0] == "foo"
