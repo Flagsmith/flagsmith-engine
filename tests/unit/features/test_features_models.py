@@ -49,8 +49,8 @@ def test_feature_state_get_value_mv_values(
     my_feature = FeatureModel(id=1, name="mv_feature", type=STANDARD)
 
     # with some multivariate feature options
-    mv_feature_option_1 = MultivariateFeatureOptionModel(value=mv_feature_value_1)
-    mv_feature_option_2 = MultivariateFeatureOptionModel(value=mv_feature_value_2)
+    mv_feature_option_1 = MultivariateFeatureOptionModel(id=1, value=mv_feature_value_1)
+    mv_feature_option_2 = MultivariateFeatureOptionModel(id=2, value=mv_feature_value_2)
 
     # and associated values
     mv_feature_state_value_1 = MultivariateFeatureStateValueModel(

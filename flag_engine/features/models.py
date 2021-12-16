@@ -20,6 +20,7 @@ class FeatureModel:
 
 @dataclass
 class MultivariateFeatureOptionModel:
+    id: int
     value: typing.Any
 
 
