@@ -21,6 +21,7 @@ class FeatureSchema(LoadToModelSchema):
 
 
 class MultivariateFeatureOptionSchema(LoadToModelSchema):
+    id = fields.Int()
     value = fields.Field(allow_none=True)
 
     class Meta:

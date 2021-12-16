@@ -21,6 +21,7 @@ class FeatureModel:
 @dataclass
 class MultivariateFeatureOptionModel:
     value: typing.Any
+    id: int = None
 
 
 @dataclass
