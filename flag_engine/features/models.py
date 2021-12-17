@@ -26,9 +26,10 @@ class MultivariateFeatureOptionModel:
 
 @dataclass
 class MultivariateFeatureStateValueModel:
-    id: int
     multivariate_feature_option: MultivariateFeatureOptionModel
     percentage_allocation: float
+    id: int = None
+    mv_fs_value_uuid: str = field(default_factory=uuid.uuid4)
 
 
 @dataclass
@@ -66,7 +67,8 @@ class FeatureStateModel:
         # percentage value.
         start_percentage = 0
         for mv_value in sorted(
-            self.multivariate_feature_state_values, key=lambda v: v.id
+            self.multivariate_feature_state_values,
+            key=lambda v: v.id or v.mv_fs_value_uuid,
         ):
             limit = mv_value.percentage_allocation + start_percentage
             if start_percentage <= percentage_value < limit:

@@ -16,6 +16,14 @@ def test_initializing_feature_state_creates_default_feature_state_uuid(feature_1
     assert feature_state.featurestate_uuid is not None
 
 
+def test_initializing_multivariate_feature_state_value_creates_default_uuid():
+    mv_feature_option = MultivariateFeatureOptionModel(value="value")
+    mv_fs_value_model = MultivariateFeatureStateValueModel(
+        multivariate_feature_option=mv_feature_option, id=1, percentage_allocation=10
+    )
+    assert mv_fs_value_model.mv_fs_value_uuid is not None
+
+
 def test_feature_state_get_value_no_mv_values(feature_1):
     # Given
     value = "foo"
