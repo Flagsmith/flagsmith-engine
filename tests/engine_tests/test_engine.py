@@ -1,5 +1,6 @@
 import json
 import typing
+from pathlib import Path
 
 import pytest
 
@@ -9,9 +10,11 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.builders import build_identity_model
 from flag_engine.identities.models import IdentityModel
 
+MODULE_PATH = Path(__file__).parent.resolve()
+
 
 def _extract_test_cases(
-    file_path: str,
+    file_path: Path,
 ) -> typing.Iterable[typing.Tuple[EnvironmentModel, IdentityModel, dict]]:
     """
     Extract the test cases from the json data file which should be in the following
@@ -46,7 +49,7 @@ def _extract_test_cases(
 @pytest.mark.parametrize(
     "environment_model, identity_model, api_response",
     _extract_test_cases(
-        "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
+        MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
     ),
 )
 def test_engine(environment_model, identity_model, api_response):

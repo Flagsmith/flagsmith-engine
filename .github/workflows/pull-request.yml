@@ -43,5 +43,4 @@ jobs:
               run: flake8 .
 
             - name: Run Tests
-              run: |
-                  pytest -p no:warnings
+              run: pytest -p no:warnings
