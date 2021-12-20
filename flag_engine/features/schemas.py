@@ -51,6 +51,7 @@ class FeatureStateSchema(BaseFeatureStateSchema):
     multivariate_feature_state_values = fields.List(
         fields.Nested(MultivariateFeatureStateValueSchema)
     )
+    django_id = fields.Int(allow_none=True)
 
     class Meta:
         unknown = EXCLUDE
