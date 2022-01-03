@@ -21,7 +21,7 @@ class FeatureSchema(LoadToModelSchema):
 
 
 class MultivariateFeatureOptionSchema(LoadToModelSchema):
-    id = fields.Int()
+    id = fields.Int(allow_none=True)
     value = fields.Field(allow_none=True)
 
     class Meta:
@@ -29,7 +29,7 @@ class MultivariateFeatureOptionSchema(LoadToModelSchema):
 
 
 class MultivariateFeatureStateValueSchema(LoadToModelSchema):
-    id = fields.Int()
+    id = fields.Int(allow_none=True)
     mv_fs_value_uuid = fields.Str(dump_default=uuid.uuid4)
     multivariate_feature_option = fields.Nested(MultivariateFeatureOptionSchema)
     percentage_allocation = fields.Decimal(validate=[validate.Range(0, 100)])
