@@ -11,6 +11,10 @@ class FeatureModel:
     name: str
     type: str
 
+    @property
+    def pk(self):
+        return self.id
+
     def __eq__(self, other):
         return self.id == other.id
 
@@ -22,6 +26,10 @@ class FeatureModel:
 class MultivariateFeatureOptionModel:
     value: typing.Any
     id: int = None
+
+    @property
+    def pk(self):
+        return self.id
 
 
 @dataclass

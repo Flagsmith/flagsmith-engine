@@ -132,3 +132,23 @@ def test_get_value_uses_featuestate_uuid_for_multivariate_value_calculation_if_d
     mocked_get_hashed_percentage.assert_called_with(
         [feature_state.featurestate_uuid, identity_id]
     )
+
+
+def test_feature_model_have_pk():
+    # Given
+    feature_id = 1
+    # When
+    feature = FeatureModel(id=feature_id, name="test", type="FLAG")
+    # Then
+    assert feature.pk == feature_id
+
+
+def test_multivariate_feature_option_model_have_pk():
+    # Given
+    mv_feature_option_id = 1
+    # When
+    mv_feature_option = MultivariateFeatureOptionModel(
+        value=10, id=mv_feature_option_id
+    )
+    # Then
+    assert mv_feature_option.pk == mv_feature_option_id
