@@ -5,6 +5,7 @@ from marshmallow import EXCLUDE, Schema, fields, post_dump
 
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.identities.models import IdentityModel
+from flag_engine.utils.marshmallow.fields import IdentityFeaturesListField
 from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
 
 from .traits.schemas import TraitSchema
@@ -29,7 +30,10 @@ class BaseIdentitySchema(Schema):
 
 class IdentitySchema(LoadToModelMixin, BaseIdentitySchema):
     identity_traits = fields.List(fields.Nested(TraitSchema), required=False)
-    identity_features = fields.List(fields.Nested(FeatureStateSchema), required=False)
+    identity_features = IdentityFeaturesListField(
+        fields.Nested(FeatureStateSchema), required=False
+    )
+
     django_id = fields.Int(required=False, allow_none=True)
     composite_key = fields.Str(dump_only=True)
 
