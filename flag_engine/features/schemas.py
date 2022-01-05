@@ -69,13 +69,11 @@ class FeatureStateSchema(BaseFeatureStateSchema):
     def validate_percentage_allocations(self, data, **kwargs):
         """Since we do support modifying percentage allocation on a per identity override bases
         we need to validate the percentage before building the document(dict)"""
-        if (
-            sum(
-                mvfsv["percentage_allocation"]
-                for mvfsv in data["multivariate_feature_state_values"]
-            )
-            > 100
-        ):
+        total_allocation = sum(
+            mvfsv["percentage_allocation"]
+            for mvfsv in data["multivariate_feature_state_values"]
+        )
+        if total_allocation > 100:
 
             raise InvalidPercentageAllocation(
                 "Total percentage allocation should not be more than 100"
