@@ -67,6 +67,8 @@ class FeatureStateSchema(BaseFeatureStateSchema):
 
     @post_dump()
     def validate_percentage_allocations(self, data, **kwargs):
+        """Since we do support modifying percentage allocation on a per identity override bases
+        we need to validate the percentage before building the document(dict)"""
         if (
             sum(
                 mvfsv["percentage_allocation"]
