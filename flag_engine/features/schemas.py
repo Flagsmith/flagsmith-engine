@@ -1,6 +1,6 @@
 import uuid
 
-from marshmallow import EXCLUDE, Schema, fields, post_load, validate
+from marshmallow import EXCLUDE, Schema, fields, post_dump, post_load, validate
 
 from flag_engine.features.models import (
     FeatureModel,
@@ -8,6 +8,7 @@ from flag_engine.features.models import (
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
+from flag_engine.utils.exceptions import InvalidPercentageAllocation
 from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
 
 
@@ -63,3 +64,18 @@ class FeatureStateSchema(BaseFeatureStateSchema):
         feature_state = FeatureStateModel(**data)
         feature_state.set_value(value)
         return feature_state
+
+    @post_dump()
+    def validate_percentage_allocations(self, data, **kwargs):
+        """Since we do support modifying percentage allocation on a per identity override bases
+        we need to validate the percentage before building the document(dict)"""
+        total_allocation = sum(
+            mvfsv["percentage_allocation"]
+            for mvfsv in data["multivariate_feature_state_values"]
+        )
+        if total_allocation > 100:
+
+            raise InvalidPercentageAllocation(
+                "Total percentage allocation should not be more than 100"
+            )
+        return data
