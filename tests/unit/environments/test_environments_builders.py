@@ -112,12 +112,17 @@ def test_build_environment_model_with_multivariate_flag():
                     {
                         "id": 1,
                         "percentage_allocation": 10.0,
-                        "multivariate_feature_option": {"value": variate_1_value},
+                        "multivariate_feature_option": {
+                            "value": variate_1_value,
+                        },
                     },
                     {
                         "id": 2,
                         "percentage_allocation": 10.0,
-                        "multivariate_feature_option": {"value": variate_2_value},
+                        "multivariate_feature_option": {
+                            "value": variate_2_value,
+                            "id": 2,
+                        },
                     },
                 ],
             },

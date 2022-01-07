@@ -4,3 +4,7 @@ class FeatureStateNotFound(Exception):
 
 class DuplicateFeatureState(Exception):
     pass
+
+
+class InvalidPercentageAllocation(Exception):
+    pass

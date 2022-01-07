@@ -129,7 +129,9 @@ def segment_override_fs(segment, feature_1):
 def mv_feature_state_value():
     return MultivariateFeatureStateValueModel(
         id=1,
-        multivariate_feature_option=MultivariateFeatureOptionModel(value="test_value"),
+        multivariate_feature_option=MultivariateFeatureOptionModel(
+            id=1, value="test_value"
+        ),
         percentage_allocation=100,
     )
 

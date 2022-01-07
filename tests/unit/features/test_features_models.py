@@ -16,6 +16,14 @@ def test_initializing_feature_state_creates_default_feature_state_uuid(feature_1
     assert feature_state.featurestate_uuid is not None
 
 
+def test_initializing_multivariate_feature_state_value_creates_default_uuid():
+    mv_feature_option = MultivariateFeatureOptionModel(value="value")
+    mv_fs_value_model = MultivariateFeatureStateValueModel(
+        multivariate_feature_option=mv_feature_option, id=1, percentage_allocation=10
+    )
+    assert mv_fs_value_model.mv_fs_value_uuid is not None
+
+
 def test_feature_state_get_value_no_mv_values(feature_1):
     # Given
     value = "foo"
@@ -49,8 +57,8 @@ def test_feature_state_get_value_mv_values(
     my_feature = FeatureModel(id=1, name="mv_feature", type=STANDARD)
 
     # with some multivariate feature options
-    mv_feature_option_1 = MultivariateFeatureOptionModel(value=mv_feature_value_1)
-    mv_feature_option_2 = MultivariateFeatureOptionModel(value=mv_feature_value_2)
+    mv_feature_option_1 = MultivariateFeatureOptionModel(id=1, value=mv_feature_value_1)
+    mv_feature_option_2 = MultivariateFeatureOptionModel(id=2, value=mv_feature_value_2)
 
     # and associated values
     mv_feature_state_value_1 = MultivariateFeatureStateValueModel(

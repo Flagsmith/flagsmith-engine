@@ -2,6 +2,7 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.models import IdentityModel
+from flag_engine.utils.collections import IdentityFeaturesList
 
 
 def test_build_identity_model_from_dictionary_no_feature_states():
@@ -21,6 +22,33 @@ def test_build_identity_model_from_dictionary_no_feature_states():
     assert isinstance(identity_model, IdentityModel)
     assert len(identity_model.identity_features) == 0
     assert len(identity_model.identity_traits) == 1
+
+
+def test_build_identity_model_from_dictionary_uses_identity_feature_list_for_identity_features():
+    # Given
+    identity_dict = {
+        "id": 1,
+        "identifier": "test-identity",
+        "environment_api_key": "api-key",
+        "created_date": "2021-08-22T06:25:23.406995Z",
+        "identity_features": [
+            {
+                "id": 1,
+                "feature": {
+                    "id": 1,
+                    "name": "test_feature",
+                    "type": STANDARD,
+                },
+                "enabled": True,
+                "feature_state_value": "some-value",
+            }
+        ],
+    }
+
+    # When
+    identity_model = build_identity_model(identity_dict)
+    # Then
+    assert isinstance(identity_model.identity_features, IdentityFeaturesList)
 
 
 def test_build_build_identity_model_from_dict_creates_identity_uuid():
