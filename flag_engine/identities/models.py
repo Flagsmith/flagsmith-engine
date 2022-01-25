@@ -20,7 +20,7 @@ class IdentityModel:
     django_id: int = None
 
     @property
-    def composite_key(self):
+    def composite_key(self) -> str:
         return self.generate_composite_key(self.environment_api_key, self.identifier)
 
     @staticmethod
