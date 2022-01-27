@@ -7,7 +7,7 @@ def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key()
     assert (
         EnvironmentAPIKeyModel(
             id=1,
-            key="scr.random_key",
+            key="ser.random_key",
             name="test_key",
             created_at=datetime.now(),
             client_api_key="test_key",
@@ -20,7 +20,7 @@ def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key_w
     assert (
         EnvironmentAPIKeyModel(
             id=1,
-            key="scr.random_key",
+            key="ser.random_key",
             name="test_key",
             created_at=datetime.now(),
             expires_at=datetime.now() + timedelta(days=5),
@@ -34,7 +34,7 @@ def test_environment_api_key_model_is_valid_is_false_for_expired_active_key():
     assert (
         EnvironmentAPIKeyModel(
             id=1,
-            key="scr.random_key",
+            key="ser.random_key",
             name="test_key",
             created_at=datetime.now() - timedelta(days=5),
             expires_at=datetime.now(),
@@ -48,7 +48,7 @@ def test_environment_api_key_model_is_valid_is_false_for_non_expired_inactive_ke
     assert (
         EnvironmentAPIKeyModel(
             id=1,
-            key="scr.random_key",
+            key="ser.random_key",
             name="test_key",
             created_at=datetime.now(),
             active=False,
