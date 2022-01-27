@@ -221,6 +221,17 @@ class DjangoEnvironment:
 
 
 @dataclass
+class DjangoEnvironmentAPIKey:
+    id: int
+    environment: DjangoEnvironment
+    key: str
+    created_at: datetime
+    name: str
+    expires_at: datetime = None
+    active: bool = True
+
+
+@dataclass
 class DjangoTrait:
     trait_key: str
     trait_value: typing.Any
