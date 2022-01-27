@@ -46,7 +46,14 @@ class FeatureStateModel:
     def set_value(self, value: typing.Any):
         self._value = value
 
-    def get_value(self, identity_id: int = None):
+    def get_value(self, identity_id: typing.Union[int, str] = None) -> typing.Any:
+        """
+        Get the value of the feature state.
+
+        :param identity_id: a unique identifier for the identity, can be either a
+            numeric id or a string but must be unique for the identity.
+        :return: the value of the feature state.
+        """
         if identity_id and len(self.multivariate_feature_state_values) > 0:
             return self._get_multivariate_value(identity_id)
         return self._value
@@ -55,7 +62,9 @@ class FeatureStateModel:
         """Mimick django method name to simplify serialization logic"""
         return self.get_value()
 
-    def _get_multivariate_value(self, identity_id: int) -> typing.Any:
+    def _get_multivariate_value(
+        self, identity_id: typing.Union[int, str]
+    ) -> typing.Any:
         percentage_value = get_hashed_percentage_for_object_ids(
             [self.django_id or self.featurestate_uuid, identity_id]
         )

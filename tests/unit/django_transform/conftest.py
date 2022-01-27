@@ -7,6 +7,7 @@ from flag_engine.features.constants import MULTIVARIATE, STANDARD
 from flag_engine.segments import constants
 from tests.mock_django_classes import (
     DjangoEnvironment,
+    DjangoEnvironmentAPIKey,
     DjangoFeature,
     DjangoFeatureSegment,
     DjangoFeatureState,
@@ -108,6 +109,17 @@ def django_environment(
             django_multivariate_feature_state,
             django_enabled_feature_state_with_string_value,
         ],
+    )
+
+
+@pytest.fixture()
+def django_environment_api_key(django_environment):
+    return DjangoEnvironmentAPIKey(
+        id=1,
+        environment=django_environment,
+        key="ser.random_key",
+        created_at=datetime.now(),
+        name="test_key",
     )
 
 
