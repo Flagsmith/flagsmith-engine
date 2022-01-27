@@ -13,9 +13,9 @@ class EnvironmentAPIKeyModel:
     key: str
     created_at: datetime
     name: str
-    expires_at: datetime
-    active: bool
     client_api_key: str
+    expires_at: datetime = None
+    active: bool = True
 
     @property
     def is_valid(self):
