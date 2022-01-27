@@ -1,6 +1,7 @@
 import json
 
 from flag_engine.django_transform.document_builders import (
+    build_environment_api_key_document,
     build_environment_document,
     build_identity_document,
 )
@@ -58,3 +59,16 @@ def test_build_environment_document(
                 "featurestate_uuid",
             )
         )
+
+
+def test_build_environment_api_key_document(django_environment_api_key):
+    # When
+    api_key_document = build_environment_api_key_document(django_environment_api_key)
+
+    # Then
+    assert api_key_document["id"] == django_environment_api_key.id
+    assert api_key_document["key"] == django_environment_api_key.key
+    assert (
+        api_key_document["client_api_key"]
+        == django_environment_api_key.environment.api_key
+    )

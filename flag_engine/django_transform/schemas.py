@@ -3,7 +3,10 @@ import typing
 from marshmallow import fields, post_dump, pre_dump
 
 from flag_engine.django_transform.fields import DjangoRelatedManagerField
-from flag_engine.environments.schemas import BaseEnvironmentSchema
+from flag_engine.environments.schemas import (
+    BaseEnvironmentAPIKeySchema,
+    BaseEnvironmentSchema,
+)
 from flag_engine.features.schemas import (
     BaseFeatureStateSchema,
     MultivariateFeatureStateValueSchema,
@@ -115,3 +118,10 @@ class DjangoEnvironmentSchema(BaseEnvironmentSchema):
     def set_environment_key_in_context(self, obj, *args, **kwargs):
         self.context["environment_api_key"] = getattr(obj, "api_key", None)
         return obj
+
+
+class DjangoEnvironmentAPIKeySchema(BaseEnvironmentAPIKeySchema):
+    client_api_key = fields.Method(serialize="serialize_client_api_key")
+
+    def serialize_client_api_key(self, instance: typing.Any) -> str:
+        return instance.environment.api_key

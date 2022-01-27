@@ -1,10 +1,26 @@
 from marshmallow import EXCLUDE, Schema, fields
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
-from flag_engine.environments.models import EnvironmentModel
+from flag_engine.environments.models import EnvironmentAPIKeyModel, EnvironmentModel
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.projects.schemas import ProjectSchema
 from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
+
+
+class BaseEnvironmentAPIKeySchema(Schema):
+    id = fields.Int()
+    key = fields.Str()
+    created_at = fields.DateTime()
+    name = fields.Str()
+    expires_at = fields.DateTime()
+    active = fields.Bool()
+
+
+class EnvironmentAPIKeySchema(LoadToModelMixin, Schema):
+    client_api_key = fields.Str()
+
+    class Meta:
+        model_class = EnvironmentAPIKeyModel
 
 
 class BaseEnvironmentSchema(Schema):
