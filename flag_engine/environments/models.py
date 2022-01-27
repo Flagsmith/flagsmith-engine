@@ -17,6 +17,10 @@ class EnvironmentAPIKeyModel:
     active: bool
     client_api_key: str
 
+    @property
+    def is_valid(self):
+        return self.active and (not self.expires_at or self.expires_at > datetime.now())
+
 
 @dataclass
 class EnvironmentModel:
