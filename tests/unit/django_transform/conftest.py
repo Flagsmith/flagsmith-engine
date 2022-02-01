@@ -99,9 +99,11 @@ def django_environment(
     django_disabled_feature_state,
     django_multivariate_feature_state,
     django_enabled_feature_state_with_string_value,
+    random_api_key,
 ):
     return DjangoEnvironment(
         id=1,
+        api_key=random_api_key,
         project=django_project,
         feature_states=[
             django_disabled_feature_state,
@@ -156,11 +158,17 @@ def django_segment_rule(django_segment_condition):
 
 
 @pytest.fixture()
-def django_feature_segment(django_disabled_feature_state):
+def django_feature_segment(
+    mocker, django_disabled_feature_state, django_environment_api_key
+):
     feature_state = copy.deepcopy(django_disabled_feature_state)
     feature_state.id += 1
     feature_state.enabled = True
-    return DjangoFeatureSegment(feature_states=[feature_state])
+    return DjangoFeatureSegment(
+        id_=1,
+        environment=mocker.MagicMock(api_key=django_environment_api_key),
+        feature_states=[feature_state],
+    )
 
 
 @pytest.fixture()
