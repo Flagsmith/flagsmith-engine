@@ -5,7 +5,7 @@ from marshmallow import fields
 
 class DjangoRelatedManagerField(fields.List):
     def __init__(self, *args, filter_func: typing.Callable = None, **kwargs):
-        super(DjangoRelatedManagerField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.filter_func = filter_func
 
     def _serialize(
