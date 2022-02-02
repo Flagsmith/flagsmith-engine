@@ -15,7 +15,7 @@ def test_django_related_manager_field_serialize():
     # a mock to represent a related manager object
     a_list = [1, 2, 3, 4]
     mock_related_manager_field = mock.MagicMock()
-    mock_related_manager_field.filter.return_value = a_list
+    mock_related_manager_field.all.return_value = a_list
 
     # a dummy object with the mock related manager as the only attribute
     class MyObject:
@@ -35,20 +35,26 @@ def test_django_related_manager_field_serialize():
     assert serialized_data == a_list
 
 
-def test_django_related_manager_field_filter_called_with_correct_arguments():
+def test_django_related_manager_field_uses_filter_function_as_provided():
     # Given
     attribute_name = "my_attribute"
-    filters = {"id": None, "another_id__isnull": False}
 
     # add the spec to the mock to ensure that our mock object only has the relevant
     # attribute this ensures that we can use the mock assertion below instead of having
     # to rely on the response from obj.__getattr__.return_value. See the code for
     # marshmallow.utils.get_value for more information on why.
     object_to_serialize = mock.MagicMock(spec=[attribute_name])
-    field = DjangoRelatedManagerField(fields.Int(), metadata={"filter_kwargs": filters})
+
+    object_to_serialize.my_attribute.all.return_value = [1, 2, 3, 4]
+
+    def filter_func(e):
+        return e > 2
+
+    field = DjangoRelatedManagerField(fields.Int(), filter_func=filter_func)
 
     # When
-    field.serialize(attribute_name, obj=object_to_serialize)
+    serialized_data = field.serialize(attribute_name, obj=object_to_serialize)
 
     # Then
-    object_to_serialize.my_attribute.filter.assert_called_once_with(**filters)
+    object_to_serialize.my_attribute.all.assert_called_once()
+    assert serialized_data == [3, 4]

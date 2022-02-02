@@ -3,6 +3,7 @@ import typing
 from marshmallow import fields, post_dump, pre_dump
 
 from flag_engine.django_transform.fields import DjangoRelatedManagerField
+from flag_engine.django_transform.filters import sort_and_filter_feature_segments
 from flag_engine.environments.schemas import (
     BaseEnvironmentAPIKeySchema,
     BaseEnvironmentSchema,
@@ -58,20 +59,17 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         self.feature_state_schema = DjangoFeatureStateSchema()
 
     def serialize_feature_states(self, instance: typing.Any) -> typing.List[dict]:
-        # Feature segments in the django data model are associated with a segment
-        # and an environment we need to make sure we only get the feature segments
-        # for the environment we are serializing. The api key is set in the context
-        # using a pre_dump method on the EnvironmentSchema.
+        # api key is set in the context using a pre_dump method on EnvironmentSchema.
         environment_api_key = self.context.get("environment_api_key")
-        queryset = instance.feature_segments.order_by("feature", "-priority")
-        if environment_api_key:
-            queryset = queryset.filter(environment__api_key=environment_api_key)
+        feature_segments = sort_and_filter_feature_segments(
+            instance.feature_segments.all(), environment_api_key
+        )
 
         # Django datamodel incorrectly uses a foreign key for the
         # FeatureState -> FeatureSegment relationship so we have to recursively
         # build the list like this
         feature_states = []
-        for feature_segment in queryset:
+        for feature_segment in feature_segments:
             feature_states.extend(feature_segment.feature_states.all())
         return self.feature_state_schema.dump(feature_states, many=True)
 
@@ -109,7 +107,7 @@ class DjangoProjectSchema(BaseProjectSchema):
 class DjangoEnvironmentSchema(BaseEnvironmentSchema):
     feature_states = DjangoRelatedManagerField(
         fields.Nested(DjangoFeatureStateSchema),
-        metadata={"filter_kwargs": {"feature_segment_id": None, "identity_id": None}},
+        filter_func=lambda e: e.feature_segment_id is None and e.identity_id is None,
         dump_only=True,
     )
     project = fields.Nested(DjangoProjectSchema, dump_only=True)

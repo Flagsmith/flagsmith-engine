@@ -14,7 +14,7 @@ class DjangoSegmentCondition:
 class DjangoSegmentConditionRelatedObjectManager:
     conditions: typing.List[DjangoSegmentCondition]
 
-    def filter(self, **filter_kwargs) -> typing.List[DjangoSegmentCondition]:
+    def all(self) -> typing.List[DjangoSegmentCondition]:
         return self.conditions
 
 
@@ -37,9 +37,6 @@ class DjangoSegmentRule:
 @dataclass
 class DjangoSegmentRuleRelatedObjectManager:
     rules: typing.List[DjangoSegmentRule]
-
-    def filter(self, **filter_kwargs) -> typing.List[DjangoSegmentRule]:
-        return self.rules
 
     def all(self) -> typing.List[DjangoSegmentRule]:
         return self.rules
@@ -65,29 +62,28 @@ class DjangoSegment:
 class DjangoSegmentRelatedObjectManager:
     segments: typing.List[DjangoSegment]
 
-    def filter(self, **filter_kwargs) -> typing.List[DjangoSegment]:
+    def all(self) -> typing.List[DjangoSegment]:
         return self.segments
 
 
 class DjangoFeatureSegment:
-    def __init__(self, feature_states: typing.List["DjangoFeatureState"] = None):
-        self.feature_states = DjangoFeatureSegmentFeatureStatesRelatedManager(
-            feature_states or []
-        )
+    def __init__(
+        self,
+        id_: int,
+        environment: "DjangoEnvironment",
+        feature_states: typing.List["DjangoFeatureState"] = None,
+    ):
+        self.id = id_
+        self.environment = environment
+        self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
 
 
 @dataclass
 class DjangoFeatureSegmentRelatedObjectManager:
     feature_segments: typing.List[DjangoFeatureSegment]
 
-    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureSegment]:
-        return self.feature_segments
-
     def all(self) -> typing.List[DjangoFeatureSegment]:
         return self.feature_segments
-
-    def order_by(self, *args) -> "DjangoFeatureSegmentRelatedObjectManager":
-        return self
 
 
 @dataclass
@@ -144,9 +140,7 @@ class DjangoMultivariateFeatureStateValueRelatedManager:
         DjangoMultivariateFeatureStateValue
     ] = field(default_factory=list)
 
-    def filter(
-        self, **filter_kwargs
-    ) -> typing.List[DjangoMultivariateFeatureStateValue]:
+    def all(self) -> typing.List[DjangoMultivariateFeatureStateValue]:
         return self.multivariate_feature_state_values
 
 
@@ -164,7 +158,9 @@ class DjangoFeatureState:
         ] = None,
     ):
         self.id = id
+        self.feature_segment_id = getattr(feature_segment, "id", None)
         self.feature_segment = feature_segment
+        self.identity_id = getattr(identity, "id", None)
         self.identity = identity
         self.feature = feature
         self.enabled = enabled
@@ -183,20 +179,8 @@ class DjangoFeatureState:
 class DjangoFeatureStateRelatedManager:
     feature_states: typing.List[DjangoFeatureState]
 
-    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureState]:
-        return self.feature_states
-
     def all(self) -> typing.List[DjangoFeatureState]:
         return self.feature_states
-
-
-class DjangoFeatureSegmentFeatureStatesRelatedManager(DjangoFeatureStateRelatedManager):
-    def filter(self, **filter_kwargs) -> typing.List[DjangoFeatureState]:
-        if not filter_kwargs.get("environment__api_key"):
-            raise ValueError("Must provide environment__api_key filter arg")
-        return super(DjangoFeatureSegmentFeatureStatesRelatedManager, self).filter(
-            **filter_kwargs
-        )
 
 
 class DjangoEnvironment:
@@ -241,7 +225,7 @@ class DjangoTrait:
 class DjangoTraitRelatedManager:
     traits: typing.List[DjangoTrait]
 
-    def filter(self, **filter_kwargs) -> typing.List[DjangoTrait]:
+    def all(self) -> typing.List[DjangoTrait]:
         return self.traits
 
 
