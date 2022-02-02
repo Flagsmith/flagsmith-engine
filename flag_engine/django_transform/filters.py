@@ -42,4 +42,6 @@ def sort_and_filter_feature_segments(
         )
 
     # TODO: determine why this sorting is necessary
-    return sorted(feature_segments, key=lambda fs: (fs.feature, Reverser(fs.priority)))
+    return sorted(
+        feature_segments, key=lambda fs: (fs.feature_id, Reverser(fs.priority))
+    )
