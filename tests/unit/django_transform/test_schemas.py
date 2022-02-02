@@ -49,28 +49,36 @@ def test_segment_schema_serialize_feature_states(mocker):
     schema = DjangoSegmentSchema(context={"environment_api_key": environment_api_key})
 
     # and we create some mock objects
+    mock_environment = mocker.MagicMock(api_key=environment_api_key)
     mock_segment = mocker.MagicMock()
     mock_feature_state = mocker.MagicMock()
-    mock_feature_segment = mocker.MagicMock()
+    mock_feature_segment = mocker.MagicMock(environment=mock_environment)
+    mock_feature_segments = [mock_feature_segment]
 
     # and set up the return values as per django queryset logic
-    order_by_response = mock_segment.feature_segments.order_by.return_value
+    mock_segment.feature_segments.all.return_value = mock_feature_segments
     mock_feature_segment.feature_states.all.return_value = [mock_feature_state]
-    order_by_response.filter.return_value = [mock_feature_segment]
+
+    # and we mock the sort_and_filter function to return the same set of feature
+    # segments
+    mock_sort_and_filter_feature_segments = mocker.patch(
+        "flag_engine.django_transform.schemas.sort_and_filter_feature_segments",
+        return_value=mock_feature_segments,
+    )
 
     # When
     serialized_instance = schema.serialize_feature_states(mock_segment)
 
     # Then
     # The feature segments are filtered correctly by the environment
-    mock_segment.feature_segments.order_by.assert_called_once_with(
-        "feature", "-priority"
-    )
-    order_by_response.filter.assert_called_once_with(
-        environment__api_key=environment_api_key
-    )
+    mock_segment.feature_segments.all.assert_called_once_with()
 
     # and the feature states are dumped and returned correctly
     mock_feature_state_schema.dump.assert_called_once()
     mock_feature_state_schema.dump.assert_called_with([mock_feature_state], many=True)
     assert serialized_instance == mock_feature_state_schema.dump.return_value
+
+    # and the sort and filter function is called with the correct inputs
+    mock_sort_and_filter_feature_segments.assert_called_once_with(
+        mock_feature_segments, environment_api_key
+    )

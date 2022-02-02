@@ -34,7 +34,15 @@ def mock_django_feature(mock_django_project):
 
 
 @pytest.fixture()
-def mock_django_segment(mock_django_project, mock_django_feature):
+def mock_django_segment(
+    mocker, mock_django_project, mock_django_feature, random_api_key
+):
+    # To avoid circular fixture dependencies we need to use a traditional MagicMock
+    # here which just mimics the api_key of the environment. This is such that the
+    # python filtering is correct in the `serialize_feature_states` method on the
+    # DjangoSegmentSchema.
+    mock_environment = mocker.MagicMock(api_key=random_api_key)
+
     django_segment_condition = DjangoSegmentCondition(
         operator=EQUAL, property="foo", value="bar"
     )
@@ -42,6 +50,8 @@ def mock_django_segment(mock_django_project, mock_django_feature):
         type=ALL_RULE, conditions=[django_segment_condition]
     )
     django_feature_segment = DjangoFeatureSegment(
+        id_=1,
+        environment=mock_environment,
         feature_states=[
             DjangoFeatureState(
                 id=2,
@@ -49,7 +59,7 @@ def mock_django_segment(mock_django_project, mock_django_feature):
                 enabled=True,
                 value="overridden for segment",
             )
-        ]
+        ],
     )
     django_segment = DjangoSegment(
         id=1,
