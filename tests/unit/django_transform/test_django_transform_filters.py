@@ -12,19 +12,19 @@ def test_sort_and_filter_feature_segments():
     @dataclass
     class MockFeatureSegment:
         id: int
-        feature: int
+        feature_id: int
         priority: int
         environment: object
 
     api_key = "api-key"
-    matching_env = MockEnvironment(api_key=api_key)
-    not_matching_env = MockEnvironment(api_key="some-other-api-key")
+    valid_env = MockEnvironment(api_key=api_key)
+    invalid_env = MockEnvironment(api_key="some-other-api-key")
 
     feature_segments = [
-        MockFeatureSegment(id=1, feature=2, priority=1, environment=matching_env),
-        MockFeatureSegment(id=2, feature=2, priority=2, environment=matching_env),
-        MockFeatureSegment(id=3, feature=1, priority=1, environment=matching_env),
-        MockFeatureSegment(id=4, feature=1, priority=1, environment=not_matching_env),
+        MockFeatureSegment(id=1, feature_id=2, priority=1, environment=valid_env),
+        MockFeatureSegment(id=2, feature_id=2, priority=2, environment=valid_env),
+        MockFeatureSegment(id=3, feature_id=1, priority=1, environment=valid_env),
+        MockFeatureSegment(id=4, feature_id=1, priority=1, environment=invalid_env),
     ]
 
     # When
