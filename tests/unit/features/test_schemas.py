@@ -48,7 +48,7 @@ def test_dumping_fs_schema_works_for_valid_allocation():
     FeatureStateSchema().dump(data)
 
 
-def test_can_dump_featuresate_schema_without_mvfs(feature_1):
+def test_can_dump_featurestate_schema_without_mvfs(feature_1):
     raw_data = {"feature_state_value": "value"}
     dumped_data = FeatureStateSchema(
         exclude=["multivariate_feature_state_values"]
