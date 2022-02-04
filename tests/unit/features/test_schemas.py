@@ -49,8 +49,11 @@ def test_dumping_fs_schema_works_for_valid_allocation():
 
 
 def test_can_dump_featurestate_schema_without_mvfs(feature_1):
+    # Given
     raw_data = {"feature_state_value": "value"}
+    # When
     dumped_data = FeatureStateSchema(
         exclude=["multivariate_feature_state_values"]
     ).dump(raw_data)
+    # Then
     assert raw_data["feature_state_value"] == dumped_data["feature_state_value"]
