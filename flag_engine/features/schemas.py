@@ -69,6 +69,11 @@ class FeatureStateSchema(BaseFeatureStateSchema):
     def validate_percentage_allocations(self, data, **kwargs):
         """Since we do support modifying percentage allocation on a per identity override bases
         we need to validate the percentage before building the document(dict)"""
+        # Since client(s) can exclude this field from dumping we need to make sure
+        # We only run the validation if the field is present on the serializer
+        if "multivariate_feature_state_values" not in self.fields:
+            return data
+
         total_allocation = sum(
             mvfsv["percentage_allocation"]
             for mvfsv in data["multivariate_feature_state_values"]
