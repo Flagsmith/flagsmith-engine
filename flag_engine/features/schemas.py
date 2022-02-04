@@ -72,7 +72,7 @@ class FeatureStateSchema(BaseFeatureStateSchema):
         # Since client(s) can exclude this field from dumping we need to make sure
         # We only run the validation if the field is present on the serializer
         if "multivariate_feature_state_values" not in self.fields:
-            return
+            return data
 
         total_allocation = sum(
             mvfsv["percentage_allocation"]
