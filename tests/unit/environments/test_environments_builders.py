@@ -1,4 +1,7 @@
-from flag_engine.environments.builders import build_environment_model
+from flag_engine.environments.builders import (
+    build_environment_api_key_model,
+    build_environment_model,
+)
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
@@ -142,3 +145,21 @@ def test_build_environment_model_with_multivariate_flag():
         isinstance(mvfs, MultivariateFeatureStateValueModel)
         for mvfs in fs.multivariate_feature_state_values
     )
+
+
+def test_build_environment_api_key_model():
+    # Given
+    environment_key_dict = {
+        "key": "ser.7duQYrsasJXqdGsdaagyfU",
+        "active": True,
+        "created_at": "2022-02-07T04:58:25.969438+00:00",
+        "client_api_key": "RQchaCQ2mYicSCAwKoAg2E",
+        "id": 10,
+        "name": "api key 2",
+        "expires_at": None,
+    }
+    # When
+    environment_key_model = build_environment_api_key_model(environment_key_dict)
+
+    # Then
+    assert environment_key_model.key == environment_key_dict["key"]

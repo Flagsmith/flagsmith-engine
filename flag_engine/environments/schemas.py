@@ -12,11 +12,11 @@ class BaseEnvironmentAPIKeySchema(Schema):
     key = fields.Str()
     created_at = fields.DateTime()
     name = fields.Str()
-    expires_at = fields.DateTime()
     active = fields.Bool()
+    expires_at = fields.DateTime(allow_none=True)
 
 
-class EnvironmentAPIKeySchema(LoadToModelMixin, Schema):
+class EnvironmentAPIKeySchema(LoadToModelMixin, BaseEnvironmentAPIKeySchema):
     client_api_key = fields.Str()
 
     class Meta:
