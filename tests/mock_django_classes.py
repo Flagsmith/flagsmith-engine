@@ -174,6 +174,10 @@ class DjangoFeatureState:
     def get_feature_state_value(self):
         return self.value
 
+    @property
+    def feature_id(self):
+        return self.feature.id
+
 
 @dataclass
 class DjangoFeatureStateRelatedManager:
