@@ -30,7 +30,7 @@ class DjangoFeatureStatesRelatedManagerField(DjangoRelatedManagerField):
 
             existing_feature_state = features_map.get(fs.feature_id)
             if not existing_feature_state or (
-                fs.live_from < now and fs.version > existing_feature_state
+                fs.live_from < now and fs.version > existing_feature_state.version
             ):
                 features_map[fs.feature_id] = fs
 
