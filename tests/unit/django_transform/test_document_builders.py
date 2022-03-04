@@ -87,24 +87,33 @@ def test_build_environment_document_with_multiple_feature_state_versions(
 ):
     # Given
     yesterday = datetime.now() - timedelta(days=1)
+    tomorrow = datetime.now() + timedelta(days=1)
 
+    # a feature
     feature = DjangoFeature(
         id=1, name="test_feature", project=django_project, type=STANDARD
     )
+
+    # and 3 feature states for the same feature, 2 with live_from dates in the past and
+    # one with a live from date in the future
     default_fs_kwargs = {"feature": feature, "live_from": yesterday, "enabled": True}
     feature_state_v1 = DjangoFeatureState(id=1, version=1, **default_fs_kwargs)
     feature_state_v2 = DjangoFeatureState(id=2, version=2, **default_fs_kwargs)
+    feature_state_v3 = DjangoFeatureState(
+        id=3, version=3, feature=feature, enabled=True, live_from=tomorrow
+    )
 
     django_environment = DjangoEnvironment(
         id=1,
         project=django_project,
-        feature_states=[feature_state_v1, feature_state_v2],
+        feature_states=[feature_state_v1, feature_state_v2, feature_state_v3],
     )
 
     # When
     environment_document = build_environment_document(django_environment)
 
     # Then
+    # we only get one feature state and it is the one that is the latest live version
     assert len(environment_document["feature_states"]) == 1
     assert environment_document["feature_states"][0]["django_id"] == feature_state_v2.id
 
@@ -114,6 +123,7 @@ def test_build_identity_document_with_multiple_feature_state_versions(
 ):
     # Given
     yesterday = datetime.now() - timedelta(days=1)
+    tomorrow = datetime.now() + timedelta(days=1)
     feature = django_disabled_feature_state.feature
 
     identity_feature_state_v1 = DjangoFeatureState(
@@ -122,12 +132,19 @@ def test_build_identity_document_with_multiple_feature_state_versions(
     identity_feature_state_v2 = DjangoFeatureState(
         id=3, version=2, feature=feature, live_from=yesterday, enabled=True
     )
+    identity_feature_state_v3 = DjangoFeatureState(
+        id=3, version=2, feature=feature, live_from=tomorrow, enabled=True
+    )
     django_identity = DjangoIdentity(
         id=1,
         identifier="identity",
         created_date=yesterday,
         environment=django_environment,
-        feature_states=[identity_feature_state_v1, identity_feature_state_v2],
+        feature_states=[
+            identity_feature_state_v1,
+            identity_feature_state_v2,
+            identity_feature_state_v3,
+        ],
     )
 
     # When
