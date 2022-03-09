@@ -41,7 +41,7 @@ def evaluate_identity_in_segment(
             override_traits or identity.identity_traits,
             rule,
             segment.id,
-            identity.composite_key,
+            identity.django_id or identity.composite_key,
         )
         for rule in segment.rules
     )
