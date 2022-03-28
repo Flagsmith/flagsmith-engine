@@ -58,10 +58,6 @@ class FeatureStateModel:
             return self._get_multivariate_value(identity_id)
         return self._value
 
-    def get_feature_state_value(self):
-        """Mimick django method name to simplify serialization logic"""
-        return self.get_value()
-
     def _get_multivariate_value(
         self, identity_id: typing.Union[int, str]
     ) -> typing.Any:
