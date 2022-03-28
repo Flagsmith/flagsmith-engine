@@ -1,6 +1,6 @@
 import typing
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.features.models import FeatureStateModel
@@ -19,7 +19,9 @@ class EnvironmentAPIKeyModel:
 
     @property
     def is_valid(self):
-        return self.active and (not self.expires_at or self.expires_at > datetime.now())
+        return self.active and (
+            not self.expires_at or self.expires_at > datetime.now(tz=timezone.utc)
+        )
 
 
 @dataclass
