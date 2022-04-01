@@ -42,6 +42,19 @@ class EnvironmentModel:
 
     @property
     def integrations_data(self) -> dict:
+        """
+        Return a dictionary representation of all integration config objects.
+
+            e.g.
+            {
+                "mixpanel_configuration": {"base_url": None, "api_key": "some-key"},
+                "segment_configuration": {
+                    "base_url": "https://api.segment.com",
+                    "api_key": "some-key",
+                }
+            }
+        """
+
         integrations_data = {}
         for integration_attr in self._INTEGRATION_ATTS:
             integration_config: IntegrationModel = getattr(self, integration_attr, None)
