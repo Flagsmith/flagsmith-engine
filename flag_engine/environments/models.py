@@ -32,3 +32,22 @@ class EnvironmentModel:
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None
     heap_config: IntegrationModel = None
+
+    _INTEGRATION_ATTS = [
+        "amplitude_config",
+        "segment_config",
+        "mixpanel_config",
+        "heap_config",
+    ]
+
+    @property
+    def integrations_data(self) -> dict:
+        integrations_data = {}
+        for integration_attr in self._INTEGRATION_ATTS:
+            integration_config: IntegrationModel = getattr(self, integration_attr, None)
+            if integration_config:
+                integrations_data[integration_attr] = {
+                    "base_url": integration_config.base_url,
+                    "api_key": integration_config.api_key,
+                }
+        return integrations_data
