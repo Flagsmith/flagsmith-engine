@@ -1,10 +1,14 @@
-import re
 import typing
 from dataclasses import dataclass, field
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
 from flag_engine.utils.types import get_casting_function
+
+try:
+    import re2 as re
+except ImportError:
+    import re
 
 
 @dataclass
