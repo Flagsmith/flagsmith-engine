@@ -2,6 +2,8 @@ import re
 import typing
 from dataclasses import dataclass, field
 
+import semver
+
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
 from flag_engine.utils.types import get_casting_function
@@ -20,6 +22,12 @@ class SegmentConditionModel:
 
     def matches_trait_value(self, trait_value: typing.Any) -> bool:
         # TODO: move this logic to the evaluator module
+        if (
+            type(trait_value) is str
+            and semver.VersionInfo.isvalid(trait_value)
+            and semver.VersionInfo.isvalid(self.value)
+        ):
+            trait_value = semver.VersionInfo.parse(trait_value)
         if self.operator in self.EXCEPTION_OPERATOR_METHODS:
             evaluator_function = getattr(
                 self, self.EXCEPTION_OPERATOR_METHODS.get(self.operator)
@@ -35,7 +43,6 @@ class SegmentConditionModel:
             constants.NOT_EQUAL: "__ne__",
             constants.CONTAINS: "__contains__",
         }.get(self.operator)
-
         matching_function = getattr(
             trait_value, matching_function_name, lambda v: False
         )
