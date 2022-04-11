@@ -57,19 +57,19 @@ def test_engine(environment_model, identity_model, api_response):
     # we get the feature states from the engine
     engine_response = get_identity_feature_states(environment_model, identity_model)
 
-    # and we sort the flags and feature states so we can iterate over them and compare
+    # and we sort the feature states so we can iterate over them and compare
     sorted_engine_flags = sorted(engine_response, key=lambda fs: fs.feature.name)
-    sorted_api_flags = sorted(api_response["flags"], key=lambda f: f["feature"]["name"])
+    api_flags = api_response["flags"]
 
     # Then
     # there are an equal number of flags and feature states
-    assert len(sorted_engine_flags) == len(sorted_api_flags)
+    assert len(sorted_engine_flags) == len(api_flags)
 
     # and the values and enabled status of each of the feature states returned by the
     # engine are identical to those returned by the Django API (i.e. the test data).
     for i, feature_state in enumerate(sorted_engine_flags):
         assert (
             feature_state.get_value(identity_model.django_id)
-            == sorted_api_flags[i]["feature_state_value"]
+            == api_flags[i]["feature_state_value"]
         )
-        assert feature_state.enabled == sorted_api_flags[i]["enabled"]
+        assert feature_state.enabled == api_flags[i]["enabled"]
