@@ -5,7 +5,7 @@ from marshmallow import ValidationError, validates
 from flag_engine.identities.schemas import TraitSchema
 
 from .constants import TRAIT_STRING_VALUE_MAX_LENGTH
-from .fields import APITraitValueField, DynamoDBTraitValueField
+from .fields import APITraitValueField
 
 
 class APITraitSchema(TraitSchema):
@@ -21,7 +21,3 @@ class APITraitSchema(TraitSchema):
                 f"Value string is too long. Must be less than "
                 f"{TRAIT_STRING_VALUE_MAX_LENGTH} character"
             )
-
-
-class DynamoDBTraitSchema(TraitSchema):
-    trait_value = DynamoDBTraitValueField(allow_none=True)

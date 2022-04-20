@@ -1,5 +1,4 @@
 import typing
-from decimal import Decimal
 
 from marshmallow.fields import Field
 
@@ -19,22 +18,4 @@ class APITraitValueField(Field):
     ):
         if type(value) not in ACCEPTED_TRAIT_VALUE_TYPES:
             value = str(value)
-        return value
-
-
-class DynamoDBTraitValueField(Field):
-    def _deserialize(
-        self,
-        value: typing.Any,
-        attr: typing.Optional[str],
-        data: typing.Optional[typing.Mapping[str, typing.Any]],
-        **kwargs,
-    ):
-        if type(value) == Decimal:
-            return float(value)
-        return value
-
-    def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
-        if type(value) == float:
-            return Decimal(value)
         return value
