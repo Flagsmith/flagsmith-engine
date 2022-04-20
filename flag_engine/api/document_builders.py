@@ -1,4 +1,4 @@
-from flag_engine.django_transform.schemas import (
+from flag_engine.api.schemas import (
     DjangoEnvironmentAPIKeySchema,
     DjangoEnvironmentSchema,
     DjangoIdentitySchema,
