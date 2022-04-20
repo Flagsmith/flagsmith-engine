@@ -156,6 +156,8 @@ class DjangoFeatureState:
         multivariate_feature_state_values: typing.List[
             DjangoMultivariateFeatureStateValue
         ] = None,
+        version: int = 1,
+        live_from: datetime = None,
     ):
         self.id = id
         self.feature_segment_id = getattr(feature_segment, "id", None)
@@ -170,9 +172,15 @@ class DjangoFeatureState:
                 multivariate_feature_state_values or []
             )
         )
+        self.version = version
+        self.live_from = live_from or datetime.now()
 
     def get_feature_state_value(self):
         return self.value
+
+    @property
+    def feature_id(self):
+        return self.feature.id
 
 
 @dataclass

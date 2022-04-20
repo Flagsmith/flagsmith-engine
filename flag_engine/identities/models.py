@@ -5,13 +5,14 @@ from dataclasses import dataclass, field
 
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.collections import IdentityFeaturesList
+from flag_engine.utils.datetime import utcnow_with_tz
 
 
 @dataclass
 class IdentityModel:
     identifier: str
     environment_api_key: str
-    created_date: datetime = field(default_factory=datetime.datetime.now)
+    created_date: datetime = field(default_factory=utcnow_with_tz)
     identity_features: IdentityFeaturesList = field(
         default_factory=IdentityFeaturesList
     )

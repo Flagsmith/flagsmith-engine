@@ -1,8 +1,12 @@
 import typing
+from datetime import datetime
 
 from marshmallow import fields, post_dump, pre_dump
 
-from flag_engine.django_transform.fields import DjangoRelatedManagerField
+from flag_engine.django_transform.fields import (
+    DjangoFeatureStatesRelatedManagerField,
+    DjangoRelatedManagerField,
+)
 from flag_engine.django_transform.filters import sort_and_filter_feature_segments
 from flag_engine.environments.schemas import (
     BaseEnvironmentAPIKeySchema,
@@ -59,26 +63,34 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         self.feature_state_schema = DjangoFeatureStateSchema()
 
     def serialize_feature_states(self, instance: typing.Any) -> typing.List[dict]:
+        # TODO: move this logic to Django so we can optimise queries
         # api key is set in the context using a pre_dump method on EnvironmentSchema.
         environment_api_key = self.context.get("environment_api_key")
         feature_segments = sort_and_filter_feature_segments(
             instance.feature_segments.all(), environment_api_key
         )
 
-        # Django datamodel incorrectly uses a foreign key for the
-        # FeatureState -> FeatureSegment relationship so we have to recursively
-        # build the list like this
-        feature_states = []
+        # iterate over the feature segments and related feature states to end up with
+        # a list consisting of the latest version feature state for each feature
+        feature_states = {}
+        now = datetime.now()
         for feature_segment in feature_segments:
-            feature_states.extend(feature_segment.feature_states.all())
-        return self.feature_state_schema.dump(feature_states, many=True)
+            for feature_state in feature_segment.feature_states.all():
+                existing_feature_state = feature_states.get(feature_state.feature_id)
+                if not existing_feature_state or (
+                    feature_state.version > existing_feature_state.version
+                    and feature_state.live_from < now
+                ):
+                    feature_states[feature_state.feature_id] = feature_state
+
+        return self.feature_state_schema.dump(list(feature_states.values()), many=True)
 
 
 class DjangoIdentitySchema(BaseIdentitySchema):
     identity_traits = DjangoRelatedManagerField(
         fields.Nested(TraitSchema), required=False
     )
-    identity_features = DjangoRelatedManagerField(
+    identity_features = DjangoFeatureStatesRelatedManagerField(
         fields.Nested(DjangoFeatureStateSchema), required=False
     )
     django_id = fields.Int(attribute="id")
@@ -105,7 +117,7 @@ class DjangoProjectSchema(BaseProjectSchema):
 
 
 class DjangoEnvironmentSchema(BaseEnvironmentSchema):
-    feature_states = DjangoRelatedManagerField(
+    feature_states = DjangoFeatureStatesRelatedManagerField(
         fields.Nested(DjangoFeatureStateSchema),
         filter_func=lambda e: e.feature_segment_id is None and e.identity_id is None,
         dump_only=True,

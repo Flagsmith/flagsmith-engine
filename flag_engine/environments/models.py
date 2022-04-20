@@ -5,6 +5,7 @@ from datetime import datetime
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.projects.models import ProjectModel
+from flag_engine.utils.datetime import utcnow_with_tz
 
 
 @dataclass
@@ -19,7 +20,9 @@ class EnvironmentAPIKeyModel:
 
     @property
     def is_valid(self):
-        return self.active and (not self.expires_at or self.expires_at > datetime.now())
+        return self.active and (
+            not self.expires_at or self.expires_at > utcnow_with_tz()
+        )
 
 
 @dataclass

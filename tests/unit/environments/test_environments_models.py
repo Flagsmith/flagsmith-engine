@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.environments.models import EnvironmentAPIKeyModel
@@ -10,7 +10,7 @@ def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key()
             id=1,
             key="ser.random_key",
             name="test_key",
-            created_at=datetime.now(),
+            created_at=datetime.now(tz=timezone.utc),
             client_api_key="test_key",
         ).is_valid
         is True
@@ -23,8 +23,8 @@ def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key_w
             id=1,
             key="ser.random_key",
             name="test_key",
-            created_at=datetime.now(),
-            expires_at=datetime.now() + timedelta(days=5),
+            created_at=datetime.now(tz=timezone.utc),
+            expires_at=datetime.now(tz=timezone.utc) + timedelta(days=5),
             client_api_key="test_key",
         ).is_valid
         is True
@@ -37,8 +37,8 @@ def test_environment_api_key_model_is_valid_is_false_for_expired_active_key():
             id=1,
             key="ser.random_key",
             name="test_key",
-            created_at=datetime.now() - timedelta(days=5),
-            expires_at=datetime.now(),
+            created_at=datetime.now(tz=timezone.utc) - timedelta(days=5),
+            expires_at=datetime.now(tz=timezone.utc),
             client_api_key="test_key",
         ).is_valid
         is False
@@ -51,7 +51,7 @@ def test_environment_api_key_model_is_valid_is_false_for_non_expired_inactive_ke
             id=1,
             key="ser.random_key",
             name="test_key",
-            created_at=datetime.now(),
+            created_at=datetime.now(tz=timezone.utc),
             active=False,
             client_api_key="test_key",
         ).is_valid
