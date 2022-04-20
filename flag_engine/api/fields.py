@@ -6,9 +6,6 @@ from .constants import ACCEPTED_TRAIT_VALUE_TYPES
 
 
 class APITraitValueField(Field):
-    def _serialize(self, value: typing.Any, attr: str, obj: typing.Any, **kwargs):
-        return value
-
     def _deserialize(
         self,
         value: typing.Any,
