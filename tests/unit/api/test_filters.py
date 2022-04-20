@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from flag_engine.django_transform.filters import sort_and_filter_feature_segments
+from flag_engine.api.filters import sort_and_filter_feature_segments
 
 
 def test_sort_and_filter_feature_segments():

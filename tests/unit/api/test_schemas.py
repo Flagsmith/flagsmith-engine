@@ -1,10 +1,50 @@
-from flag_engine.django_transform.schemas import (
+import pytest
+from marshmallow import ValidationError
+
+from flag_engine.api.constants import TRAIT_STRING_VALUE_MAX_LENGTH
+from flag_engine.api.schemas import (
+    APITraitSchema,
     DjangoEnvironmentSchema,
     DjangoSegmentConditionSchema,
     DjangoSegmentSchema,
 )
 from flag_engine.segments.constants import PERCENTAGE_SPLIT
 from tests.mock_django_classes import DjangoSegmentCondition
+
+
+def test_loading_trait_value_longer_than_trait_string_value_max_length_raises_validation_error():
+    # Given
+    schema = APITraitSchema()
+    data = {
+        "trait_key": "trait_key",
+        "trait_value": "i" * (TRAIT_STRING_VALUE_MAX_LENGTH + 1),
+    }
+    # Then
+    with pytest.raises(ValidationError):
+        schema.load(data)
+
+
+@pytest.mark.parametrize(
+    "value, deserialized_value",
+    (
+        ("1", "1"),
+        (1.1, 1.1),
+        (True, True),
+        (-1, -1),
+        ({"key": "value"}, str({"key": "value"})),
+    ),
+)
+def test_loading_valid_trait_value_works(value, deserialized_value):
+    # Given
+    schema = APITraitSchema()
+    data = {
+        "trait_key": "trait_key",
+        "trait_value": value,
+    }
+    # When
+    trait = schema.load(data)
+    # Then
+    assert trait.trait_value == deserialized_value
 
 
 def test_environment_schema_dump_sets_api_key_in_context(django_environment):
@@ -40,7 +80,7 @@ def test_segment_schema_serialize_feature_states(mocker):
     # a mock feature state schema object so we can confirm that dump is
     # called correctly later on
     mock_feature_state_schema_class = mocker.patch(
-        "flag_engine.django_transform.schemas.DjangoFeatureStateSchema"
+        "flag_engine.api.schemas.DjangoFeatureStateSchema"
     )
     mock_feature_state_schema = mock_feature_state_schema_class.return_value
 
@@ -62,7 +102,7 @@ def test_segment_schema_serialize_feature_states(mocker):
     # and we mock the sort_and_filter function to return the same set of feature
     # segments
     mock_sort_and_filter_feature_segments = mocker.patch(
-        "flag_engine.django_transform.schemas.sort_and_filter_feature_segments",
+        "flag_engine.api.schemas.sort_and_filter_feature_segments",
         return_value=mock_feature_segments,
     )
 

@@ -1,11 +1,26 @@
 import typing
 
-from marshmallow import fields
+from marshmallow.fields import Field, List
+
+from .constants import ACCEPTED_TRAIT_VALUE_TYPES
 
 from flag_engine.utils.datetime import utcnow_with_tz
 
 
-class DjangoRelatedManagerField(fields.List):
+class APITraitValueField(Field):
+    def _deserialize(
+        self,
+        value: typing.Any,
+        attr: typing.Optional[str],
+        data: typing.Optional[typing.Mapping[str, typing.Any]],
+        **kwargs,
+    ):
+        if type(value) not in ACCEPTED_TRAIT_VALUE_TYPES:
+            value = str(value)
+        return value
+
+
+class DjangoRelatedManagerField(List):
     def __init__(self, *args, filter_func: typing.Callable = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.filter_func = filter_func
