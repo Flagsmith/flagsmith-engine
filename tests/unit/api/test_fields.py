@@ -1,13 +1,30 @@
 from datetime import timedelta
 from unittest import mock
 
+import pytest
 from marshmallow import fields
 
-from flag_engine.django_transform.fields import (
+from flag_engine.utils.datetime import utcnow_with_tz
+from flag_engine.api.fields import (
+    APITraitValueField,
     DjangoFeatureStatesRelatedManagerField,
     DjangoRelatedManagerField,
 )
-from flag_engine.utils.datetime import utcnow_with_tz
+
+
+@pytest.mark.parametrize(
+    "value, deserialized_value",
+    (
+        ("1", "1"),
+        (1.1, 1.1),
+        (True, True),
+        (-1, -1),
+        ({"key": "value"}, str({"key": "value"})),
+    ),
+)
+def test_api_trait_value_field_deserialize(value, deserialized_value):
+    field = APITraitValueField()
+    assert field.deserialize(value) == deserialized_value
 
 
 def test_django_related_manager_field_serialize():

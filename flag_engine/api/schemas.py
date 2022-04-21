@@ -1,12 +1,12 @@
 import typing
 
-from marshmallow import fields, post_dump, pre_dump
+from marshmallow import ValidationError, fields, post_dump, pre_dump, validates
 
-from flag_engine.django_transform.fields import (
+from flag_engine.api.fields import (
     DjangoFeatureStatesRelatedManagerField,
     DjangoRelatedManagerField,
 )
-from flag_engine.django_transform.filters import sort_and_filter_feature_segments
+from flag_engine.api.filters import sort_and_filter_feature_segments
 from flag_engine.environments.schemas import (
     BaseEnvironmentAPIKeySchema,
     BaseEnvironmentSchema,
@@ -16,15 +16,31 @@ from flag_engine.features.schemas import (
     MultivariateFeatureStateValueSchema,
 )
 from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.schemas import BaseIdentitySchema
-from flag_engine.identities.traits.schemas import TraitSchema
+from flag_engine.identities.schemas import BaseIdentitySchema, TraitSchema
 from flag_engine.projects.schemas import BaseProjectSchema
 from flag_engine.segments.schemas import (
     BaseSegmentConditionSchema,
     BaseSegmentRuleSchema,
     BaseSegmentSchema,
 )
-from flag_engine.utils.datetime import utcnow_with_tz
+
+from .constants import TRAIT_STRING_VALUE_MAX_LENGTH
+from .fields import APITraitValueField
+
+
+class APITraitSchema(TraitSchema):
+    trait_value = APITraitValueField(allow_none=True)
+
+    @validates("trait_value")
+    def validate_trait_value_length(
+        self, trait_value: typing.Union[int, str, bool, float]
+    ):
+        type_ = type(trait_value)
+        if type_ == str and len(trait_value) > TRAIT_STRING_VALUE_MAX_LENGTH:
+            raise ValidationError(
+                f"Value string is too long. Must be less than "
+                f"{TRAIT_STRING_VALUE_MAX_LENGTH} character"
+            )
 
 
 class DjangoFeatureStateSchema(BaseFeatureStateSchema):
@@ -73,13 +89,14 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         # iterate over the feature segments and related feature states to end up with
         # a list consisting of the latest version feature state for each feature
         feature_states = {}
-        now = utcnow_with_tz()
         for feature_segment in feature_segments:
             for feature_state in feature_segment.feature_states.all():
+                if not feature_state.is_live:
+                    continue
+
                 existing_feature_state = feature_states.get(feature_state.feature_id)
                 if not existing_feature_state or (
                     feature_state.version > existing_feature_state.version
-                    and feature_state.live_from < now
                 ):
                     feature_states[feature_state.feature_id] = feature_state
 
