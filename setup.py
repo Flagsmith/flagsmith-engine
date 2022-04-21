@@ -14,6 +14,7 @@ setup(
     install_requires=[
         "marshmallow>=3.14.1",
         "dataclasses;python_version<'3.7'",
+        "semver==2.13.0",
     ],
     classifiers=[
         "License :: OSI Approved :: BSD License",
