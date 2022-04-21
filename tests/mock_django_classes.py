@@ -2,6 +2,8 @@ import typing
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from flag_engine.utils.datetime import utcnow_with_tz
+
 
 @dataclass
 class DjangoSegmentCondition:
@@ -173,7 +175,7 @@ class DjangoFeatureState:
             )
         )
         self.version = version
-        self.live_from = live_from or datetime.now()
+        self.live_from = live_from or utcnow_with_tz()
 
     def get_feature_state_value(self):
         return self.value

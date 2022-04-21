@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest import mock
 
 from marshmallow import fields
@@ -7,6 +7,7 @@ from flag_engine.django_transform.fields import (
     DjangoFeatureStatesRelatedManagerField,
     DjangoRelatedManagerField,
 )
+from flag_engine.utils.datetime import utcnow_with_tz
 
 
 def test_django_related_manager_field_serialize():
@@ -74,7 +75,7 @@ def test_django_feature_state_related_manager_field_serialize_discards_old_versi
     # expect a django object to. Each feature state associated with the same feature
     # but with incrementing version numbers.
     feature_id = 1
-    yesterday = datetime.now() - timedelta(days=1)
+    yesterday = utcnow_with_tz() - timedelta(days=1)
     feature_states = [
         mock.MagicMock(id=i, feature_id=feature_id, version=i, live_from=yesterday)
         for i in (1, 2, 3, 4, 5)
