@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="flagsmith-flag-engine",
-    version="2.0.0",
+    version="2.0.1",
     author="Flagsmith",
     author_email="support@flagsmith.com",
     packages=find_packages(include=["flag_engine", "flag_engine.*"]),
@@ -14,6 +14,7 @@ setup(
     install_requires=[
         "marshmallow>=3.14.1",
         "dataclasses;python_version<'3.7'",
+        "semver==2.13.0",
     ],
     classifiers=[
         "License :: OSI Approved :: BSD License",
