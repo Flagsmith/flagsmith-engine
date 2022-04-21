@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flag_engine.django_transform.document_builders import (
     build_environment_api_key_document,
@@ -7,6 +7,7 @@ from flag_engine.django_transform.document_builders import (
     build_identity_document,
 )
 from flag_engine.features.constants import STANDARD
+from flag_engine.utils.datetime import utcnow_with_tz
 from flag_engine.utils.json.encoders import DecimalEncoder
 from tests.mock_django_classes import (
     DjangoEnvironment,
@@ -86,8 +87,8 @@ def test_build_environment_document_with_multiple_feature_state_versions(
     django_project,
 ):
     # Given
-    yesterday = datetime.now() - timedelta(days=1)
-    tomorrow = datetime.now() + timedelta(days=1)
+    yesterday = utcnow_with_tz() - timedelta(days=1)
+    tomorrow = utcnow_with_tz() + timedelta(days=1)
 
     # a feature
     feature = DjangoFeature(
@@ -122,8 +123,8 @@ def test_build_identity_document_with_multiple_feature_state_versions(
     django_environment, django_disabled_feature_state
 ):
     # Given
-    yesterday = datetime.now() - timedelta(days=1)
-    tomorrow = datetime.now() + timedelta(days=1)
+    yesterday = utcnow_with_tz() - timedelta(days=1)
+    tomorrow = utcnow_with_tz() + timedelta(days=1)
     feature = django_disabled_feature_state.feature
 
     identity_feature_state_v1 = DjangoFeatureState(
