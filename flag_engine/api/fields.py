@@ -4,8 +4,6 @@ from marshmallow.fields import Field, List
 
 from .constants import ACCEPTED_TRAIT_VALUE_TYPES
 
-from flag_engine.utils.datetime import utcnow_with_tz
-
 
 class APITraitValueField(Field):
     def _deserialize(
@@ -38,15 +36,15 @@ class DjangoRelatedManagerField(List):
 
 class DjangoFeatureStatesRelatedManagerField(DjangoRelatedManagerField):
     def get_value(self, obj, attr, **kwargs):
-        now = utcnow_with_tz()
         features_map = {}
         for fs in getattr(obj, attr).all():
-            if self.filter_func and not self.filter_func(fs):
+            if (self.filter_func and not self.filter_func(fs)) or not fs.is_live:
                 continue
 
             existing_feature_state = features_map.get(fs.feature_id)
-            if not existing_feature_state or (
-                fs.live_from < now and fs.version > existing_feature_state.version
+            if (
+                not existing_feature_state
+                or fs.version > existing_feature_state.version
             ):
                 features_map[fs.feature_id] = fs
 

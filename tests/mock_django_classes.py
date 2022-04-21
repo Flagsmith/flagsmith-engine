@@ -184,6 +184,14 @@ class DjangoFeatureState:
     def feature_id(self):
         return self.feature.id
 
+    @property
+    def is_live(self):
+        return (
+            self.version is not None
+            and self.live_from is not None
+            and self.live_from <= utcnow_with_tz()
+        )
+
 
 @dataclass
 class DjangoFeatureStateRelatedManager:

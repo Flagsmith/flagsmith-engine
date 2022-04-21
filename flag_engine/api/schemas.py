@@ -23,7 +23,6 @@ from flag_engine.segments.schemas import (
     BaseSegmentRuleSchema,
     BaseSegmentSchema,
 )
-from flag_engine.utils.datetime import utcnow_with_tz
 
 from .constants import TRAIT_STRING_VALUE_MAX_LENGTH
 from .fields import APITraitValueField
@@ -90,13 +89,14 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         # iterate over the feature segments and related feature states to end up with
         # a list consisting of the latest version feature state for each feature
         feature_states = {}
-        now = utcnow_with_tz()
         for feature_segment in feature_segments:
             for feature_state in feature_segment.feature_states.all():
+                if not feature_state.is_live:
+                    continue
+
                 existing_feature_state = feature_states.get(feature_state.feature_id)
                 if not existing_feature_state or (
                     feature_state.version > existing_feature_state.version
-                    and feature_state.live_from < now
                 ):
                     feature_states[feature_state.feature_id] = feature_state
 
