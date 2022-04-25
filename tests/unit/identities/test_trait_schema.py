@@ -13,7 +13,6 @@ from flag_engine.identities.traits.schemas import TraitSchema
         ("key1", 21),
         ("key1", None),
         ("key1", 11.2),
-        ("key1", 11.2),
         ("key1", True),
     ),
 )
@@ -43,6 +42,7 @@ def test_trait_schema_load_converts_decimal_to_float():
 
     # Then
     assert trait_model.trait_value == trait_value
+    assert isinstance(trait_model.trait_value, float)
 
 
 @pytest.mark.parametrize(
