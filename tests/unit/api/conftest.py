@@ -190,6 +190,10 @@ def django_identity(
     django_enabled_feature_state_with_string_value,
     django_multivariate_feature_state,
     django_environment,
+    django_trait_integer,
+    django_trait_float,
+    django_trait_string,
+    django_trait_boolean,
 ):
     return DjangoIdentity(
         id=1,
@@ -200,5 +204,11 @@ def django_identity(
             django_enabled_feature_state,
             django_enabled_feature_state_with_string_value,
             django_multivariate_feature_state,
+        ],
+        identity_traits=[
+            django_trait_boolean,
+            django_trait_float,
+            django_trait_integer,
+            django_trait_string,
         ],
     )
