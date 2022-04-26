@@ -1,8 +1,33 @@
+import enum
 import typing
 import uuid
 from dataclasses import dataclass, field
 
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
+
+
+class FlagsmithValueType(enum.Enum):
+    STRING = "str"
+    INTEGER = "int"
+    BOOLEAN = "bool"
+    FLOAT = "float"
+    NONE = "nonetype"
+
+
+@dataclass
+class FlagsmithValue:
+    value: str
+    value_type: FlagsmithValueType = FlagsmithValueType.STRING
+
+    @classmethod
+    def from_untyped_value(cls, untyped_value: typing.Any) -> "FlagsmithValue":
+        try:
+            type_ = type(untyped_value).__name__.lower()
+            flagsmith_value_type = FlagsmithValueType(type_)
+        except ValueError:
+            flagsmith_value_type = FlagsmithValueType.STRING
+
+        return cls(value=str(untyped_value), value_type=flagsmith_value_type)
 
 
 @dataclass
@@ -20,7 +45,7 @@ class FeatureModel:
 
 @dataclass
 class MultivariateFeatureOptionModel:
-    value: typing.Any
+    value: FlagsmithValue
     id: int = None
 
 
@@ -38,15 +63,15 @@ class FeatureStateModel:
     enabled: bool
     django_id: int = None
     featurestate_uuid: str = field(default_factory=uuid.uuid4)
-    _value: typing.Any = field(default=None, init=False)
+    _value: FlagsmithValue = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[
         MultivariateFeatureStateValueModel
     ] = field(default_factory=list)
 
     def set_value(self, value: typing.Any):
-        self._value = value
+        self._value = FlagsmithValue.from_untyped_value(untyped_value=value)
 
-    def get_value(self, identity_id: typing.Union[int, str] = None) -> typing.Any:
+    def get_value(self, identity_id: typing.Union[int, str] = None) -> FlagsmithValue:
         """
         Get the value of the feature state.
 
@@ -60,7 +85,7 @@ class FeatureStateModel:
 
     def _get_multivariate_value(
         self, identity_id: typing.Union[int, str]
-    ) -> typing.Any:
+    ) -> FlagsmithValue:
         percentage_value = get_hashed_percentage_for_object_ids(
             [self.django_id or self.featurestate_uuid, identity_id]
         )
