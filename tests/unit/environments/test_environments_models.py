@@ -59,13 +59,13 @@ def test_environment_api_key_model_is_valid_is_false_for_non_expired_inactive_ke
     )
 
 
-def test_environment_integrations_data_returns_empty_dict_when_no_integrations(
+def test_environment_has_integrations_false_when_no_integrations(
     environment,
 ):
-    assert environment.integrations_data == {}
+    assert environment.has_integrations is False
 
 
-def test_environment_integrations_data_returns_correct_data_when_multiple_integrations(
+def test_environment_has_integrations_true_when_integrations_exist(
     environment,
 ):
     # Given
@@ -77,11 +77,5 @@ def test_environment_integrations_data_returns_correct_data_when_multiple_integr
         api_key=example_key, base_url=segment_url
     )
 
-    # When
-    integrations_data = environment.integrations_data
-
     # Then
-    assert integrations_data == {
-        "mixpanel_config": {"api_key": example_key, "base_url": None},
-        "segment_config": {"api_key": example_key, "base_url": segment_url},
-    }
+    assert environment.has_integrations is True
