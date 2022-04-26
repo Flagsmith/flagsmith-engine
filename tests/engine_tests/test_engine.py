@@ -7,7 +7,7 @@ import pytest
 from flag_engine.engine import get_identity_feature_states
 from flag_engine.environments.builders import build_environment_model
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FlagsmithValue, FlagsmithValueType
+from flag_engine.features.models import FlagsmithValue
 from flag_engine.identities.builders import build_identity_model
 from flag_engine.identities.models import IdentityModel
 
@@ -70,12 +70,9 @@ def test_engine(environment_model, identity_model, api_response):
     # engine are identical to those returned by the Django API (i.e. the test data).
     for i, feature_state in enumerate(sorted_engine_flags):
         engine_value = feature_state.get_value(identity_model.django_id)
-        api_value = api_flags[i]["feature_state_value"]
 
-        api_value_as_fs_value = FlagsmithValue(
-            value=str(api_value),
-            value_type=FlagsmithValueType(type(api_value).__name__.lower()),
-        )
+        api_value = api_flags[i]["feature_state_value"]
+        api_value_as_fs_value = FlagsmithValue.from_untyped_value(api_value)
 
         assert engine_value == api_value_as_fs_value
         assert feature_state.enabled == api_flags[i]["enabled"]

@@ -9,6 +9,7 @@ from flag_engine.engine import (
     get_identity_feature_states,
 )
 from flag_engine.environments.builders import build_environment_model
+from flag_engine.features.models import FlagsmithValue
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.traits.models import TraitModel
 from tests.mock_django_classes import DjangoFeatureState, DjangoIdentity
@@ -29,7 +30,7 @@ def test_environment_end_to_end(mock_django_environment):
     # and the feature states should be correct
     assert len(feature_states) == 1
     assert feature_states[0].enabled is True
-    assert feature_states[0].get_value().value == "foobar"
+    assert feature_states[0].get_value() == FlagsmithValue(value="foobar")
 
 
 def test_identity_end_to_end(mock_django_environment, mock_django_feature):
@@ -79,4 +80,6 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
     )
     assert feature_states
     assert len(feature_states) == 1
-    assert feature_states[0].get_value().value == identity_feature_state_value
+    assert feature_states[0].get_value() == FlagsmithValue(
+        value=identity_feature_state_value
+    )
