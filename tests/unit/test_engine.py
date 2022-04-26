@@ -7,7 +7,7 @@ from flag_engine.engine import (
     get_identity_feature_states,
 )
 from flag_engine.features.constants import STANDARD
-from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.features.models import FeatureModel, FeatureStateModel, FlagsmithValue
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
 from tests.unit.conftest import (
@@ -127,7 +127,7 @@ def test_identity_get_all_feature_states_with_traits(
     )
 
     # Then
-    assert all_feature_states[0].get_value() == "segment_override"
+    assert all_feature_states[0].get_value() == FlagsmithValue(value="segment_override")
 
 
 def test_environment_get_all_feature_states(environment):

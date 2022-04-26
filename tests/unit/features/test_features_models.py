@@ -6,6 +6,7 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
+    FlagsmithValue,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
@@ -17,7 +18,7 @@ def test_initializing_feature_state_creates_default_feature_state_uuid(feature_1
 
 
 def test_initializing_multivariate_feature_state_value_creates_default_uuid():
-    mv_feature_option = MultivariateFeatureOptionModel(value="value")
+    mv_feature_option = MultivariateFeatureOptionModel(value=FlagsmithValue("value"))
     mv_fs_value_model = MultivariateFeatureStateValueModel(
         multivariate_feature_option=mv_feature_option, id=1, percentage_allocation=10
     )
@@ -32,7 +33,11 @@ def test_feature_state_get_value_no_mv_values(feature_1):
 
     # Then
     # the default value is always returned, even if an identity id is provided
-    assert feature_state.get_value() == feature_state.get_value(1) == value
+    assert (
+        feature_state.get_value()
+        == feature_state.get_value(1)
+        == FlagsmithValue(value=value)
+    )
 
 
 mv_feature_control_value = "control"
@@ -57,8 +62,12 @@ def test_feature_state_get_value_mv_values(
     my_feature = FeatureModel(id=1, name="mv_feature", type=STANDARD)
 
     # with some multivariate feature options
-    mv_feature_option_1 = MultivariateFeatureOptionModel(id=1, value=mv_feature_value_1)
-    mv_feature_option_2 = MultivariateFeatureOptionModel(id=2, value=mv_feature_value_2)
+    mv_feature_option_1 = MultivariateFeatureOptionModel(
+        id=1, value=FlagsmithValue(mv_feature_value_1)
+    )
+    mv_feature_option_2 = MultivariateFeatureOptionModel(
+        id=2, value=FlagsmithValue(mv_feature_value_2)
+    )
 
     # and associated values
     mv_feature_state_value_1 = MultivariateFeatureStateValueModel(
@@ -86,7 +95,9 @@ def test_feature_state_get_value_mv_values(
 
     # Then
     # the value of the feature state is correct based on the percentage value returned
-    assert mv_feature_state.get_value(identity_id=1) == expected_value
+    assert mv_feature_state.get_value(
+        identity_id=1
+    ) == FlagsmithValue.from_untyped_value(expected_value)
 
 
 def test_get_value_uses_django_id_for_multivariate_value_calculation_if_not_none(

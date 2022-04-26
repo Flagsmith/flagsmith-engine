@@ -7,6 +7,7 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
+    FlagsmithValue,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
@@ -130,7 +131,7 @@ def mv_feature_state_value():
     return MultivariateFeatureStateValueModel(
         id=1,
         multivariate_feature_option=MultivariateFeatureOptionModel(
-            id=1, value="test_value"
+            id=1, value=FlagsmithValue(value="test_value")
         ),
         percentage_allocation=100,
     )

@@ -6,6 +6,7 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureStateModel,
+    FlagsmithValue,
     MultivariateFeatureStateValueModel,
 )
 from tests.unit.helpers import get_environment_feature_state_for_feature_by_name
@@ -74,12 +75,9 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
     )
 
     # and the value is set correctly on the feature state which has a value
-    assert (
-        get_environment_feature_state_for_feature_by_name(
-            environment_model, feature_with_string_value_name
-        ).get_value()
-        == string_value
-    )
+    assert get_environment_feature_state_for_feature_by_name(
+        environment_model, feature_with_string_value_name
+    ).get_value() == FlagsmithValue(value=string_value)
 
 
 def test_build_environment_model_with_multivariate_flag():

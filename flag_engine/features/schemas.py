@@ -5,6 +5,7 @@ from marshmallow import EXCLUDE, Schema, fields, post_dump, post_load, validate
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
+    FlagsmithValue,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
@@ -21,12 +22,28 @@ class FeatureSchema(LoadToModelSchema):
         model_class = FeatureModel
 
 
+class FlagsmithValueSchema(LoadToModelSchema):
+    value_type = fields.Str()
+    value = fields.Str()
+
+    class Meta:
+        model_class = FlagsmithValue
+
+
 class MultivariateFeatureOptionSchema(LoadToModelSchema):
     id = fields.Int(allow_none=True)
     value = fields.Field(allow_none=True)
 
     class Meta:
         model_class = MultivariateFeatureOptionModel
+
+    @post_load()
+    def make_instance(self, data, **kwargs) -> object:
+        flagsmith_value = FlagsmithValue.from_untyped_value(data.pop("value", None))
+        data["value"] = flagsmith_value
+        return super(MultivariateFeatureOptionSchema, self).make_instance(
+            data, **kwargs
+        )
 
 
 class MultivariateFeatureStateValueSchema(LoadToModelSchema):

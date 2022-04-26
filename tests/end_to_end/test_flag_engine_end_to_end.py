@@ -29,7 +29,7 @@ def test_environment_end_to_end(mock_django_environment):
     # and the feature states should be correct
     assert len(feature_states) == 1
     assert feature_states[0].enabled is True
-    assert feature_states[0].get_value() == "foobar"
+    assert feature_states[0].get_value().value == "foobar"
 
 
 def test_identity_end_to_end(mock_django_environment, mock_django_feature):
@@ -79,4 +79,4 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
     )
     assert feature_states
     assert len(feature_states) == 1
-    assert feature_states[0].get_value() == identity_feature_state_value
+    assert feature_states[0].get_value().value == identity_feature_state_value
