@@ -7,9 +7,10 @@ from flag_engine.engine import (
     get_identity_feature_states,
 )
 from flag_engine.features.constants import STANDARD
-from flag_engine.features.models import FeatureModel, FeatureStateModel, FlagsmithValue
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
+from flag_engine.utils.models import FlagsmithValue
 from tests.unit.conftest import (
     segment_condition_property,
     segment_condition_string_value,
@@ -115,15 +116,16 @@ def test_identity_get_all_feature_states_with_traits(
     environment_with_segment_override, identity_in_segment, identity
 ):
     # Given
-    trait_models = TraitModel(
-        trait_key=segment_condition_property, trait_value=segment_condition_string_value
+    trait_model = TraitModel(
+        trait_key=segment_condition_property,
+        trait_value=FlagsmithValue.from_untyped_value(segment_condition_string_value),
     )
 
     # When
     all_feature_states = get_identity_feature_states(
         environment=environment_with_segment_override,
         identity=identity_in_segment,
-        override_traits=[trait_models],
+        override_traits=[trait_model],
     )
 
     # Then

@@ -2,6 +2,7 @@ import pytest
 
 from flag_engine.segments import constants
 from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
+from flag_engine.utils.models import FlagsmithValue
 
 
 @pytest.mark.parametrize(
@@ -66,7 +67,9 @@ def test_segment_condition_matches_trait_value(
     assert (
         SegmentConditionModel(
             operator=operator, property_="foo", value=condition_value
-        ).matches_trait_value(trait_value=trait_value)
+        ).matches_trait_value(
+            trait_value=FlagsmithValue.from_untyped_value(trait_value)
+        )
         == expected_result
     )
 
@@ -101,7 +104,7 @@ def test_segment_condition_matches_trait_value_for_semver(
     assert (
         SegmentConditionModel(
             operator=operator, property_="version", value=condition_value
-        ).matches_trait_value(trait_value=trait_value)
+        ).matches_trait_value(trait_value=FlagsmithValue(value=trait_value))
         is expected_result
     )
 

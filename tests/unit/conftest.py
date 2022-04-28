@@ -7,7 +7,6 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
-    FlagsmithValue,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
@@ -21,6 +20,7 @@ from flag_engine.segments.models import (
     SegmentModel,
     SegmentRuleModel,
 )
+from flag_engine.utils.models import FlagsmithValue
 
 segment_condition_property = "foo"
 segment_condition_string_value = "bar"
@@ -102,7 +102,8 @@ def identity(environment):
 @pytest.fixture()
 def trait_matching_segment(segment_condition):
     return TraitModel(
-        trait_key=segment_condition.property_, trait_value=segment_condition.value
+        trait_key=segment_condition.property_,
+        trait_value=FlagsmithValue.from_untyped_value(segment_condition.value),
     )
 
 

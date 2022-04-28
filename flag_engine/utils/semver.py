@@ -7,7 +7,7 @@ def is_semver(value: str) -> bool:
     False
     """
 
-    return value[-7:] == ":semver"
+    return isinstance(value, str) and value[-7:] == ":semver"
 
 
 def remove_semver_suffix(value: str) -> str:
