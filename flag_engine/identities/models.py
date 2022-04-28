@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.collections import IdentityFeaturesList
 from flag_engine.utils.datetime import utcnow_with_tz
+from flag_engine.utils.models import FlagsmithValueType
 
 
 @dataclass
@@ -32,7 +33,7 @@ class IdentityModel:
         existing_traits = {trait.trait_key: trait for trait in self.identity_traits}
 
         for trait in traits:
-            if trait.trait_value is None:
+            if trait.trait_value.value_type == FlagsmithValueType.NONE:
                 existing_traits.pop(trait.trait_key, None)
             else:
                 existing_traits[trait.trait_key] = trait

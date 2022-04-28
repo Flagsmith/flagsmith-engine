@@ -6,10 +6,10 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
-    FlagsmithValue,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
+from flag_engine.utils.models import FlagsmithValue
 
 
 def test_initializing_feature_state_creates_default_feature_state_uuid(feature_1):

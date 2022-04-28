@@ -9,6 +9,7 @@ from flag_engine.api.schemas import (
     DjangoSegmentSchema,
 )
 from flag_engine.segments.constants import PERCENTAGE_SPLIT
+from flag_engine.utils.models import FlagsmithValueType
 from tests.mock_django_classes import DjangoSegmentCondition
 
 
@@ -25,16 +26,16 @@ def test_loading_trait_value_longer_than_trait_string_value_max_length_raises_va
 
 
 @pytest.mark.parametrize(
-    "value, deserialized_value",
+    "value, expected_value, expected_value_type",
     (
-        ("1", "1"),
-        (1.1, 1.1),
-        (True, True),
-        (-1, -1),
-        ({"key": "value"}, str({"key": "value"})),
+        ("1", "1", FlagsmithValueType.STRING),
+        (1.1, "1.1", FlagsmithValueType.FLOAT),
+        (True, "True", FlagsmithValueType.BOOLEAN),
+        (-1, "-1", FlagsmithValueType.INTEGER),
+        ({"key": "value"}, str({"key": "value"}), FlagsmithValueType.STRING),
     ),
 )
-def test_loading_valid_trait_value_works(value, deserialized_value):
+def test_loading_valid_trait_value_works(value, expected_value, expected_value_type):
     # Given
     schema = APITraitSchema()
     data = {
@@ -44,7 +45,8 @@ def test_loading_valid_trait_value_works(value, deserialized_value):
     # When
     trait = schema.load(data)
     # Then
-    assert trait.trait_value == deserialized_value
+    assert trait.trait_value.value == expected_value
+    assert trait.trait_value.value_type == expected_value_type
 
 
 def test_environment_schema_dump_sets_api_key_in_context(django_environment):

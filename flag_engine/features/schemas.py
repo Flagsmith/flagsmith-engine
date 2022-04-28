@@ -5,12 +5,12 @@ from marshmallow import EXCLUDE, Schema, fields, post_dump, post_load, validate
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
-    FlagsmithValue,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
 from flag_engine.utils.exceptions import InvalidPercentageAllocation
 from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
+from flag_engine.utils.models import FlagsmithValue
 
 
 class FeatureSchema(LoadToModelSchema):
@@ -20,14 +20,6 @@ class FeatureSchema(LoadToModelSchema):
 
     class Meta:
         model_class = FeatureModel
-
-
-class FlagsmithValueSchema(LoadToModelSchema):
-    value_type = fields.Str()
-    value = fields.Str()
-
-    class Meta:
-        model_class = FlagsmithValue
 
 
 class MultivariateFeatureOptionSchema(LoadToModelSchema):

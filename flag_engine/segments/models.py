@@ -6,51 +6,89 @@ import semver
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
-from flag_engine.utils.semver import is_semver
-from flag_engine.utils.types import get_casting_function
+from flag_engine.utils.models import FlagsmithValue, FlagsmithValueType
+from flag_engine.utils.semver import is_semver, remove_semver_suffix
 
 
 @dataclass
 class SegmentConditionModel:
-    EXCEPTION_OPERATOR_METHODS = {
-        constants.NOT_CONTAINS: "evaluate_not_contains",
-        constants.REGEX: "evaluate_regex",
-    }
-
     operator: str
     value: str
     property_: str = None
 
-    def matches_trait_value(self, trait_value: typing.Any) -> bool:
+    def matches_trait_value(self, trait_value: FlagsmithValue) -> bool:
         # TODO: move this logic to the evaluator module
-        if type(self.value) is str and is_semver(self.value):
-            trait_value = semver.VersionInfo.parse(trait_value)
-        if self.operator in self.EXCEPTION_OPERATOR_METHODS:
-            evaluator_function = getattr(
-                self, self.EXCEPTION_OPERATOR_METHODS.get(self.operator)
+        if trait_value.value_type == FlagsmithValueType.STRING and is_semver(
+            self.value
+        ):
+            return self.evaluate_semver_match(trait_value.value, str(self.value))
+        elif trait_value.value_type == FlagsmithValueType.BOOLEAN:
+            return self.evaluate_bool_match(
+                trait_value.value in ("True", "true", "1"),
+                str(self.value) in ("True", "true", "1"),
             )
-            return evaluator_function(trait_value)
+        elif trait_value.value_type == FlagsmithValueType.INTEGER:
+            return self.evaluate_number_match(int(trait_value.value), int(self.value))
+        elif trait_value.value_type == FlagsmithValueType.FLOAT:
+            return self.evaluate_number_match(
+                float(trait_value.value), float(self.value)
+            )
+        elif trait_value.value_type == FlagsmithValueType.STRING:
+            return self.evaluate_string_match(trait_value.value, str(self.value))
 
-        matching_function_name = {
-            constants.EQUAL: "__eq__",
-            constants.GREATER_THAN: "__gt__",
-            constants.GREATER_THAN_INCLUSIVE: "__ge__",
-            constants.LESS_THAN: "__lt__",
-            constants.LESS_THAN_INCLUSIVE: "__le__",
-            constants.NOT_EQUAL: "__ne__",
-            constants.CONTAINS: "__contains__",
-        }.get(self.operator)
-        matching_function = getattr(
-            trait_value, matching_function_name, lambda v: False
+        return False
+
+    def evaluate_string_match(
+        self, value_from_trait: str, value_from_segment: str
+    ) -> bool:
+        if self.operator == constants.EQUAL:
+            return value_from_trait == value_from_segment
+        elif self.operator == constants.NOT_EQUAL:
+            return value_from_trait != value_from_segment
+        elif self.operator == constants.CONTAINS:
+            return value_from_segment in value_from_trait
+        elif self.operator == constants.NOT_CONTAINS:
+            return value_from_segment not in value_from_trait
+        elif self.operator == constants.REGEX:
+            return re.compile(value_from_segment).match(value_from_trait) is not None
+        return False
+
+    def evaluate_bool_match(
+        self, value_from_trait: bool, value_from_segment: bool
+    ) -> bool:
+        if self.operator == constants.EQUAL:
+            return value_from_trait == value_from_segment
+        elif self.operator == constants.NOT_EQUAL:
+            return value_from_trait != value_from_segment
+        return False
+
+    def evaluate_number_match(
+        self,
+        value_from_trait: typing.Union[int, float, semver.VersionInfo],
+        value_from_segment: typing.Union[int, float, semver.VersionInfo],
+    ):
+        if self.operator == constants.EQUAL:
+            return value_from_trait == value_from_segment
+        elif self.operator == constants.NOT_EQUAL:
+            return value_from_trait != value_from_segment
+        elif self.operator == constants.LESS_THAN:
+            return value_from_trait < value_from_segment
+        elif self.operator == constants.LESS_THAN_INCLUSIVE:
+            return value_from_trait <= value_from_segment
+        elif self.operator == constants.GREATER_THAN:
+            return value_from_trait > value_from_segment
+        elif self.operator == constants.GREATER_THAN_INCLUSIVE:
+            return value_from_trait >= value_from_segment
+        return False
+
+    def evaluate_semver_match(
+        self, value_from_trait: str, value_from_segment: str
+    ) -> bool:
+        value_from_segment = semver.VersionInfo.parse(
+            remove_semver_suffix(value_from_segment)
         )
-        to_same_type_as_trait_value = get_casting_function(trait_value)
-        return matching_function(to_same_type_as_trait_value(self.value))
-
-    def evaluate_not_contains(self, trait_value: typing.Iterable) -> bool:
-        return self.value not in trait_value
-
-    def evaluate_regex(self, trait_value: str) -> bool:
-        return re.compile(str(self.value)).match(trait_value) is not None
+        value_from_trait = semver.VersionInfo.parse(value_from_trait)
+        return self.evaluate_number_match(value_from_trait, value_from_segment)
 
 
 @dataclass

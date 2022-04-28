@@ -6,9 +6,9 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureStateModel,
-    FlagsmithValue,
     MultivariateFeatureStateValueModel,
 )
+from flag_engine.utils.models import FlagsmithValue
 from tests.unit.helpers import get_environment_feature_state_for_feature_by_name
 
 

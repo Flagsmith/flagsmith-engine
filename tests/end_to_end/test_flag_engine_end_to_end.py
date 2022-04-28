@@ -9,9 +9,9 @@ from flag_engine.engine import (
     get_identity_feature_states,
 )
 from flag_engine.environments.builders import build_environment_model
-from flag_engine.features.models import FlagsmithValue
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.utils.models import FlagsmithValue
 from tests.mock_django_classes import DjangoFeatureState, DjangoIdentity
 
 
@@ -65,7 +65,7 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
     # simulate dumping back to dynamo to make sure the builder function also works on
     # the identity model
     identity_model.identity_traits.append(
-        TraitModel(trait_key="foo", trait_value="bar")
+        TraitModel(trait_key="foo", trait_value=FlagsmithValue(value="bar"))
     )
     identity_data_from_engine = build_identity_dict(identity_model)
     assert identity_data_from_engine

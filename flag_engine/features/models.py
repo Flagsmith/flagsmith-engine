@@ -1,33 +1,9 @@
-import enum
 import typing
 import uuid
 from dataclasses import dataclass, field
 
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
-
-
-class FlagsmithValueType(enum.Enum):
-    STRING = "str"
-    INTEGER = "int"
-    BOOLEAN = "bool"
-    FLOAT = "float"
-    NONE = "nonetype"
-
-
-@dataclass
-class FlagsmithValue:
-    value: str
-    value_type: FlagsmithValueType = FlagsmithValueType.STRING
-
-    @classmethod
-    def from_untyped_value(cls, untyped_value: typing.Any) -> "FlagsmithValue":
-        try:
-            type_ = type(untyped_value).__name__.lower()
-            flagsmith_value_type = FlagsmithValueType(type_)
-        except ValueError:
-            flagsmith_value_type = FlagsmithValueType.STRING
-
-        return cls(value=str(untyped_value), value_type=flagsmith_value_type)
+from flag_engine.utils.models import FlagsmithValue
 
 
 @dataclass

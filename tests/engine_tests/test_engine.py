@@ -7,9 +7,9 @@ import pytest
 from flag_engine.engine import get_identity_feature_states
 from flag_engine.environments.builders import build_environment_model
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FlagsmithValue
 from flag_engine.identities.builders import build_identity_model
 from flag_engine.identities.models import IdentityModel
+from flag_engine.utils.models import FlagsmithValue
 
 MODULE_PATH = Path(__file__).parent.resolve()
 
