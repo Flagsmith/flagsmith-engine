@@ -38,13 +38,13 @@ class FeatureStateModel:
     enabled: bool
     django_id: int = None
     featurestate_uuid: str = field(default_factory=uuid.uuid4)
-    _value: typing.Any = field(default=None, init=False)
+    feature_state_value: typing.Any = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[
         MultivariateFeatureStateValueModel
     ] = field(default_factory=list)
 
     def set_value(self, value: typing.Any):
-        self._value = value
+        self.feature_state_value = value
 
     def get_value(self, identity_id: typing.Union[int, str] = None) -> typing.Any:
         """
@@ -56,7 +56,7 @@ class FeatureStateModel:
         """
         if identity_id and len(self.multivariate_feature_state_values) > 0:
             return self._get_multivariate_value(identity_id)
-        return self._value
+        return self.feature_state_value
 
     def _get_multivariate_value(
         self, identity_id: typing.Union[int, str]
@@ -83,4 +83,4 @@ class FeatureStateModel:
 
         # default to return the control value if no MV values found, although this
         # should never happen
-        return self._value
+        return self.feature_state_value
