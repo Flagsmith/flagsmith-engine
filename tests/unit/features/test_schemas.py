@@ -1,5 +1,6 @@
 import pytest
 
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.features.schemas import (
     FeatureStateSchema,
     MultivariateFeatureOptionSchema,
@@ -57,3 +58,14 @@ def test_can_dump_featurestate_schema_without_mvfs(feature_1):
     ).dump(raw_data)
     # Then
     assert raw_data["feature_state_value"] == dumped_data["feature_state_value"]
+
+
+def test_dumping_feature_state_model_returns_dict_with_feature_state_value():
+    # Given
+    feature = FeatureModel(id=1, name="test_feature", type="STANDARD")
+    fs_value = "some_value"
+    fs_model = FeatureStateModel(feature=feature, enabled=True)
+    # When
+    fs_model.set_value(fs_value)
+    # Then
+    assert FeatureStateSchema().dump(fs_model)["feature_state_value"] == fs_value
