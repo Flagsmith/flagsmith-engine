@@ -11,6 +11,53 @@ from flag_engine.features.models import (
 from tests.unit.helpers import get_environment_feature_state_for_feature_by_name
 
 
+def test_build_environment_model():
+    """Test to exercise the basic fields on the schema."""
+    # Given
+    environment_dict = {
+        "id": 1,
+        "api_key": "api-key",
+        "project": {
+            "id": 1,
+            "name": "test project",
+            "organisation": {
+                "id": 1,
+                "name": "Test org",
+                "stop_serving_flags": False,
+                "persist_trait_data": True,
+                "feature_analytics": True,
+            },
+            "hide_disabled_flags": False,
+        },
+        "feature_states": [
+            {
+                "id": 1,
+                "enabled": True,
+                "feature_state_value": None,
+                "feature": {"id": 1, "name": "enabled_feature", "type": STANDARD},
+            }
+        ],
+        "webhooks": [
+            {
+                "url": "https://my.webhook.com/hook",
+                "secret": "secret!",
+                "created_at": "2022-05-11T11:33:14.073487+00:00",
+                "updated_at": "2022-05-11T11:33:14.073487+00:00",
+                "enabled": True,
+            }
+        ],
+    }
+
+    # When
+    environment_model = build_environment_model(environment_dict)
+
+    # Then
+    assert environment_model
+
+    assert len(environment_model.feature_states) == 1
+    assert len(environment_model.webhooks) == 1
+
+
 def test_get_flags_for_environment_returns_feature_states_for_environment_dictionary():
     # Given
     # some variables for use later

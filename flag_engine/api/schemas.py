@@ -10,6 +10,7 @@ from flag_engine.api.filters import sort_and_filter_feature_segments
 from flag_engine.environments.schemas import (
     BaseEnvironmentAPIKeySchema,
     BaseEnvironmentSchema,
+    WebhookSchema,
 )
 from flag_engine.features.schemas import (
     BaseFeatureStateSchema,
@@ -140,6 +141,7 @@ class DjangoEnvironmentSchema(BaseEnvironmentSchema):
         dump_only=True,
     )
     project = fields.Nested(DjangoProjectSchema, dump_only=True)
+    webhooks = DjangoRelatedManagerField(fields.Nested(WebhookSchema), required=False)
 
     @pre_dump()
     def set_environment_key_in_context(self, obj, *args, **kwargs):
