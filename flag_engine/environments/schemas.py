@@ -1,10 +1,14 @@
 from marshmallow import EXCLUDE, Schema, fields
 
 from flag_engine.environments.integrations.schemas import IntegrationSchema
-from flag_engine.environments.models import EnvironmentAPIKeyModel, EnvironmentModel
+from flag_engine.environments.models import (
+    EnvironmentAPIKeyModel,
+    EnvironmentModel,
+    WebhookModel,
+)
 from flag_engine.features.schemas import FeatureStateSchema
 from flag_engine.projects.schemas import ProjectSchema
-from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
+from flag_engine.utils.marshmallow.schemas import LoadToModelMixin, LoadToModelSchema
 
 
 class BaseEnvironmentAPIKeySchema(Schema):
@@ -23,6 +27,17 @@ class EnvironmentAPIKeySchema(LoadToModelMixin, BaseEnvironmentAPIKeySchema):
         model_class = EnvironmentAPIKeyModel
 
 
+class WebhookSchema(LoadToModelSchema):
+    enabled = fields.Bool()
+    url = fields.URL()
+    secret = fields.Str()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()
+
+    class Meta:
+        model_class = WebhookModel
+
+
 class BaseEnvironmentSchema(Schema):
     id = fields.Int()
     api_key = fields.Str()
@@ -35,6 +50,9 @@ class BaseEnvironmentSchema(Schema):
 class EnvironmentSchema(LoadToModelMixin, BaseEnvironmentSchema):
     feature_states = fields.List(fields.Nested(FeatureStateSchema))
     project = fields.Nested(ProjectSchema)
+    webhooks = fields.List(
+        fields.Nested(WebhookSchema), required=False, allow_none=True
+    )
 
     class Meta:
         model_class = EnvironmentModel
