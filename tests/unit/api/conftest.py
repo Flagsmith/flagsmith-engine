@@ -20,6 +20,7 @@ from tests.mock_django_classes import (
     DjangoSegmentCondition,
     DjangoSegmentRule,
     DjangoTrait,
+    DjangoWebhook,
 )
 
 
@@ -92,6 +93,11 @@ def django_multivariate_feature_state(django_project):
     )
 
 
+@pytest.fixture
+def django_webhook():
+    return DjangoWebhook(url="https://my.webhook.com/hook", secret="secret!")
+
+
 @pytest.fixture()
 def django_environment(
     django_project,
@@ -100,6 +106,7 @@ def django_environment(
     django_multivariate_feature_state,
     django_enabled_feature_state_with_string_value,
     random_api_key,
+    django_webhook,
 ):
     return DjangoEnvironment(
         id=1,
@@ -111,6 +118,7 @@ def django_environment(
             django_multivariate_feature_state,
             django_enabled_feature_state_with_string_value,
         ],
+        webhooks=[django_webhook],
     )
 
 

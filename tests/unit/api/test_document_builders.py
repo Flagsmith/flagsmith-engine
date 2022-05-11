@@ -33,7 +33,11 @@ def test_build_identity_document(django_identity):
 
 
 def test_build_environment_document(
-    django_environment, django_project, django_segment, django_organisation
+    django_environment,
+    django_project,
+    django_segment,
+    django_organisation,
+    django_webhook,
 ):
     # When
     environment_document = build_environment_document(django_environment)
@@ -68,6 +72,12 @@ def test_build_environment_document(
                 "featurestate_uuid",
             )
         )
+
+    assert len(environment_document["webhooks"]) == 1
+    serialized_webhook = environment_document["webhooks"][0]
+    assert serialized_webhook["enabled"] == django_webhook.enabled
+    assert serialized_webhook["url"] == django_webhook.url
+    assert serialized_webhook["secret"] == django_webhook.secret
 
 
 def test_build_environment_api_key_document(django_environment_api_key):

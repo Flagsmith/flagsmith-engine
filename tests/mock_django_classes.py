@@ -201,6 +201,23 @@ class DjangoFeatureStateRelatedManager:
         return self.feature_states
 
 
+@dataclass
+class DjangoWebhook:
+    url: str
+    secret: str
+    created_at: datetime = field(default_factory=utcnow_with_tz)
+    updated_at: datetime = field(default_factory=utcnow_with_tz)
+    enabled: bool = True
+
+
+@dataclass
+class DjangoWebhookRelatedManager:
+    webhooks: typing.List[DjangoWebhook]
+
+    def all(self) -> typing.List[DjangoWebhook]:
+        return self.webhooks
+
+
 class DjangoEnvironment:
     def __init__(
         self,
@@ -209,6 +226,7 @@ class DjangoEnvironment:
         name: str = "Test Environment",
         api_key: str = "api-key",
         feature_states: typing.List[DjangoFeatureState] = None,
+        webhooks: typing.List[DjangoWebhook] = None,
     ):
         if feature_states:
             assert not any(
@@ -220,6 +238,7 @@ class DjangoEnvironment:
         self.api_key = api_key
         self.project = project
         self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
+        self.webhooks = DjangoWebhookRelatedManager(webhooks or [])
 
 
 @dataclass

@@ -26,6 +26,15 @@ class EnvironmentAPIKeyModel:
 
 
 @dataclass
+class WebhookModel:
+    created_at: datetime
+    updated_at: datetime
+    url: str
+    secret: str
+    enabled: bool = True
+
+
+@dataclass
 class EnvironmentModel:
     id: int
     api_key: str
@@ -35,12 +44,14 @@ class EnvironmentModel:
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None
     heap_config: IntegrationModel = None
+    webhooks: typing.List[WebhookModel] = field(default_factory=list)
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
         "segment_config",
         "mixpanel_config",
         "heap_config",
+        "webhooks",
     ]
 
     @property
