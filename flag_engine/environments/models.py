@@ -44,6 +44,7 @@ class EnvironmentModel:
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None
     heap_config: IntegrationModel = None
+    dynatrace_config: IntegrationModel = None
     webhooks: typing.List[WebhookModel] = field(default_factory=list)
 
     _INTEGRATION_ATTS = [
@@ -51,6 +52,7 @@ class EnvironmentModel:
         "segment_config",
         "mixpanel_config",
         "heap_config",
+        "dynatrace_config",
         "webhooks",
     ]
 
@@ -76,5 +78,6 @@ class EnvironmentModel:
                 integrations_data[integration_attr] = {
                     "base_url": integration_config.base_url,
                     "api_key": integration_config.api_key,
+                    "entity_selector": integration_config.entity_selector,
                 }
         return integrations_data
