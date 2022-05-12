@@ -45,6 +45,7 @@ class BaseEnvironmentSchema(Schema):
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+    dynatrace_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
 
 
 class EnvironmentSchema(LoadToModelMixin, BaseEnvironmentSchema):
