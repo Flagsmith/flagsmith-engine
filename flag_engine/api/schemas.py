@@ -86,6 +86,7 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         feature_segments = filter_feature_segments(
             instance.feature_segments.all(), environment_api_key
         )
+
         # iterate over the feature segments and related feature states to end up with
         # a list consisting of the latest version feature state for each feature
         feature_states = {}
@@ -100,6 +101,7 @@ class DjangoSegmentSchema(BaseSegmentSchema):
                     feature_state.version > existing_feature_state.version
                 ):
                     feature_states[feature_state.feature_id] = feature_state
+
         return self.feature_state_schema.dump(list(feature_states.values()), many=True)
 
 

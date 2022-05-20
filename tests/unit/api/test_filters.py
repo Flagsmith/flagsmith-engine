@@ -28,16 +28,10 @@ def test_filter_feature_segments():
     ]
 
     # When
-    sorted_feature_segments = filter_feature_segments(
+    filtered_feature_segments = filter_feature_segments(
         feature_segments, environment_api_key=api_key
     )
 
     # Then
     # the feature segment for a different environment was removed
-    assert len(sorted_feature_segments) == 3
-
-    # and the feature segments have been sorted correctly by feature, then by priority
-    # (descending)
-    # assert sorted_feature_segments[0].id == 3
-    # assert sorted_feature_segments[1].id == 2
-    # assert sorted_feature_segments[2].id == 1
+    assert len(filtered_feature_segments) == 3
