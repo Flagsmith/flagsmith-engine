@@ -83,7 +83,7 @@ def test_segment_schema_serialize_feature_states(mocker):
         "flag_engine.api.schemas.DjangoFeatureStateSchema"
     )
     mock_feature_state_schema = mock_feature_state_schema_class.return_value
-
+    expected_priority = 0
     # and we instantiate the segment schema with the environment_api_key in the context
     environment_api_key = "api-key"
     schema = DjangoSegmentSchema(context={"environment_api_key": environment_api_key})
@@ -92,7 +92,9 @@ def test_segment_schema_serialize_feature_states(mocker):
     mock_environment = mocker.MagicMock(api_key=environment_api_key)
     mock_segment = mocker.MagicMock()
     mock_feature_state = mocker.MagicMock()
-    mock_feature_segment = mocker.MagicMock(environment=mock_environment)
+    mock_feature_segment = mocker.MagicMock(
+        environment=mock_environment, priority=expected_priority
+    )
     mock_feature_segments = [mock_feature_segment]
 
     # and set up the return values as per django queryset logic
@@ -108,7 +110,6 @@ def test_segment_schema_serialize_feature_states(mocker):
 
     # When
     serialized_instance = schema.serialize_feature_states(mock_segment)
-
     # Then
     # The feature segments are filtered correctly by the environment
     mock_segment.feature_segments.all.assert_called_once_with()
@@ -118,7 +119,9 @@ def test_segment_schema_serialize_feature_states(mocker):
     mock_feature_state_schema.dump.assert_called_with([mock_feature_state], many=True)
     assert serialized_instance == mock_feature_state_schema.dump.return_value
 
-    # and the sort and filter function is called with the correct inputs
+    # and the filter function is called with the correct inputs
     mock_filter_feature_segments.assert_called_once_with(
         mock_feature_segments, environment_api_key
     )
+    # and priority was set on the feature state
+    assert mock_feature_state.priority == expected_priority
