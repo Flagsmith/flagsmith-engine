@@ -37,6 +37,7 @@ class FeatureStateModel:
     feature: FeatureModel
     enabled: bool
     django_id: int = None
+    priority: int = None
     featurestate_uuid: str = field(default_factory=uuid.uuid4)
     feature_state_value: typing.Any = field(default=None, init=False)
     multivariate_feature_state_values: typing.List[

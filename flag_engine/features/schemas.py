@@ -43,6 +43,8 @@ class BaseFeatureStateSchema(Schema):
     featurestate_uuid = fields.Str(dump_default=uuid.uuid4)
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
+    # Used for storing feature segment priority
+    priority = fields.Int(allow_none=True)
 
     class Meta:
         unknown = EXCLUDE
