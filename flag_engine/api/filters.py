@@ -20,7 +20,7 @@ class Reverser:
         return other.obj < self.obj
 
 
-def sort_and_filter_feature_segments(
+def filter_feature_segments(
     feature_segments: typing.Iterable, environment_api_key: str
 ) -> typing.List:
     """
@@ -41,7 +41,4 @@ def sort_and_filter_feature_segments(
             )
         )
 
-    # TODO: determine why this sorting is necessary
-    return sorted(
-        feature_segments, key=lambda fs: (fs.feature_id, Reverser(fs.priority))
-    )
+    return feature_segments

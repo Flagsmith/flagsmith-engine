@@ -101,8 +101,8 @@ def test_segment_schema_serialize_feature_states(mocker):
 
     # and we mock the sort_and_filter function to return the same set of feature
     # segments
-    mock_sort_and_filter_feature_segments = mocker.patch(
-        "flag_engine.api.schemas.sort_and_filter_feature_segments",
+    mock_filter_feature_segments = mocker.patch(
+        "flag_engine.api.schemas.filter_feature_segments",
         return_value=mock_feature_segments,
     )
 
@@ -119,6 +119,6 @@ def test_segment_schema_serialize_feature_states(mocker):
     assert serialized_instance == mock_feature_state_schema.dump.return_value
 
     # and the sort and filter function is called with the correct inputs
-    mock_sort_and_filter_feature_segments.assert_called_once_with(
+    mock_filter_feature_segments.assert_called_once_with(
         mock_feature_segments, environment_api_key
     )
