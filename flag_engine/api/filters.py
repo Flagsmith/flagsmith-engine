@@ -1,25 +1,6 @@
 import typing
 
 
-class Reverser:
-    """
-    Helper class to allow us to reverse the sort direction for individual keys when
-    sorting by multiple keys
-
-        e.g. s = sorted(l, key=lambda e: (attr1, Reverser(attr2)))
-
-    """
-
-    def __init__(self, obj: typing.Any):
-        self.obj = obj
-
-    def __eq__(self, other):
-        return self.obj == other.obj
-
-    def __lt__(self, other):
-        return other.obj < self.obj
-
-
 def filter_feature_segments(
     feature_segments: typing.Iterable, environment_api_key: str
 ) -> typing.List:
