@@ -92,7 +92,6 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         feature_states = {}
         for feature_segment in feature_segments:
             for feature_state in feature_segment.feature_states.all():
-                feature_state.priority = feature_segment.priority
                 if not feature_state.is_live:
                     continue
 
@@ -101,7 +100,6 @@ class DjangoSegmentSchema(BaseSegmentSchema):
                     feature_state.version > existing_feature_state.version
                 ):
                     feature_states[feature_state.feature_id] = feature_state
-
         return self.feature_state_schema.dump(list(feature_states.values()), many=True)
 
 

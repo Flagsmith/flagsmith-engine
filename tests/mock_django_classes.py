@@ -72,11 +72,13 @@ class DjangoFeatureSegment:
     def __init__(
         self,
         id_: int,
+        priority: int,
         environment: "DjangoEnvironment",
         feature_states: typing.List["DjangoFeatureState"] = None,
     ):
         self.id = id_
         self.environment = environment
+        self.priority = priority
         self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
 
 

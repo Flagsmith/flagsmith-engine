@@ -1,3 +1,4 @@
+import math
 import typing
 
 from flag_engine.environments.models import EnvironmentModel
@@ -102,15 +103,10 @@ def _get_identity_feature_states_dict(
     for matching_segment in identity_segments:
         for feature_state in matching_segment.feature_states:
             if feature_state.feature in feature_states:
-                try:
-                    if (
-                        feature_states[feature_state.feature].priority
-                        < feature_state.priority
-                    ):
-                        continue
-                except TypeError:
-                    pass
-
+                if _should_not_override(
+                    feature_states[feature_state.feature], feature_state
+                ):
+                    continue
             feature_states[feature_state.feature] = feature_state
 
     # Override with any feature states defined directly the identity
@@ -123,3 +119,33 @@ def _get_identity_feature_states_dict(
     )
 
     return feature_states
+
+
+def _should_not_override(
+    fs_being_overridden: FeatureStateModel, overriding_fs: FeatureStateModel
+) -> bool:
+    """
+    Allow override only if:
+
+    1. `fs_being_overridden` does not have a feature segment(i.e: it is an environment feature state or it's a
+    feature segment feature state but from an old document that does not have `feature_segment.priority`)
+    but `overriding_fs` does.
+
+    2. `fs_being_overridden` have a feature segment with low priority(i.e: the number is greater)
+
+    Do not override for any other case
+
+    """
+
+    try:
+        return (
+            getattr(
+                fs_being_overridden.feature_segment,
+                "priority",
+                math.inf,
+            )
+            < overriding_fs.feature_segment.priority
+        )
+
+    except (TypeError, AttributeError):
+        return False
