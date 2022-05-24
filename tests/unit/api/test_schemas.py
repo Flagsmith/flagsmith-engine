@@ -83,7 +83,6 @@ def test_segment_schema_serialize_feature_states(mocker):
         "flag_engine.api.schemas.DjangoFeatureStateSchema"
     )
     mock_feature_state_schema = mock_feature_state_schema_class.return_value
-
     # and we instantiate the segment schema with the environment_api_key in the context
     environment_api_key = "api-key"
     schema = DjangoSegmentSchema(context={"environment_api_key": environment_api_key})
@@ -101,14 +100,13 @@ def test_segment_schema_serialize_feature_states(mocker):
 
     # and we mock the sort_and_filter function to return the same set of feature
     # segments
-    mock_sort_and_filter_feature_segments = mocker.patch(
-        "flag_engine.api.schemas.sort_and_filter_feature_segments",
+    mock_filter_feature_segments = mocker.patch(
+        "flag_engine.api.schemas.filter_feature_segments",
         return_value=mock_feature_segments,
     )
 
     # When
     serialized_instance = schema.serialize_feature_states(mock_segment)
-
     # Then
     # The feature segments are filtered correctly by the environment
     mock_segment.feature_segments.all.assert_called_once_with()
@@ -118,7 +116,7 @@ def test_segment_schema_serialize_feature_states(mocker):
     mock_feature_state_schema.dump.assert_called_with([mock_feature_state], many=True)
     assert serialized_instance == mock_feature_state_schema.dump.return_value
 
-    # and the sort and filter function is called with the correct inputs
-    mock_sort_and_filter_feature_segments.assert_called_once_with(
+    # and the filter function is called with the correct inputs
+    mock_filter_feature_segments.assert_called_once_with(
         mock_feature_segments, environment_api_key
     )

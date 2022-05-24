@@ -101,9 +101,11 @@ def _get_identity_feature_states_dict(
     identity_segments = get_identity_segments(environment, identity, override_traits)
     for matching_segment in identity_segments:
         for feature_state in matching_segment.feature_states:
-            # note that feature states are stored on the segment in descending priority
-            # order so we only care that the last one is added
-            # TODO: can we optimise this?
+            if feature_state.feature in feature_states:
+                if feature_states[feature_state.feature].is_higher_segment_priority(
+                    feature_state
+                ):
+                    continue
             feature_states[feature_state.feature] = feature_state
 
     # Override with any feature states defined directly the identity
