@@ -166,15 +166,18 @@ def django_segment_rule(django_segment_condition):
 
 
 @pytest.fixture()
-def django_feature_segment(
-    mocker, django_disabled_feature_state, django_environment_api_key
-):
+def django_feature_segment(mocker, django_disabled_feature_state, random_api_key):
+    environment = mocker.MagicMock(api_key=random_api_key)
     feature_state = copy.deepcopy(django_disabled_feature_state)
     feature_state.id += 1
+    feature_state.feature_segment = DjangoFeatureSegment(
+        id_=1, priority=0, environment=environment
+    )
     feature_state.enabled = True
     return DjangoFeatureSegment(
         id_=1,
-        environment=mocker.MagicMock(api_key=django_environment_api_key),
+        priority=0,
+        environment=environment,
         feature_states=[feature_state],
     )
 

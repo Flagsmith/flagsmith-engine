@@ -38,6 +38,7 @@ def test_build_environment_document(
     django_segment,
     django_organisation,
     django_webhook,
+    django_feature_segment,
 ):
     # When
     environment_document = build_environment_document(django_environment)
@@ -52,7 +53,10 @@ def test_build_environment_document(
 
     segment = project["segments"][0]
     assert segment["name"] == django_segment.name
-
+    assert (
+        segment["feature_states"][0]["feature_segment"]["priority"]
+        == django_feature_segment.priority
+    )
     organisation = project["organisation"]
     assert organisation["name"] == django_organisation.name
     assert organisation["persist_trait_data"] == django_organisation.persist_trait_data

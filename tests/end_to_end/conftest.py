@@ -51,6 +51,7 @@ def mock_django_segment(
     )
     django_feature_segment = DjangoFeatureSegment(
         id_=1,
+        priority=0,
         environment=mock_environment,
         feature_states=[
             DjangoFeatureState(
