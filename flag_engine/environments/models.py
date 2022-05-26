@@ -53,7 +53,6 @@ class EnvironmentModel:
         "mixpanel_config",
         "heap_config",
         "dynatrace_config",
-        "webhooks",
     ]
 
     @property
