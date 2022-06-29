@@ -77,11 +77,9 @@ def test_build_environment_document(
             )
         )
 
-    assert len(environment_document["webhooks"]) == 1
-    serialized_webhook = environment_document["webhooks"][0]
-    assert serialized_webhook["enabled"] == django_webhook.enabled
-    assert serialized_webhook["url"] == django_webhook.url
-    assert serialized_webhook["secret"] == django_webhook.secret
+    assert environment_document["webhook_config"] is not None
+    assert environment_document["webhook_config"]["url"] == django_webhook.url
+    assert environment_document["webhook_config"]["secret"] == django_webhook.secret
 
 
 def test_build_environment_api_key_document(django_environment_api_key):

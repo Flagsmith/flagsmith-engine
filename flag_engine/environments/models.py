@@ -27,11 +27,8 @@ class EnvironmentAPIKeyModel:
 
 @dataclass
 class WebhookModel:
-    created_at: datetime
-    updated_at: datetime
     url: str
     secret: str
-    enabled: bool = True
 
 
 @dataclass
@@ -45,7 +42,7 @@ class EnvironmentModel:
     mixpanel_config: IntegrationModel = None
     heap_config: IntegrationModel = None
     dynatrace_config: IntegrationModel = None
-    webhooks: typing.List[WebhookModel] = field(default_factory=list)
+    webhook_config: WebhookModel = None
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
