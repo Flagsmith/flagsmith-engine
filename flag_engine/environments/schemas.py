@@ -28,11 +28,8 @@ class EnvironmentAPIKeySchema(LoadToModelMixin, BaseEnvironmentAPIKeySchema):
 
 
 class WebhookSchema(LoadToModelSchema):
-    enabled = fields.Bool()
     url = fields.URL()
     secret = fields.Str()
-    created_at = fields.DateTime()
-    updated_at = fields.DateTime()
 
     class Meta:
         model_class = WebhookModel
@@ -46,14 +43,12 @@ class BaseEnvironmentSchema(Schema):
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     dynatrace_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+    webhook_config = fields.Nested(WebhookSchema, required=False, allow_none=True)
 
 
 class EnvironmentSchema(LoadToModelMixin, BaseEnvironmentSchema):
     feature_states = fields.List(fields.Nested(FeatureStateSchema))
     project = fields.Nested(ProjectSchema)
-    webhooks = fields.List(
-        fields.Nested(WebhookSchema), required=False, allow_none=True
-    )
 
     class Meta:
         model_class = EnvironmentModel

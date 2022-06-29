@@ -14,6 +14,7 @@ from tests.unit.helpers import get_environment_feature_state_for_feature_by_name
 def test_build_environment_model():
     """Test to exercise the basic fields on the schema."""
     # Given
+    webhook_url = "https://my.webhook.com/hook"
     environment_dict = {
         "id": 1,
         "api_key": "api-key",
@@ -37,15 +38,10 @@ def test_build_environment_model():
                 "feature": {"id": 1, "name": "enabled_feature", "type": STANDARD},
             }
         ],
-        "webhooks": [
-            {
-                "url": "https://my.webhook.com/hook",
-                "secret": "secret!",
-                "created_at": "2022-05-11T11:33:14.073487+00:00",
-                "updated_at": "2022-05-11T11:33:14.073487+00:00",
-                "enabled": True,
-            }
-        ],
+        "webhook_config": {
+            "url": webhook_url,
+            "secret": "secret!",
+        },
     }
 
     # When
@@ -55,7 +51,7 @@ def test_build_environment_model():
     assert environment_model
 
     assert len(environment_model.feature_states) == 1
-    assert len(environment_model.webhooks) == 1
+    assert environment_model.webhook_config.url == webhook_url
 
 
 def test_get_flags_for_environment_returns_feature_states_for_environment_dictionary():
