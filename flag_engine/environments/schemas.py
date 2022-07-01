@@ -38,6 +38,8 @@ class WebhookSchema(LoadToModelSchema):
 class BaseEnvironmentSchema(Schema):
     id = fields.Int()
     api_key = fields.Str()
+    allow_client_traits = fields.Bool(required=False, default=True)
+
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
