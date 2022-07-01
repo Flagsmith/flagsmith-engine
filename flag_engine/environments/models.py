@@ -37,6 +37,8 @@ class EnvironmentModel:
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
+    allow_client_traits: bool = True
+
     amplitude_config: IntegrationModel = None
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None
