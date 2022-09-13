@@ -77,6 +77,16 @@ def feature_2():
 
 
 @pytest.fixture()
+def feature_state_1(feature_1):
+    return FeatureStateModel(feature=feature_1, enabled=True)
+
+
+@pytest.fixture()
+def feature_state_2(feature_2):
+    return FeatureStateModel(feature=feature_2, enabled=True)
+
+
+@pytest.fixture()
 def environment(feature_1, feature_2, project):
     return EnvironmentModel(
         id=1,
