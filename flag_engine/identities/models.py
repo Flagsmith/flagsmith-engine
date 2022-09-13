@@ -39,3 +39,8 @@ class IdentityModel:
 
         self.identity_traits = list(existing_traits.values())
         return self.identity_traits
+
+    def prune_features(self, valid_features: typing.List[str]) -> None:
+        self.identity_features = IdentityFeaturesList(
+            [fs for fs in self.identity_features if fs.feature.name in valid_features]
+        )

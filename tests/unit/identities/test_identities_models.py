@@ -98,3 +98,19 @@ def test_append_feature_state(identity, feature_1):
     identity.identity_features.append(fs_1)
     # Then
     fs_1 in identity.identity_features
+
+
+def test_prune_features_only_keeps_valid_features(
+    identity, feature_state_1, feature_state_2
+):
+    # Given
+    identity.identity_features.append(feature_state_1)
+    identity.identity_features.append(feature_state_2)
+
+    valid_features = [feature_state_1.feature.name]
+
+    # When
+    identity.prune_features(valid_features)
+
+    # Then
+    assert identity.identity_features == [feature_state_1]
