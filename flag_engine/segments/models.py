@@ -57,7 +57,7 @@ class SegmentConditionModel:
     def evaluate_regex(self, trait_value: str) -> bool:
         return re.compile(str(self.value)).match(trait_value) is not None
 
-    def evaluate_modulo(self, trait_value: str) -> bool:
+    def evaluate_modulo(self, trait_value: typing.Union[str, int, float, bool]) -> bool:
         if type(trait_value) not in (int, float):
             return False
         try:
