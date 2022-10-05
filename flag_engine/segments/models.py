@@ -16,6 +16,7 @@ class SegmentConditionModel:
     EXCEPTION_OPERATOR_METHODS = {
         constants.NOT_CONTAINS: "evaluate_not_contains",
         constants.REGEX: "evaluate_regex",
+        constants.MODULO: "evaluate_modulo",
     }
 
     operator: str
@@ -55,6 +56,17 @@ class SegmentConditionModel:
 
     def evaluate_regex(self, trait_value: str) -> bool:
         return re.compile(str(self.value)).match(trait_value) is not None
+
+    def evaluate_modulo(self, trait_value: str) -> bool:
+        if type(trait_value) not in (int, float):
+            return False
+        try:
+            divisor, remainder = self.value.split("|")
+            divisor = float(divisor)
+            remainder = float(remainder)
+        except ValueError:
+            return False
+        return trait_value % divisor == remainder
 
 
 @dataclass
