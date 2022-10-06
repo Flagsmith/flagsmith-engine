@@ -10,10 +10,6 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
-from tests.unit.conftest import (
-    segment_condition_property,
-    segment_condition_string_value,
-)
 from tests.unit.helpers import get_environment_feature_state_for_feature
 
 
@@ -112,7 +108,11 @@ def test_identity_get_all_feature_states_segments_only(
 
 
 def test_identity_get_all_feature_states_with_traits(
-    environment_with_segment_override, identity_in_segment, identity
+    environment_with_segment_override,
+    identity_in_segment,
+    identity,
+    segment_condition_string_value,
+    segment_condition_property,
 ):
     # Given
     trait_models = TraitModel(

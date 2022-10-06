@@ -14,10 +14,6 @@ from flag_engine.segments.models import (
     SegmentModel,
     SegmentRuleModel,
 )
-from tests.unit.conftest import (
-    segment_condition_property,
-    segment_condition_string_value,
-)
 
 from .fixtures import (
     empty_segment,
@@ -147,21 +143,21 @@ def test_identity_in_segment_percentage_split(
 
 
 @pytest.mark.parametrize(
-    "operator, value, property_, expected_result",
+    "operator,  property_, expected_result",
     (
-        (IS_SET, segment_condition_string_value, segment_condition_property, True),
-        (IS_NOT_SET, segment_condition_string_value, segment_condition_property, False),
-        (IS_SET, segment_condition_string_value, "random_property", False),
-        (IS_NOT_SET, segment_condition_string_value, "random_property", True),
+        (IS_SET, pytest.lazy_fixture("segment_condition_property"), True),
+        (IS_NOT_SET, pytest.lazy_fixture("segment_condition_property"), False),
+        (IS_SET, "random_property", False),
+        (IS_NOT_SET, "random_property", True),
     ),
 )
 def test_identity_in_segment_is_set(
-    mocker, identity_in_segment, operator, value, property_, expected_result
+    mocker, identity_in_segment, operator, property_, expected_result
 ):
     # Given
     segment_condition_model = SegmentConditionModel(
         operator=operator,
-        value=value,
+        value="",
         property_=property_,
     )
     rule = SegmentRuleModel(type=ALL_RULE, conditions=[segment_condition_model])
