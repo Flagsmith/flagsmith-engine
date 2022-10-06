@@ -20,7 +20,7 @@ class SegmentConditionModel:
     }
 
     operator: str
-    value: str
+    value: str = None
     property_: str = None
 
     def matches_trait_value(self, trait_value: typing.Any) -> bool:

@@ -157,7 +157,6 @@ def test_identity_in_segment_is_set(
     # Given
     segment_condition_model = SegmentConditionModel(
         operator=operator,
-        value="",
         property_=property_,
     )
     rule = SegmentRuleModel(type=ALL_RULE, conditions=[segment_condition_model])
