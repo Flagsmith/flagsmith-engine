@@ -151,7 +151,7 @@ def test_identity_in_segment_percentage_split(
         (IS_NOT_SET, "random_property", True),
     ),
 )
-def test_identity_in_segment_is_set(
+def test_identity_in_segment_is_set_and_is_not_set(
     mocker, identity_in_segment, operator, property_, expected_result
 ):
     # Given
