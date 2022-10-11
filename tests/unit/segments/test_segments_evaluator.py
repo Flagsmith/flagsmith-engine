@@ -2,7 +2,12 @@ import pytest
 
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
-from flag_engine.segments.constants import ALL_RULE, PERCENTAGE_SPLIT
+from flag_engine.segments.constants import (
+    ALL_RULE,
+    IS_NOT_SET,
+    IS_SET,
+    PERCENTAGE_SPLIT,
+)
 from flag_engine.segments.evaluator import evaluate_identity_in_segment
 from flag_engine.segments.models import (
     SegmentConditionModel,
@@ -135,3 +140,30 @@ def test_identity_in_segment_percentage_split(
 
     # Then
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "operator,  property_, expected_result",
+    (
+        (IS_SET, pytest.lazy_fixture("segment_condition_property"), True),
+        (IS_NOT_SET, pytest.lazy_fixture("segment_condition_property"), False),
+        (IS_SET, "random_property", False),
+        (IS_NOT_SET, "random_property", True),
+    ),
+)
+def test_identity_in_segment_is_set_and_is_not_set(
+    mocker, identity_in_segment, operator, property_, expected_result
+):
+    # Given
+    segment_condition_model = SegmentConditionModel(
+        operator=operator,
+        property_=property_,
+    )
+    rule = SegmentRuleModel(type=ALL_RULE, conditions=[segment_condition_model])
+    segment = SegmentModel(id=1, name="segment model", rules=[rule])
+
+    # When
+    result = evaluate_identity_in_segment(identity=identity_in_segment, segment=segment)
+
+    # Then
+    assert result is expected_result

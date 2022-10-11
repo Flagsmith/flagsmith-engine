@@ -12,7 +12,7 @@ from flag_engine.utils.marshmallow.schemas import LoadToModelMixin
 
 class BaseSegmentConditionSchema(Schema):
     operator = fields.Str(validate=validate.OneOf(constants.CONDITION_OPERATORS))
-    value = fields.Field()
+    value = fields.Field(allow_none=True)
 
 
 class SegmentConditionSchema(LoadToModelMixin, BaseSegmentConditionSchema):

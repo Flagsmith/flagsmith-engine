@@ -21,12 +21,19 @@ from flag_engine.segments.models import (
     SegmentRuleModel,
 )
 
-segment_condition_property = "foo"
-segment_condition_string_value = "bar"
+
+@pytest.fixture()
+def segment_condition_property():
+    return "foo"
 
 
 @pytest.fixture()
-def segment_condition():
+def segment_condition_string_value():
+    return "bar"
+
+
+@pytest.fixture()
+def segment_condition(segment_condition_property, segment_condition_string_value):
     return SegmentConditionModel(
         operator=constants.EQUAL,
         property_=segment_condition_property,

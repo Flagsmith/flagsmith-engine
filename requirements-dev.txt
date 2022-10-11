@@ -39,12 +39,13 @@ pyparsing==3.0.9
 pytest==7.1.2
     # via
     #   -r requirements-dev.in
+    #   pytest-lazy-fixture
     #   pytest-mock
+pytest-lazy-fixture==0.6.3
+    # via -r requirements-dev.in
 pytest-mock==3.8.1
     # via -r requirements-dev.in
 tomli==2.0.1
-    # via
-    #   black
-    #   pytest
+    # via pytest
 typing-extensions==4.3.0
     # via black
