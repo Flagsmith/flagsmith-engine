@@ -88,4 +88,11 @@ def _traits_match_segment_condition(
     trait = next(
         filter(lambda t: t.trait_key == condition.property_, identity_traits), None
     )
+
+    if condition.operator == constants.IS_NOT_SET:
+        return trait is None
+
+    if condition.operator == constants.IS_SET:
+        return trait is not None
+
     return condition.matches_trait_value(trait.trait_value) if trait else False

@@ -99,11 +99,35 @@ def test_segment_condition_matches_trait_value(
     ],
 )
 def test_segment_condition_matches_trait_value_for_semver(
-    identity, operator, trait_value, condition_value, expected_result
+    operator, trait_value, condition_value, expected_result
 ):
     assert (
         SegmentConditionModel(
             operator=operator, property_="version", value=condition_value
+        ).matches_trait_value(trait_value=trait_value)
+        is expected_result
+    )
+
+
+@pytest.mark.parametrize(
+    "trait_value, condition_value, expected_result",
+    [
+        (1, "2|0", False),
+        (2, "2|0", True),
+        (3, "2|0", False),
+        (34.2, "4|3", False),
+        (35.0, "4|3", True),
+        ("dummy", "3|0", False),
+        ("1.0.0", "3|0", False),
+        (False, "1|3", False),
+    ],
+)
+def test_segment_condition_matches_trait_value_for_modulo(
+    trait_value, condition_value, expected_result
+):
+    assert (
+        SegmentConditionModel(
+            operator=constants.MODULO, property_="foo", value=condition_value
         ).matches_trait_value(trait_value=trait_value)
         is expected_result
     )
