@@ -28,17 +28,25 @@ class IdentityModel:
     def generate_composite_key(env_key: str, identifier: str) -> str:
         return f"{env_key}_{identifier}"
 
-    def update_traits(self, traits: typing.List[TraitModel]) -> typing.List[TraitModel]:
+    def update_traits(
+        self, traits: typing.List[TraitModel]
+    ) -> typing.Tuple[typing.List[TraitModel], bool]:
         existing_traits = {trait.trait_key: trait for trait in self.identity_traits}
+        traits_changed = False
 
         for trait in traits:
-            if trait.trait_value is None:
-                existing_traits.pop(trait.trait_key, None)
-            else:
+            existing_trait = existing_traits.get(trait.trait_key)
+
+            if trait.trait_value is None and existing_trait:
+                existing_traits.pop(trait.trait_key)
+                traits_changed = True
+
+            elif getattr(existing_trait, "trait_value", None) != trait.trait_value:
                 existing_traits[trait.trait_key] = trait
+                traits_changed = True
 
         self.identity_traits = list(existing_traits.values())
-        return self.identity_traits
+        return self.identity_traits, traits_changed
 
     def prune_features(self, valid_feature_names: typing.List[str]) -> None:
         self.identity_features = IdentityFeaturesList(
