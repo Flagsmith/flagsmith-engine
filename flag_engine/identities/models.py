@@ -28,7 +28,7 @@ class IdentityModel:
     def generate_composite_key(env_key: str, identifier: str) -> str:
         return f"{env_key}_{identifier}"
 
-    def update_traits(self, traits: typing.List[TraitModel]) -> None:
+    def update_traits(self, traits: typing.List[TraitModel]) -> typing.List[TraitModel]:
         existing_traits = {trait.trait_key: trait for trait in self.identity_traits}
 
         for trait in traits:
@@ -38,3 +38,13 @@ class IdentityModel:
                 existing_traits[trait.trait_key] = trait
 
         self.identity_traits = list(existing_traits.values())
+        return self.identity_traits
+
+    def prune_features(self, valid_feature_names: typing.List[str]) -> None:
+        self.identity_features = IdentityFeaturesList(
+            [
+                fs
+                for fs in self.identity_features
+                if fs.feature.name in valid_feature_names
+            ]
+        )

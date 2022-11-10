@@ -1,5 +1,6 @@
 import re
 import typing
+from contextlib import suppress
 from dataclasses import dataclass, field
 
 import semver
@@ -15,42 +16,57 @@ class SegmentConditionModel:
     EXCEPTION_OPERATOR_METHODS = {
         constants.NOT_CONTAINS: "evaluate_not_contains",
         constants.REGEX: "evaluate_regex",
+        constants.MODULO: "evaluate_modulo",
     }
 
     operator: str
-    value: str
+    value: str = None
     property_: str = None
 
     def matches_trait_value(self, trait_value: typing.Any) -> bool:
         # TODO: move this logic to the evaluator module
-        if type(self.value) is str and is_semver(self.value):
-            trait_value = semver.VersionInfo.parse(trait_value)
-        if self.operator in self.EXCEPTION_OPERATOR_METHODS:
-            evaluator_function = getattr(
-                self, self.EXCEPTION_OPERATOR_METHODS.get(self.operator)
-            )
-            return evaluator_function(trait_value)
+        with suppress(ValueError):
+            if type(self.value) is str and is_semver(self.value):
+                trait_value = semver.VersionInfo.parse(trait_value)
+            if self.operator in self.EXCEPTION_OPERATOR_METHODS:
+                evaluator_function = getattr(
+                    self, self.EXCEPTION_OPERATOR_METHODS.get(self.operator)
+                )
+                return evaluator_function(trait_value)
 
-        matching_function_name = {
-            constants.EQUAL: "__eq__",
-            constants.GREATER_THAN: "__gt__",
-            constants.GREATER_THAN_INCLUSIVE: "__ge__",
-            constants.LESS_THAN: "__lt__",
-            constants.LESS_THAN_INCLUSIVE: "__le__",
-            constants.NOT_EQUAL: "__ne__",
-            constants.CONTAINS: "__contains__",
-        }.get(self.operator)
-        matching_function = getattr(
-            trait_value, matching_function_name, lambda v: False
-        )
-        to_same_type_as_trait_value = get_casting_function(trait_value)
-        return matching_function(to_same_type_as_trait_value(self.value))
+            matching_function_name = {
+                constants.EQUAL: "__eq__",
+                constants.GREATER_THAN: "__gt__",
+                constants.GREATER_THAN_INCLUSIVE: "__ge__",
+                constants.LESS_THAN: "__lt__",
+                constants.LESS_THAN_INCLUSIVE: "__le__",
+                constants.NOT_EQUAL: "__ne__",
+                constants.CONTAINS: "__contains__",
+            }.get(self.operator)
+            matching_function = getattr(
+                trait_value, matching_function_name, lambda v: False
+            )
+            to_same_type_as_trait_value = get_casting_function(trait_value)
+            return matching_function(to_same_type_as_trait_value(self.value))
+
+        return False
 
     def evaluate_not_contains(self, trait_value: typing.Iterable) -> bool:
         return self.value not in trait_value
 
     def evaluate_regex(self, trait_value: str) -> bool:
         return re.compile(str(self.value)).match(trait_value) is not None
+
+    def evaluate_modulo(self, trait_value: typing.Union[str, int, float, bool]) -> bool:
+        if type(trait_value) not in (int, float):
+            return False
+        try:
+            divisor, remainder = self.value.split("|")
+            divisor = float(divisor)
+            remainder = float(remainder)
+        except ValueError:
+            return False
+        return trait_value % divisor == remainder
 
 
 @dataclass

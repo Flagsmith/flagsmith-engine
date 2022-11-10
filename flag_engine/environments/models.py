@@ -26,21 +26,32 @@ class EnvironmentAPIKeyModel:
 
 
 @dataclass
+class WebhookModel:
+    url: str
+    secret: str
+
+
+@dataclass
 class EnvironmentModel:
     id: int
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
+    allow_client_traits: bool = True
+
     amplitude_config: IntegrationModel = None
     segment_config: IntegrationModel = None
     mixpanel_config: IntegrationModel = None
     heap_config: IntegrationModel = None
+    dynatrace_config: IntegrationModel = None
+    webhook_config: WebhookModel = None
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
         "segment_config",
         "mixpanel_config",
         "heap_config",
+        "dynatrace_config",
     ]
 
     @property
@@ -65,5 +76,6 @@ class EnvironmentModel:
                 integrations_data[integration_attr] = {
                     "base_url": integration_config.base_url,
                     "api_key": integration_config.api_key,
+                    "entity_selector": integration_config.entity_selector,
                 }
         return integrations_data

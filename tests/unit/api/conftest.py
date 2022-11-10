@@ -20,6 +20,7 @@ from tests.mock_django_classes import (
     DjangoSegmentCondition,
     DjangoSegmentRule,
     DjangoTrait,
+    DjangoWebhookConfig,
 )
 
 
@@ -92,6 +93,11 @@ def django_multivariate_feature_state(django_project):
     )
 
 
+@pytest.fixture
+def django_webhook():
+    return DjangoWebhookConfig(url="https://my.webhook.com/hook", secret="secret!")
+
+
 @pytest.fixture()
 def django_environment(
     django_project,
@@ -100,6 +106,7 @@ def django_environment(
     django_multivariate_feature_state,
     django_enabled_feature_state_with_string_value,
     random_api_key,
+    django_webhook,
 ):
     return DjangoEnvironment(
         id=1,
@@ -111,6 +118,7 @@ def django_environment(
             django_multivariate_feature_state,
             django_enabled_feature_state_with_string_value,
         ],
+        webhook_config=django_webhook,
     )
 
 
@@ -158,15 +166,18 @@ def django_segment_rule(django_segment_condition):
 
 
 @pytest.fixture()
-def django_feature_segment(
-    mocker, django_disabled_feature_state, django_environment_api_key
-):
+def django_feature_segment(mocker, django_disabled_feature_state, random_api_key):
+    environment = mocker.MagicMock(api_key=random_api_key)
     feature_state = copy.deepcopy(django_disabled_feature_state)
     feature_state.id += 1
+    feature_state.feature_segment = DjangoFeatureSegment(
+        id_=1, priority=0, environment=environment
+    )
     feature_state.enabled = True
     return DjangoFeatureSegment(
         id_=1,
-        environment=mocker.MagicMock(api_key=django_environment_api_key),
+        priority=0,
+        environment=environment,
         feature_states=[feature_state],
     )
 

@@ -72,11 +72,13 @@ class DjangoFeatureSegment:
     def __init__(
         self,
         id_: int,
+        priority: int,
         environment: "DjangoEnvironment",
         feature_states: typing.List["DjangoFeatureState"] = None,
     ):
         self.id = id_
         self.environment = environment
+        self.priority = priority
         self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
 
 
@@ -201,6 +203,12 @@ class DjangoFeatureStateRelatedManager:
         return self.feature_states
 
 
+@dataclass
+class DjangoWebhookConfig:
+    url: str
+    secret: str
+
+
 class DjangoEnvironment:
     def __init__(
         self,
@@ -209,6 +217,7 @@ class DjangoEnvironment:
         name: str = "Test Environment",
         api_key: str = "api-key",
         feature_states: typing.List[DjangoFeatureState] = None,
+        webhook_config: DjangoWebhookConfig = None,
     ):
         if feature_states:
             assert not any(
@@ -220,6 +229,7 @@ class DjangoEnvironment:
         self.api_key = api_key
         self.project = project
         self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
+        self.webhook_config = webhook_config
 
 
 @dataclass

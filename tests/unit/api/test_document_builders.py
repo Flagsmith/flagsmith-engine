@@ -33,7 +33,12 @@ def test_build_identity_document(django_identity):
 
 
 def test_build_environment_document(
-    django_environment, django_project, django_segment, django_organisation
+    django_environment,
+    django_project,
+    django_segment,
+    django_organisation,
+    django_webhook,
+    django_feature_segment,
 ):
     # When
     environment_document = build_environment_document(django_environment)
@@ -48,7 +53,10 @@ def test_build_environment_document(
 
     segment = project["segments"][0]
     assert segment["name"] == django_segment.name
-
+    assert (
+        segment["feature_states"][0]["feature_segment"]["priority"]
+        == django_feature_segment.priority
+    )
     organisation = project["organisation"]
     assert organisation["name"] == django_organisation.name
     assert organisation["persist_trait_data"] == django_organisation.persist_trait_data
@@ -68,6 +76,10 @@ def test_build_environment_document(
                 "featurestate_uuid",
             )
         )
+
+    assert environment_document["webhook_config"] is not None
+    assert environment_document["webhook_config"]["url"] == django_webhook.url
+    assert environment_document["webhook_config"]["secret"] == django_webhook.secret
 
 
 def test_build_environment_api_key_document(django_environment_api_key):

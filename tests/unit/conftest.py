@@ -21,12 +21,19 @@ from flag_engine.segments.models import (
     SegmentRuleModel,
 )
 
-segment_condition_property = "foo"
-segment_condition_string_value = "bar"
+
+@pytest.fixture()
+def segment_condition_property():
+    return "foo"
 
 
 @pytest.fixture()
-def segment_condition():
+def segment_condition_string_value():
+    return "bar"
+
+
+@pytest.fixture()
+def segment_condition(segment_condition_property, segment_condition_string_value):
     return SegmentConditionModel(
         operator=constants.EQUAL,
         property_=segment_condition_property,
@@ -74,6 +81,16 @@ def feature_1():
 @pytest.fixture()
 def feature_2():
     return FeatureModel(id=2, name="feature_2", type=STANDARD)
+
+
+@pytest.fixture()
+def feature_state_1(feature_1):
+    return FeatureStateModel(feature=feature_1, enabled=True)
+
+
+@pytest.fixture()
+def feature_state_2(feature_2):
+    return FeatureStateModel(feature=feature_2, enabled=True)
 
 
 @pytest.fixture()

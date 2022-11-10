@@ -4,12 +4,20 @@ from marshmallow import EXCLUDE, Schema, fields, post_dump, post_load, validate
 
 from flag_engine.features.models import (
     FeatureModel,
+    FeatureSegmentModel,
     FeatureStateModel,
     MultivariateFeatureOptionModel,
     MultivariateFeatureStateValueModel,
 )
 from flag_engine.utils.exceptions import InvalidPercentageAllocation
 from flag_engine.utils.marshmallow.schemas import LoadToModelSchema
+
+
+class FeatureSegmentSchema(LoadToModelSchema):
+    priority = fields.Int()
+
+    class Meta:
+        model_class = FeatureSegmentModel
 
 
 class FeatureSchema(LoadToModelSchema):
@@ -43,6 +51,8 @@ class BaseFeatureStateSchema(Schema):
     featurestate_uuid = fields.Str(dump_default=uuid.uuid4)
     feature = fields.Nested(FeatureSchema)
     enabled = fields.Bool()
+    # Used for storing feature segment priority
+    feature_segment = fields.Nested(FeatureSegmentSchema, allow_none=True)
 
     class Meta:
         unknown = EXCLUDE

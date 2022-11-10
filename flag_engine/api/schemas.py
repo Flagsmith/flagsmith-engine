@@ -6,7 +6,7 @@ from flag_engine.api.fields import (
     DjangoFeatureStatesRelatedManagerField,
     DjangoRelatedManagerField,
 )
-from flag_engine.api.filters import sort_and_filter_feature_segments
+from flag_engine.api.filters import filter_feature_segments
 from flag_engine.environments.schemas import (
     BaseEnvironmentAPIKeySchema,
     BaseEnvironmentSchema,
@@ -82,7 +82,7 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         # TODO: move this logic to Django so we can optimise queries
         # api key is set in the context using a pre_dump method on EnvironmentSchema.
         environment_api_key = self.context.get("environment_api_key")
-        feature_segments = sort_and_filter_feature_segments(
+        feature_segments = filter_feature_segments(
             instance.feature_segments.all(), environment_api_key
         )
 
@@ -99,7 +99,6 @@ class DjangoSegmentSchema(BaseSegmentSchema):
                     feature_state.version > existing_feature_state.version
                 ):
                     feature_states[feature_state.feature_id] = feature_state
-
         return self.feature_state_schema.dump(list(feature_states.values()), many=True)
 
 

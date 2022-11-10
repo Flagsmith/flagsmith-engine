@@ -10,12 +10,14 @@ from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
         (constants.EQUAL, "bar", "bar", True),
         (constants.EQUAL, "bar", "baz", False),
         (constants.EQUAL, 1, "1", True),
+        (constants.EQUAL, 1, "not_an_int", False),
         (constants.EQUAL, 1, "2", False),
         (constants.EQUAL, True, "True", True),
         (constants.EQUAL, False, "False", True),
         (constants.EQUAL, False, "True", False),
         (constants.EQUAL, True, "False", False),
         (constants.EQUAL, 1.23, "1.23", True),
+        (constants.EQUAL, 1.23, "not_a_float", False),
         (constants.EQUAL, 1.23, "4.56", False),
         (constants.GREATER_THAN, 2, "1", True),
         (constants.GREATER_THAN, 1, "1", False),
@@ -75,6 +77,7 @@ def test_segment_condition_matches_trait_value(
     "operator, trait_value, condition_value, expected_result",
     [
         (constants.EQUAL, "1.0.0", "1.0.0:semver", True),
+        (constants.EQUAL, "not_a_semver", "1.0.0:semver", False),
         (constants.EQUAL, "1.0.0", "1.0.1:semver", False),
         (constants.NOT_EQUAL, "1.0.0", "1.0.0:semver", False),
         (constants.NOT_EQUAL, "1.0.0", "1.0.1:semver", True),
@@ -96,11 +99,35 @@ def test_segment_condition_matches_trait_value(
     ],
 )
 def test_segment_condition_matches_trait_value_for_semver(
-    identity, operator, trait_value, condition_value, expected_result
+    operator, trait_value, condition_value, expected_result
 ):
     assert (
         SegmentConditionModel(
             operator=operator, property_="version", value=condition_value
+        ).matches_trait_value(trait_value=trait_value)
+        is expected_result
+    )
+
+
+@pytest.mark.parametrize(
+    "trait_value, condition_value, expected_result",
+    [
+        (1, "2|0", False),
+        (2, "2|0", True),
+        (3, "2|0", False),
+        (34.2, "4|3", False),
+        (35.0, "4|3", True),
+        ("dummy", "3|0", False),
+        ("1.0.0", "3|0", False),
+        (False, "1|3", False),
+    ],
+)
+def test_segment_condition_matches_trait_value_for_modulo(
+    trait_value, condition_value, expected_result
+):
+    assert (
+        SegmentConditionModel(
+            operator=constants.MODULO, property_="foo", value=condition_value
         ).matches_trait_value(trait_value=trait_value)
         is expected_result
     )

@@ -70,11 +70,16 @@ def test_environment_integrations_data_returns_correct_data_when_multiple_integr
 ):
     # Given
     example_key = "some-key"
-    segment_url = "https://api.segment.com"
-
+    base_url = "https://some-integration-url"
+    entity_selector = "some-entity-selector"
+    environment.dynatrace_config = IntegrationModel(
+        api_key=example_key,
+        base_url=base_url,
+        entity_selector=entity_selector,
+    )
     environment.mixpanel_config = IntegrationModel(api_key=example_key)
     environment.segment_config = IntegrationModel(
-        api_key=example_key, base_url=segment_url
+        api_key=example_key, base_url=base_url
     )
 
     # When
@@ -82,6 +87,19 @@ def test_environment_integrations_data_returns_correct_data_when_multiple_integr
 
     # Then
     assert integrations_data == {
-        "mixpanel_config": {"api_key": example_key, "base_url": None},
-        "segment_config": {"api_key": example_key, "base_url": segment_url},
+        "mixpanel_config": {
+            "api_key": example_key,
+            "base_url": None,
+            "entity_selector": None,
+        },
+        "segment_config": {
+            "api_key": example_key,
+            "base_url": base_url,
+            "entity_selector": None,
+        },
+        "dynatrace_config": {
+            "api_key": example_key,
+            "base_url": base_url,
+            "entity_selector": entity_selector,
+        },
     }
