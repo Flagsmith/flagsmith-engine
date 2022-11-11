@@ -39,6 +39,7 @@ class BaseEnvironmentSchema(Schema):
     id = fields.Int()
     api_key = fields.Str()
     allow_client_traits = fields.Bool(required=False, default=True)
+    updated_at = fields.DateTime()
 
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
