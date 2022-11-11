@@ -38,6 +38,7 @@ class EnvironmentModel:
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
     allow_client_traits: bool = True
+    updated_at: datetime = utcnow_with_tz()
 
     amplitude_config: IntegrationModel = None
     segment_config: IntegrationModel = None
