@@ -12,3 +12,4 @@ class ProjectModel:
     organisation: OrganisationModel
     hide_disabled_flags: bool
     segments: typing.List[SegmentModel] = field(default_factory=list)
+    enable_realtime_updates: bool = False

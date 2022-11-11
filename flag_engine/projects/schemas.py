@@ -11,6 +11,7 @@ class BaseProjectSchema(Schema):
     name = fields.Str()
     organisation = fields.Nested(OrganisationSchema)
     hide_disabled_flags = fields.Bool()
+    enable_realtime_updates = fields.Bool()
 
 
 class ProjectSchema(LoadToModelMixin, BaseProjectSchema):
