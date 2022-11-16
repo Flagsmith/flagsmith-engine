@@ -72,7 +72,7 @@ class SegmentConditionModel:
     def evaluate_in(self, trait_value) -> bool:
         try:
             return str(trait_value) in self.value.split(",")
-        except ValueError:
+        except AttributeError:
             return False
 
 
