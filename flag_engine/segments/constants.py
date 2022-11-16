@@ -35,5 +35,5 @@ CONDITION_OPERATORS = [
     MODULO,
     IS_SET,
     IS_NOT_SET,
-    IN
+    IN,
 ]
