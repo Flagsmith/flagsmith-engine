@@ -60,6 +60,12 @@ from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
         (constants.REGEX, "foo", r"[a-z]+", True),
         (constants.REGEX, "FOO", r"[a-z]+", False),
         (constants.REGEX, "1.2.3", r"\d", True),
+        (constants.IN, "foo", "", False),
+        (constants.IN, "foo", "foo, bar", True),
+        (constants.IN, "foo", "foo", True),
+        (constants.IN, 1, "1,2,3,4", True),
+        (constants.IN, 1, "", False),
+        (constants.IN, 1, "1", True),
     ),
 )
 def test_segment_condition_matches_trait_value(

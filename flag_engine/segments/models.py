@@ -17,6 +17,7 @@ class SegmentConditionModel:
         constants.NOT_CONTAINS: "evaluate_not_contains",
         constants.REGEX: "evaluate_regex",
         constants.MODULO: "evaluate_modulo",
+        constants.IN: "evaluate_in",
     }
 
     operator: str
@@ -67,6 +68,12 @@ class SegmentConditionModel:
         except ValueError:
             return False
         return trait_value % divisor == remainder
+
+    def evaluate_in(self, trait_value) -> bool:
+        try:
+            return str(trait_value) in self.value.split(",")
+        except AttributeError:
+            return False
 
 
 @dataclass
