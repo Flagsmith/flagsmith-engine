@@ -46,6 +46,7 @@ def test_identity_end_to_end(mock_django_environment, mock_django_feature):
                 feature=mock_django_feature,
                 enabled=True,
                 value=identity_feature_state_value,
+                environment=mock_django_environment,
             )
         ],
     )

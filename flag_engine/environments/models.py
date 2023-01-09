@@ -46,6 +46,7 @@ class EnvironmentModel:
     heap_config: IntegrationModel = None
     dynatrace_config: IntegrationModel = None
     webhook_config: WebhookModel = None
+    hide_disabled_flags: bool = None
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
