@@ -58,16 +58,42 @@ def test_identity_get_all_feature_states_no_segments(
         assert feature_state.enabled is expected
 
 
-def test_get_identity_feature_states_hides_disabled_flags_if_enabled(
-    environment, identity
+@pytest.mark.parametrize(
+    "environment_value, project_value, disabled_flag_returned",
+    (
+        (True, True, False),
+        (True, False, False),
+        (False, True, True),
+        (False, False, True),
+        (None, True, False),
+        (None, False, True),
+    ),
+)
+def test_get_identity_feature_states_hides_disabled_flags(
+    environment,
+    identity,
+    feature_1,
+    feature_2,
+    environment_value,
+    project_value,
+    disabled_flag_returned,
 ):
-    # Enable hide disabled flags for the project
-    environment.project.hide_disabled_flags = True
+    # Given - two identity overrides
+    identity.identity_features = [
+        FeatureStateModel(django_id=1, feature=feature_1, enabled=True),
+        FeatureStateModel(django_id=2, feature=feature_2, enabled=False),
+    ]
 
+    environment.hide_disabled_flags = environment_value
+    environment.project.hide_disabled_flags = project_value
+
+    # When
     feature_states = get_identity_feature_states(
         environment=environment, identity=identity
     )
-    assert not [fs for fs in feature_states if fs.enabled is False]
+
+    # Then
+    assert len(feature_states) == (2 if disabled_flag_returned else 1)
 
 
 def test_identity_get_all_feature_states_segments_only(
@@ -138,17 +164,29 @@ def test_environment_get_all_feature_states(environment):
     assert feature_states == environment.feature_states
 
 
-def test_environment_get_feature_states_hides_disabled_flags_if_enabled(environment):
+@pytest.mark.parametrize(
+    "environment_value, project_value, disabled_flag_returned",
+    (
+        (True, True, False),
+        (True, False, False),
+        (False, True, True),
+        (False, False, True),
+        (None, True, False),
+        (None, False, True),
+    ),
+)
+def test_environment_get_feature_states_hide_disabled_flags(
+    environment, environment_value, project_value, disabled_flag_returned
+):
     # Given
-    # Enable hide disabled flags for the project
-    environment.project.hide_disabled_flags = True
+    environment.hide_disabled_flags = environment_value
+    environment.project.hide_disabled_flags = project_value
 
     # When
     feature_states = get_environment_feature_states(environment)
 
     # Then
-    assert feature_states != environment.feature_states
-    assert not [fs for fs in feature_states if fs.enabled is False]
+    assert len(feature_states) == (2 if disabled_flag_returned else 1)
 
 
 def test_environment_get_feature_state(environment, feature_1):

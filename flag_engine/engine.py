@@ -14,7 +14,7 @@ def get_environment_feature_states(environment: EnvironmentModel):
 
     :param environment: the environment model object
     """
-    if environment.project.hide_disabled_flags:
+    if environment.get_hide_disabled_flags():
         return [fs for fs in environment.feature_states if fs.enabled]
     return environment.feature_states
 
@@ -54,7 +54,7 @@ def get_identity_feature_states(
             environment, identity, override_traits
         ).values()
     )
-    if environment.project.hide_disabled_flags:
+    if environment.get_hide_disabled_flags():
         return [fs for fs in feature_states if fs.enabled]
     return feature_states
 
