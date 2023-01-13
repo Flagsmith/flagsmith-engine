@@ -135,9 +135,7 @@ class DjangoProjectSchema(BaseProjectSchema):
 class DjangoEnvironmentSchema(BaseEnvironmentSchema):
     feature_states = DjangoFeatureStatesRelatedManagerField(
         fields.Nested(DjangoFeatureStateSchema),
-        filter_func=lambda e: e.feature_segment_id is None
-        and e.identity_id is None
-        and (e.enabled if e.environment.get_hide_disabled_flags() else True),
+        filter_func=lambda e: e.feature_segment_id is None and e.identity_id is None,
         dump_only=True,
     )
     project = fields.Nested(DjangoProjectSchema, dump_only=True)
