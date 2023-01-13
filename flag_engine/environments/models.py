@@ -81,3 +81,8 @@ class EnvironmentModel:
                     "entity_selector": integration_config.entity_selector,
                 }
         return integrations_data
+
+    def get_hide_disabled_flags(self) -> bool:
+        if self.hide_disabled_flags is not None:
+            return self.hide_disabled_flags
+        return self.project.hide_disabled_flags
