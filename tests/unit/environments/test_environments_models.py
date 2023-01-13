@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
+import pytest
+
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.environments.models import EnvironmentAPIKeyModel
 
@@ -103,3 +105,28 @@ def test_environment_integrations_data_returns_correct_data_when_multiple_integr
             "entity_selector": entity_selector,
         },
     }
+
+
+@pytest.mark.parametrize(
+    "environment_value, project_value, expected_result",
+    (
+        (True, True, True),
+        (True, False, True),
+        (False, True, False),
+        (False, False, False),
+        (None, True, True),
+        (None, False, False),
+    ),
+)
+def test_environment_get_hide_disabled_flags(
+    environment, environment_value, project_value, expected_result
+):
+    # Given
+    environment.hide_disabled_flags = environment_value
+    environment.project.hide_disabled_flags = project_value
+
+    # When
+    result = environment.get_hide_disabled_flags()
+
+    # Then
+    assert result is expected_result
