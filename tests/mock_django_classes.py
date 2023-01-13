@@ -154,7 +154,6 @@ class DjangoFeatureState:
         id: int,
         feature: DjangoFeature,
         enabled: bool,
-        environment: "DjangoEnvironment",
         feature_segment: DjangoFeatureSegment = None,
         identity: "DjangoIdentity" = None,
         value: typing.Any = None,
@@ -179,7 +178,6 @@ class DjangoFeatureState:
         )
         self.version = version
         self.live_from = live_from or utcnow_with_tz()
-        self.environment = environment
 
     def get_feature_state_value(self):
         return self.value
@@ -220,7 +218,6 @@ class DjangoEnvironment:
         api_key: str = "api-key",
         feature_states: typing.List[DjangoFeatureState] = None,
         webhook_config: DjangoWebhookConfig = None,
-        hide_disabled_flags: bool = None,
     ):
         if feature_states:
             assert not any(
@@ -233,12 +230,6 @@ class DjangoEnvironment:
         self.project = project
         self.feature_states = DjangoFeatureStateRelatedManager(feature_states or [])
         self.webhook_config = webhook_config
-        self.hide_disabled_flags = hide_disabled_flags
-
-    def get_hide_disabled_flags(self):
-        if self.hide_disabled_flags is not None:
-            return self.hide_disabled_flags
-        return self.project.hide_disabled_flags
 
 
 @dataclass

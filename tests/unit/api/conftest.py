@@ -35,33 +35,19 @@ def django_project(django_organisation):
 
 
 @pytest.fixture()
-def nested_environment(random_api_key, django_project, django_webhook):
-    return DjangoEnvironment(
-        id=1,
-        api_key=random_api_key,
-        project=django_project,
-        webhook_config=django_webhook,
-    )
-
-
-@pytest.fixture()
-def django_enabled_feature_state(django_project, nested_environment):
+def django_enabled_feature_state(django_project):
     feature = DjangoFeature(
         id=1, project=django_project, name="enabled_feature", type=STANDARD
     )
-    return DjangoFeatureState(
-        id=1, feature=feature, enabled=True, environment=nested_environment
-    )
+    return DjangoFeatureState(id=1, feature=feature, enabled=True)
 
 
 @pytest.fixture()
-def django_disabled_feature_state(django_project, nested_environment):
+def django_disabled_feature_state(django_project):
     feature = DjangoFeature(
         id=2, project=django_project, name="disabled_feature", type=STANDARD
     )
-    return DjangoFeatureState(
-        id=2, feature=feature, enabled=False, environment=nested_environment
-    )
+    return DjangoFeatureState(id=2, feature=feature, enabled=False)
 
 
 @pytest.fixture()
@@ -75,20 +61,14 @@ def django_feature_with_string_value(django_project):
 
 
 @pytest.fixture()
-def django_enabled_feature_state_with_string_value(
-    django_feature_with_string_value, nested_environment
-):
+def django_enabled_feature_state_with_string_value(django_feature_with_string_value):
     return DjangoFeatureState(
-        id=3,
-        feature=django_feature_with_string_value,
-        enabled=True,
-        value="foo",
-        environment=nested_environment,
+        id=3, feature=django_feature_with_string_value, enabled=True, value="foo"
     )
 
 
 @pytest.fixture()
-def django_multivariate_feature_state(django_project, nested_environment):
+def django_multivariate_feature_state(django_project):
     feature = DjangoFeature(
         id=4, project=django_project, name="multivariate_feature", type=MULTIVARIATE
     )
@@ -96,7 +76,6 @@ def django_multivariate_feature_state(django_project, nested_environment):
         id=4,
         feature=feature,
         enabled=True,
-        environment=nested_environment,
         multivariate_feature_state_values=[
             DjangoMultivariateFeatureStateValue(
                 id=1,

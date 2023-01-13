@@ -59,21 +59,6 @@ def test_environment_schema_dump_sets_api_key_in_context(django_environment):
     assert schema.context.get("environment_api_key") == django_environment.api_key
 
 
-def test_environment_schema_dump_with_hide_disabled(django_environment):
-    django_environment.project.hide_disabled_flags = True
-
-    # Given
-    schema = DjangoEnvironmentSchema()
-
-    # When
-    environment_data = schema.dump(django_environment)
-
-    # Then - disabled feature state is not present
-    assert not [
-        fs for fs in environment_data["feature_states"] if fs["enabled"] is False
-    ]
-
-
 def test_segment_condition_schema_dump_when_property_is_none():
     # Given
     schema = DjangoSegmentConditionSchema()

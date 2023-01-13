@@ -13,7 +13,6 @@ from tests.mock_django_classes import (
     DjangoEnvironment,
     DjangoFeature,
     DjangoFeatureState,
-    DjangoFeatureStateRelatedManager,
     DjangoIdentity,
 )
 
@@ -107,35 +106,20 @@ def test_build_environment_document_with_multiple_feature_state_versions(
     feature = DjangoFeature(
         id=1, name="test_feature", project=django_project, type=STANDARD
     )
-    django_environment = DjangoEnvironment(
-        id=1,
-        project=django_project,
-    )
+
     # and 3 feature states for the same feature, 2 with live_from dates in the past and
     # one with a live from date in the future
-    default_fs_kwargs = {
-        "feature": feature,
-        "live_from": yesterday,
-        "enabled": True,
-        "environment": django_environment,
-    }
+    default_fs_kwargs = {"feature": feature, "live_from": yesterday, "enabled": True}
     feature_state_v1 = DjangoFeatureState(id=1, version=1, **default_fs_kwargs)
     feature_state_v2 = DjangoFeatureState(id=2, version=2, **default_fs_kwargs)
     feature_state_v3 = DjangoFeatureState(
-        id=3,
-        version=3,
-        feature=feature,
-        enabled=True,
-        live_from=tomorrow,
-        environment=django_environment,
+        id=3, version=3, feature=feature, enabled=True, live_from=tomorrow
     )
 
-    django_environment.feature_states = DjangoFeatureStateRelatedManager(
-        [
-            feature_state_v1,
-            feature_state_v2,
-            feature_state_v3,
-        ]
+    django_environment = DjangoEnvironment(
+        id=1,
+        project=django_project,
+        feature_states=[feature_state_v1, feature_state_v2, feature_state_v3],
     )
 
     # When
@@ -156,28 +140,13 @@ def test_build_identity_document_with_multiple_feature_state_versions(
     feature = django_disabled_feature_state.feature
 
     identity_feature_state_v1 = DjangoFeatureState(
-        id=2,
-        version=1,
-        feature=feature,
-        live_from=yesterday,
-        enabled=True,
-        environment=django_environment,
+        id=2, version=1, feature=feature, live_from=yesterday, enabled=True
     )
     identity_feature_state_v2 = DjangoFeatureState(
-        id=3,
-        version=2,
-        feature=feature,
-        live_from=yesterday,
-        enabled=True,
-        environment=django_environment,
+        id=3, version=2, feature=feature, live_from=yesterday, enabled=True
     )
     identity_feature_state_v3 = DjangoFeatureState(
-        id=3,
-        version=2,
-        feature=feature,
-        live_from=tomorrow,
-        enabled=True,
-        environment=django_environment,
+        id=3, version=2, feature=feature, live_from=tomorrow, enabled=True
     )
     django_identity = DjangoIdentity(
         id=1,

@@ -34,23 +34,8 @@ def mock_django_feature(mock_django_project):
 
 
 @pytest.fixture()
-def mock_nested_environment(mock_django_project, mock_django_feature):
-    return DjangoEnvironment(
-        id=1,
-        project=mock_django_project,
-        name="My Environment",
-        api_key="api-key",
-    )
-
-
-@pytest.fixture()
 def mock_django_segment(
-    mocker,
-    mock_django_project,
-    mock_django_feature,
-    random_api_key,
-    request,
-    mock_nested_environment,
+    mocker, mock_django_project, mock_django_feature, random_api_key
 ):
     # To avoid circular fixture dependencies we need to use a traditional MagicMock
     # here which just mimics the api_key of the environment. This is such that the
@@ -74,7 +59,6 @@ def mock_django_segment(
                 feature=mock_django_feature,
                 enabled=True,
                 value="overridden for segment",
-                environment=mock_nested_environment,
             )
         ],
     )
@@ -91,10 +75,7 @@ def mock_django_segment(
 
 @pytest.fixture()
 def mock_django_environment(
-    mock_django_project,
-    mock_django_feature,
-    mock_django_segment,
-    mock_nested_environment,
+    mock_django_project, mock_django_feature, mock_django_segment
 ):
     return DjangoEnvironment(
         id=1,
@@ -103,11 +84,7 @@ def mock_django_environment(
         api_key="api-key",
         feature_states=[
             DjangoFeatureState(
-                id=1,
-                feature=mock_django_feature,
-                enabled=True,
-                value="foobar",
-                environment=mock_nested_environment,
+                id=1, feature=mock_django_feature, enabled=True, value="foobar"
             )
         ],
     )
