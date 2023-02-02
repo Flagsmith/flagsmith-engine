@@ -41,6 +41,7 @@ class BaseEnvironmentSchema(Schema):
     allow_client_traits = fields.Bool(required=False, default=True)
     updated_at = fields.DateTime()
     hide_disabled_flags = fields.Bool(required=False, allow_none=True)
+    use_mv_v2_evaluation = fields.Bool(required=False, default=False)
 
     segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
