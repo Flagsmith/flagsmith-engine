@@ -82,9 +82,6 @@ def test_build_environment_model_with_name():
     # Then
     assert environment_model.name == environment_name
 
-    # assert len(environment_model.feature_states) == 1
-    # assert environment_model.webhook_config.url == webhook_url
-
 
 def test_get_flags_for_environment_returns_feature_states_for_environment_dictionary():
     # Given
