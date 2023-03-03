@@ -54,6 +54,35 @@ def test_build_environment_model():
     assert environment_model.webhook_config.url == webhook_url
 
 
+def test_build_environment_model_with_name():
+    # Given
+    environment_name = "some_environment"
+    environment_dict = {
+        "id": 1,
+        "api_key": "api-key",
+        "name": environment_name,
+        "project": {
+            "id": 1,
+            "name": "test project",
+            "organisation": {
+                "id": 1,
+                "name": "Test org",
+                "stop_serving_flags": False,
+                "persist_trait_data": True,
+                "feature_analytics": True,
+            },
+            "hide_disabled_flags": False,
+        },
+        "feature_states": [],
+    }
+
+    # When
+    environment_model = build_environment_model(environment_dict)
+
+    # Then
+    assert environment_model.name == environment_name
+
+
 def test_get_flags_for_environment_returns_feature_states_for_environment_dictionary():
     # Given
     # some variables for use later

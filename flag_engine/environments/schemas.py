@@ -38,8 +38,10 @@ class WebhookSchema(LoadToModelSchema):
 class BaseEnvironmentSchema(Schema):
     id = fields.Int()
     api_key = fields.Str()
-    allow_client_traits = fields.Bool(required=False, default=True)
     updated_at = fields.DateTime()
+
+    name = fields.Str(required=False)
+    allow_client_traits = fields.Bool(required=False, default=True)
     hide_disabled_flags = fields.Bool(required=False, allow_none=True)
     use_mv_v2_evaluation = fields.Bool(required=False, default=False)
 

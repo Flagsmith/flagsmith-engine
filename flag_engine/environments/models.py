@@ -37,6 +37,8 @@ class EnvironmentModel:
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
+
+    name: str = None
     allow_client_traits: bool = True
     updated_at: datetime = field(default_factory=utcnow_with_tz)
     use_mv_v2_evaluation: bool = False
