@@ -60,6 +60,8 @@ from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
         (constants.REGEX, "foo", r"[a-z]+", True),
         (constants.REGEX, "FOO", r"[a-z]+", False),
         (constants.REGEX, "1.2.3", r"\d", True),
+        (constants.REGEX, 1, r"\d", True),
+        (constants.REGEX, None, r"[a-z]", False),
         (constants.IN, "foo", "", False),
         (constants.IN, "foo", "foo, bar", True),
         (constants.IN, "foo", "foo", True),
