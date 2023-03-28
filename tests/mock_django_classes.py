@@ -1,6 +1,7 @@
 import typing
 from dataclasses import dataclass, field
 from datetime import datetime
+from unittest.mock import MagicMock
 
 from flag_engine.utils.datetime import utcnow_with_tz
 
@@ -162,6 +163,7 @@ class DjangoFeatureState:
         ] = None,
         version: int = 1,
         live_from: datetime = None,
+        gt_mock: MagicMock = MagicMock(),
     ):
         self.id = id
         self.feature_segment_id = getattr(feature_segment, "id", None)
@@ -178,6 +180,17 @@ class DjangoFeatureState:
         )
         self.version = version
         self.live_from = live_from or utcnow_with_tz()
+        self.gt_mock = gt_mock
+
+    def __gt__(self, other: "DjangoFeatureState"):
+        """
+        This is a workaround for now to avoid reimplementing the __gt__ method from the
+        FeatureState class in the django application.
+        # TODO: remove this logic from the engine and move it to the django repo.
+        """
+        if self.gt_mock is None:
+            raise NotImplementedError()
+        return self.gt_mock(self, other)
 
     def get_feature_state_value(self):
         return self.value
@@ -192,6 +205,17 @@ class DjangoFeatureState:
             self.version is not None
             and self.live_from is not None
             and self.live_from <= utcnow_with_tz()
+        )
+
+    def is_more_recent_live_from(self, other: "DjangoFeatureState") -> bool:
+        return (
+            (
+                self.live_from is not None
+                and other.live_from is not None
+                and (self.live_from > other.live_from)
+            )
+            or self.live_from is not None
+            and other.live_from is None
         )
 
 
