@@ -95,7 +95,6 @@ def test_django_feature_state_related_manager_field_serialize_discards_old_versi
     # and which has some 'feature states' associated with it in the way that you'd
     # expect a django object to. Each feature state associated with the same feature
     # but with incrementing version numbers.
-    feature_id = 1
     yesterday = utcnow_with_tz() - timedelta(days=1)
 
     def gt_mock_side_effect(first, second):
