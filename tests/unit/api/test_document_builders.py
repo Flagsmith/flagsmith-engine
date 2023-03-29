@@ -96,7 +96,7 @@ def test_build_environment_api_key_document(django_environment_api_key):
 
 
 def test_build_environment_document_with_multiple_feature_state_versions(
-    django_project,
+    django_project, mocker
 ):
     # Given
     yesterday = utcnow_with_tz() - timedelta(days=1)
@@ -108,12 +108,31 @@ def test_build_environment_document_with_multiple_feature_state_versions(
     )
 
     # and 3 feature states for the same feature, 2 with live_from dates in the past and
-    # one with a live from date in the future
+    # one with a live from date in the future. Note that, due to the fact that we are
+    # using the FeatureState.__gt__ method to compare feature states (which is too
+    # complicated to replicate here), we're exposing a mock to pass to the __gt__ method
+    # on the DjangoFeatureState class we're using here. We then mimic the behaviour of
+    # the method in the FeatureState class in the Django project.
     default_fs_kwargs = {"feature": feature, "live_from": yesterday, "enabled": True}
-    feature_state_v1 = DjangoFeatureState(id=1, version=1, **default_fs_kwargs)
-    feature_state_v2 = DjangoFeatureState(id=2, version=2, **default_fs_kwargs)
+
+    gt_mock_fs_1 = mocker.MagicMock(return_value=False)
+    feature_state_v1 = DjangoFeatureState(
+        id=1, version=1, **default_fs_kwargs, gt_mock=gt_mock_fs_1
+    )
+
+    gt_mock_fs_2 = mocker.MagicMock(return_value=True)
+    feature_state_v2 = DjangoFeatureState(
+        id=2, version=2, **default_fs_kwargs, gt_mock=gt_mock_fs_2
+    )
+
+    gt_mock_fs_3 = mocker.MagicMock(return_value=False)
     feature_state_v3 = DjangoFeatureState(
-        id=3, version=3, feature=feature, enabled=True, live_from=tomorrow
+        id=3,
+        version=3,
+        feature=feature,
+        enabled=True,
+        live_from=tomorrow,
+        gt_mock=gt_mock_fs_3,
     )
 
     django_environment = DjangoEnvironment(
@@ -132,21 +151,41 @@ def test_build_environment_document_with_multiple_feature_state_versions(
 
 
 def test_build_identity_document_with_multiple_feature_state_versions(
-    django_environment, django_disabled_feature_state
+    django_environment, django_disabled_feature_state, mocker
 ):
     # Given
     yesterday = utcnow_with_tz() - timedelta(days=1)
     tomorrow = utcnow_with_tz() + timedelta(days=1)
     feature = django_disabled_feature_state.feature
 
+    gt_mock_identity_fs_1 = mocker.MagicMock(return_value=False)
     identity_feature_state_v1 = DjangoFeatureState(
-        id=2, version=1, feature=feature, live_from=yesterday, enabled=True
+        id=2,
+        version=1,
+        feature=feature,
+        live_from=yesterday,
+        enabled=True,
+        gt_mock=gt_mock_identity_fs_1,
     )
+
+    gt_mock_identity_fs_2 = mocker.MagicMock(return_value=True)
     identity_feature_state_v2 = DjangoFeatureState(
-        id=3, version=2, feature=feature, live_from=yesterday, enabled=True
+        id=3,
+        version=2,
+        feature=feature,
+        live_from=yesterday,
+        enabled=True,
+        gt_mock=gt_mock_identity_fs_2,
     )
+
+    gt_mock_identity_fs_3 = mocker.MagicMock(return_value=False)
     identity_feature_state_v3 = DjangoFeatureState(
-        id=3, version=2, feature=feature, live_from=tomorrow, enabled=True
+        id=3,
+        version=2,
+        feature=feature,
+        live_from=tomorrow,
+        enabled=True,
+        gt_mock=gt_mock_identity_fs_3,
     )
     django_identity = DjangoIdentity(
         id=1,

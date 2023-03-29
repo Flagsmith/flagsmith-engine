@@ -96,7 +96,7 @@ class DjangoSegmentSchema(BaseSegmentSchema):
 
                 existing_feature_state = feature_states.get(feature_state.feature_id)
                 if not existing_feature_state or (
-                    feature_state.version > existing_feature_state.version
+                    feature_state > existing_feature_state
                 ):
                     feature_states[feature_state.feature_id] = feature_state
         return self.feature_state_schema.dump(list(feature_states.values()), many=True)
