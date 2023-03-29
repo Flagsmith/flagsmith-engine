@@ -207,17 +207,6 @@ class DjangoFeatureState:
             and self.live_from <= utcnow_with_tz()
         )
 
-    def is_more_recent_live_from(self, other: "DjangoFeatureState") -> bool:
-        return (
-            (
-                self.live_from is not None
-                and other.live_from is not None
-                and (self.live_from > other.live_from)
-            )
-            or self.live_from is not None
-            and other.live_from is None
-        )
-
 
 @dataclass
 class DjangoFeatureStateRelatedManager:
