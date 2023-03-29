@@ -4,12 +4,14 @@ from unittest import mock
 import pytest
 from marshmallow import fields
 
+from flag_engine.features.constants import STANDARD
 from flag_engine.utils.datetime import utcnow_with_tz
 from flag_engine.api.fields import (
     APITraitValueField,
     DjangoFeatureStatesRelatedManagerField,
     DjangoRelatedManagerField,
 )
+from tests.mock_django_classes import DjangoFeatureState, DjangoFeature
 
 
 @pytest.mark.parametrize(
@@ -82,7 +84,9 @@ def test_django_related_manager_field_uses_filter_function_as_provided():
     assert serialized_data == [3, 4]
 
 
-def test_django_feature_state_related_manager_field_serialize_discards_old_versions():
+def test_django_feature_state_related_manager_field_serialize_discards_old_versions(
+    django_project,
+):
     # Given
     # a mock object to serialize
     attribute_name = "feature_states"
@@ -91,12 +95,30 @@ def test_django_feature_state_related_manager_field_serialize_discards_old_versi
     # and which has some 'feature states' associated with it in the way that you'd
     # expect a django object to. Each feature state associated with the same feature
     # but with incrementing version numbers.
-    feature_id = 1
     yesterday = utcnow_with_tz() - timedelta(days=1)
-    feature_states = [
-        mock.MagicMock(id=i, feature_id=feature_id, version=i, live_from=yesterday)
-        for i in (1, 2, 3, 4, 5)
-    ]
+
+    def gt_mock_side_effect(first, second):
+        # Simplified version of FeatureState.__gt__ from the django project.
+        return first.live_from < utcnow_with_tz() and (
+            first.live_from > second.live_from or first.version > second.version
+        )
+
+    django_feature = DjangoFeature(
+        id=1, name="test_feature", project=django_project, type=STANDARD
+    )
+
+    feature_states = []
+    for i in range(1, 6):
+        mock_fs = DjangoFeatureState(
+            id=i,
+            feature=django_feature,
+            version=i,
+            live_from=yesterday,
+            enabled=True,
+            gt_mock=mock.MagicMock(side_effect=gt_mock_side_effect),
+        )
+        feature_states.append(mock_fs)
+
     getattr(object_to_serialize, attribute_name).all.return_value = feature_states
 
     # and a filter function which will filter out the last feature state based on it's
