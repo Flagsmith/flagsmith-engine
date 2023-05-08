@@ -20,10 +20,19 @@ class FeatureSegmentSchema(LoadToModelSchema):
         model_class = FeatureSegmentModel
 
 
+class TagSchema(Schema):
+    label = fields.Str()
+
+
 class FeatureSchema(LoadToModelSchema):
     id = fields.Int()
     name = fields.Str()
     type = fields.Str()
+
+    tags = fields.List(
+        fields.Nested(TagSchema),
+        allow_none=True,
+    )
 
     class Meta:
         model_class = FeatureModel
@@ -89,7 +98,6 @@ class FeatureStateSchema(BaseFeatureStateSchema):
             for mvfsv in data["multivariate_feature_state_values"]
         )
         if total_allocation > 100:
-
             raise InvalidPercentageAllocation(
                 "Total percentage allocation should not be more than 100"
             )

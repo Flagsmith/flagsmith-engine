@@ -12,6 +12,7 @@ from tests.mock_django_classes import (
     DjangoSegment,
     DjangoSegmentCondition,
     DjangoSegmentRule,
+    Tag,
 )
 
 
@@ -28,8 +29,13 @@ def mock_django_project():
 
 @pytest.fixture()
 def mock_django_feature(mock_django_project):
+    tags = [Tag(label="test_tag"), Tag(label="another_test_tag")]
     return DjangoFeature(
-        id=1, name="my_feature", project=mock_django_project, type=STANDARD
+        id=1,
+        name="my_feature",
+        project=mock_django_project,
+        type=STANDARD,
+        tags=tags,
     )
 
 

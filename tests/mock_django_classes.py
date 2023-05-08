@@ -120,11 +120,17 @@ class DjangoProject:
 
 
 @dataclass
+class DjangoTag:
+    label: str
+
+
+@dataclass
 class DjangoFeature:
     id: int
     name: str
     project: DjangoProject
     type: str
+    tags: typing.Optional[typing.List[Tag]] = None
 
 
 @dataclass

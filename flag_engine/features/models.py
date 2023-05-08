@@ -7,10 +7,17 @@ from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
 @dataclass
+class TagModel:
+    label: str
+
+
+@dataclass
 class FeatureModel:
     id: int
     name: str
     type: str
+
+    tags: typing.Optional[typing.List[TagModel]] = None
 
     def __eq__(self, other):
         return self.id == other.id

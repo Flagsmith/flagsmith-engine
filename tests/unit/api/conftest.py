@@ -21,6 +21,7 @@ from tests.mock_django_classes import (
     DjangoSegmentRule,
     DjangoTrait,
     DjangoWebhookConfig,
+    Tag,
 )
 
 
@@ -68,6 +69,21 @@ def django_enabled_feature_state_with_string_value(django_feature_with_string_va
 
 
 @pytest.fixture()
+def django_enabled_feature_state_with_feature_tags() -> DjangoFeatureState:
+    feature = DjangoFeature(
+        id=5,
+        project=django_project,
+        name="tagged_feature",
+        type=STANDARD,
+        tags=[
+            Tag(label="test_tag"),
+            Tag(label="another_test_tag"),
+        ],
+    )
+    return DjangoFeatureState(id=5, feature=feature, enabled=True)
+
+
+@pytest.fixture()
 def django_multivariate_feature_state(django_project):
     feature = DjangoFeature(
         id=4, project=django_project, name="multivariate_feature", type=MULTIVARIATE
@@ -105,9 +121,10 @@ def django_environment(
     django_disabled_feature_state,
     django_multivariate_feature_state,
     django_enabled_feature_state_with_string_value,
+    django_enabled_feature_state_with_feature_tags,
     random_api_key,
     django_webhook,
-):
+) -> DjangoEnvironment:
     return DjangoEnvironment(
         id=1,
         api_key=random_api_key,
@@ -117,6 +134,7 @@ def django_environment(
             django_enabled_feature_state,
             django_multivariate_feature_state,
             django_enabled_feature_state_with_string_value,
+            django_enabled_feature_state_with_feature_tags,
         ],
         webhook_config=django_webhook,
     )
@@ -199,6 +217,7 @@ def django_identity(
     django_project,
     django_enabled_feature_state,
     django_enabled_feature_state_with_string_value,
+    django_enabled_feature_state_with_feature_tags,
     django_multivariate_feature_state,
     django_environment,
     django_trait_integer,
@@ -214,6 +233,7 @@ def django_identity(
         feature_states=[
             django_enabled_feature_state,
             django_enabled_feature_state_with_string_value,
+            django_enabled_feature_state_with_feature_tags,
             django_multivariate_feature_state,
         ],
         identity_traits=[

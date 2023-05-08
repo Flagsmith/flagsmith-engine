@@ -32,6 +32,29 @@ def test_build_identity_document(django_identity):
     assert identity_document["identity_uuid"] is not None
 
 
+def test_build_identity_document__has_feature_tags(
+    django_identity: DjangoIdentity,
+    django_enabled_feature_state_with_feature_tags: DjangoFeatureState,
+) -> None:
+    # Given
+    django_id = django_enabled_feature_state_with_feature_tags.id
+
+    # When
+    identity_document = build_identity_document(django_identity)
+
+    # Then
+    tagged_feature_state = next(
+        feature_state
+        for feature_state in identity_document["identity_features"]
+        if feature_state["django_id"] == django_id
+    )
+    assert "tags" in tagged_feature_state["feature"]
+    assert tagged_feature_state["feature"]["tags"] == [
+        {"label": tag.label}
+        for tag in django_enabled_feature_state_with_feature_tags.feature.tags
+    ]
+
+
 def test_build_environment_document(
     django_environment,
     django_project,
@@ -63,7 +86,7 @@ def test_build_environment_document(
     assert organisation["stop_serving_flags"] == django_organisation.stop_serving_flags
     assert organisation["feature_analytics"] == django_organisation.feature_analytics
 
-    assert len(environment_document["feature_states"]) == 4
+    assert len(environment_document["feature_states"]) == 5
     for feature_state in environment_document["feature_states"]:
         assert all(
             attr in feature_state
@@ -80,6 +103,29 @@ def test_build_environment_document(
     assert environment_document["webhook_config"] is not None
     assert environment_document["webhook_config"]["url"] == django_webhook.url
     assert environment_document["webhook_config"]["secret"] == django_webhook.secret
+
+
+def test_build_environment_document__has_feature_tags(
+    django_environment: DjangoEnvironment,
+    django_enabled_feature_state_with_feature_tags: DjangoFeatureState,
+) -> None:
+    # Given
+    django_id = django_enabled_feature_state_with_feature_tags.id
+
+    # When
+    environment_document = build_environment_document(django_environment)
+
+    # Then
+    tagged_feature_state = next(
+        feature_state
+        for feature_state in environment_document["feature_states"]
+        if feature_state["django_id"] == django_id
+    )
+    assert "tags" in tagged_feature_state["feature"]
+    assert tagged_feature_state["feature"]["tags"] == [
+        {"label": tag.label}
+        for tag in django_enabled_feature_state_with_feature_tags.feature.tags
+    ]
 
 
 def test_build_environment_api_key_document(django_environment_api_key):
