@@ -16,6 +16,7 @@ class BaseProjectSchema(Schema):
 
 class ProjectSchema(LoadToModelMixin, BaseProjectSchema):
     segments = fields.List(fields.Nested(SegmentSchema), required=False)
+    server_key_only_feature_ids = fields.List(fields.Int(), required=False)
 
     class Meta:
         unknown = EXCLUDE

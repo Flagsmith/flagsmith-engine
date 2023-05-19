@@ -130,6 +130,9 @@ class DjangoProjectSchema(BaseProjectSchema):
     segments = DjangoRelatedManagerField(
         fields.Nested(DjangoSegmentSchema), required=False, dump_only=True
     )
+    server_key_only_feature_ids = fields.List(
+        fields.Int(), required=False, dump_only=True
+    )
 
 
 class DjangoEnvironmentSchema(BaseEnvironmentSchema):
