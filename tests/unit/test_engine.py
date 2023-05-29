@@ -6,8 +6,10 @@ from flag_engine.engine import (
     get_identity_feature_state,
     get_identity_feature_states,
 )
+from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
 from tests.unit.helpers import get_environment_feature_state_for_feature
@@ -20,6 +22,15 @@ def test_identity_get_feature_state_without_any_override(
     feature_state = get_identity_feature_state(environment, identity, feature_1.name)
     # Then
     assert feature_state.feature == feature_1
+
+
+def test_identity_get_feature_state__nonexistent_feature__raise_expected(
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+) -> None:
+    # When & Then
+    with pytest.raises(FeatureStateNotFound):
+        get_identity_feature_state(environment, identity, "foobar")
 
 
 def test_identity_get_all_feature_states_no_segments(

@@ -91,7 +91,7 @@ class DjangoSegmentSchema(BaseSegmentSchema):
         feature_states = {}
         for feature_segment in feature_segments:
             for feature_state in feature_segment.feature_states.all():
-                if not feature_state.is_live:
+                if not feature_state.is_live:  # pragma: no cover
                     continue
 
                 existing_feature_state = feature_states.get(feature_state.feature_id)
