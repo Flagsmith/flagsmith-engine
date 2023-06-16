@@ -1,8 +1,7 @@
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.builders import build_identity_dict, build_identity_model
-from flag_engine.identities.models import IdentityModel
-from flag_engine.utils.collections import IdentityFeaturesList
+from flag_engine.identities.models import IdentityFeaturesList, IdentityModel
 
 
 def test_build_identity_model_from_dictionary_no_feature_states():

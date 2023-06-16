@@ -1,13 +1,15 @@
 import math
 import typing
 import uuid
-from dataclasses import dataclass, field
 
+from pydantic import UUID4, BaseModel, Field, confloat
+from pydantic_collections import BaseCollectionModel
+
+from flag_engine.utils.exceptions import InvalidPercentageAllocation
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
-@dataclass
-class FeatureModel:
+class FeatureModel(BaseModel):
     id: int
     name: str
     type: str
@@ -19,41 +21,77 @@ class FeatureModel:
         return hash(self.id)
 
 
-@dataclass
-class MultivariateFeatureOptionModel:
+class MultivariateFeatureOptionModel(BaseModel):
     value: typing.Any
     id: int = None
 
 
-@dataclass
-class MultivariateFeatureStateValueModel:
+class MultivariateFeatureStateValueModel(BaseModel):
     multivariate_feature_option: MultivariateFeatureOptionModel
-    percentage_allocation: float
+    percentage_allocation: confloat(ge=0, le=100)
     id: int = None
-    mv_fs_value_uuid: str = field(default_factory=uuid.uuid4)
+    mv_fs_value_uuid: UUID4 = Field(default_factory=uuid.uuid4)
 
 
-@dataclass
-class FeatureSegmentModel:
+class FeatureSegmentModel(BaseModel):
     priority: int = None
 
 
-@dataclass
-class FeatureStateModel:
+class MultivariateFeatureStateValueList(
+    BaseCollectionModel[MultivariateFeatureStateValueModel]
+):
+    @classmethod
+    def __get_validators__(
+        cls,
+    ) -> typing.Generator[typing.Callable[..., typing.Any], None, None]:
+        yield cls.validate
+        yield cls.ensure_correct_percentage_allocations
+
+    @classmethod
+    def ensure_correct_percentage_allocations(
+        cls,
+        value: typing.List[MultivariateFeatureStateValueModel],
+    ) -> typing.List[MultivariateFeatureStateValueModel]:
+        if (
+            sum(
+                multivariate_feature_state.percentage_allocation
+                for multivariate_feature_state in value
+            )
+            > 100
+        ):
+            raise InvalidPercentageAllocation(
+                "Total percentage allocation for feature must be less than 100 percent"
+            )
+        return value
+
+    def append(
+        self,
+        multivariate_feature_state_value: MultivariateFeatureStateValueModel,
+    ) -> None:
+        self.ensure_correct_percentage_allocations(
+            [*self, multivariate_feature_state_value],
+        )
+        super().append(multivariate_feature_state_value)
+
+
+class FeatureStateModel(BaseModel):
+    class Config:
+        validate_assignment: bool = True
+
     feature: FeatureModel
     enabled: bool
     django_id: int = None
     feature_segment: FeatureSegmentModel = None
-    featurestate_uuid: str = field(default_factory=uuid.uuid4)
-    feature_state_value: typing.Any = field(default=None, init=False)
-    multivariate_feature_state_values: typing.List[
-        MultivariateFeatureStateValueModel
-    ] = field(default_factory=list)
+    featurestate_uuid: UUID4 = Field(default_factory=uuid.uuid4)
+    feature_state_value: typing.Any = None
+    multivariate_feature_state_values: MultivariateFeatureStateValueList = Field(
+        default_factory=MultivariateFeatureStateValueList
+    )
 
     def set_value(self, value: typing.Any):
         self.feature_state_value = value
 
-    def get_value(self, identity_id: typing.Union[int, str] = None) -> typing.Any:
+    def get_value(self, identity_id: typing.Union[None, int, str] = None) -> typing.Any:
         """
         Get the value of the feature state.
 

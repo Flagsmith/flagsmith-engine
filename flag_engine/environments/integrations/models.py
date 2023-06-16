@@ -1,8 +1,9 @@
-from dataclasses import dataclass
+from typing import Optional
+
+from pydantic import BaseModel
 
 
-@dataclass
-class IntegrationModel:
-    api_key: str = None
-    base_url: str = None
-    entity_selector: str = None
+class IntegrationModel(BaseModel):
+    api_key: Optional[str] = None
+    base_url: Optional[str] = None
+    entity_selector: Optional[str] = None

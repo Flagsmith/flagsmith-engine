@@ -1,6 +1,7 @@
 import typing
-from dataclasses import dataclass, field
 from datetime import datetime
+
+from pydantic import BaseModel, Field
 
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.features.models import FeatureStateModel
@@ -8,14 +9,13 @@ from flag_engine.projects.models import ProjectModel
 from flag_engine.utils.datetime import utcnow_with_tz
 
 
-@dataclass
-class EnvironmentAPIKeyModel:
+class EnvironmentAPIKeyModel(BaseModel):
     id: int
     key: str
     created_at: datetime
     name: str
     client_api_key: str
-    expires_at: datetime = None
+    expires_at: typing.Optional[datetime] = None
     active: bool = True
 
     @property
@@ -25,22 +25,20 @@ class EnvironmentAPIKeyModel:
         )
 
 
-@dataclass
-class WebhookModel:
+class WebhookModel(BaseModel):
     url: str
     secret: str
 
 
-@dataclass
-class EnvironmentModel:
+class EnvironmentModel(BaseModel):
     id: int
     api_key: str
     project: ProjectModel
-    feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
+    feature_states: typing.List[FeatureStateModel] = Field(default_factory=list)
 
-    name: str = None
+    name: typing.Optional[str] = None
     allow_client_traits: bool = True
-    updated_at: datetime = field(default_factory=utcnow_with_tz)
+    updated_at: datetime = Field(default_factory=utcnow_with_tz)
     hide_sensitive_data: bool = False
     use_identity_composite_key_for_hashing: bool = False
 
@@ -50,10 +48,9 @@ class EnvironmentModel:
     mixpanel_config: typing.Optional[IntegrationModel] = None
     rudderstack_config: typing.Optional[IntegrationModel] = None
     segment_config: typing.Optional[IntegrationModel] = None
+    webhook_config: typing.Optional[WebhookModel] = None
 
     hide_disabled_flags: typing.Optional[bool] = None
-
-    webhook_config: typing.Optional[WebhookModel] = None
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
@@ -65,7 +62,7 @@ class EnvironmentModel:
     ]
 
     @property
-    def integrations_data(self) -> dict:
+    def integrations_data(self) -> typing.Dict[str, typing.Dict[str, str]]:
         """
         Return a dictionary representation of all integration config objects.
 

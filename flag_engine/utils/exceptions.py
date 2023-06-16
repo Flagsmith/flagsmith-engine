@@ -2,9 +2,9 @@ class FeatureStateNotFound(Exception):
     pass
 
 
-class DuplicateFeatureState(Exception):
+class DuplicateFeatureState(ValueError):
     pass
 
 
-class InvalidPercentageAllocation(Exception):
+class InvalidPercentageAllocation(ValueError):
     pass

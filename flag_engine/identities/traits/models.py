@@ -1,8 +1,8 @@
-import typing
-from dataclasses import dataclass
+from pydantic import BaseModel
+
+from flag_engine.identities.traits.types import TraitValue
 
 
-@dataclass
-class TraitModel:
+class TraitModel(BaseModel):
     trait_key: str
-    trait_value: typing.Any
+    trait_value: TraitValue = ...

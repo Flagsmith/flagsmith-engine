@@ -1,6 +1,6 @@
 import pytest
 
-from flag_engine.features.models import FeatureStateModel
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import DuplicateFeatureState
@@ -115,6 +115,26 @@ def test_appending_feature_states_raises_duplicate_feature_state_if_fs_for_the_f
     # Then
     with pytest.raises(DuplicateFeatureState):
         identity.identity_features.append(fs_2)
+
+
+def test_identity_model__identity_defatures__append__expected_result(
+    identity: IdentityModel,
+    feature_1: FeatureModel,
+    feature_2: FeatureModel,
+) -> None:
+    # Given
+    fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
+    fs_2 = FeatureStateModel(feature=feature_2, enabled=True)
+    identity.identity_features.append(fs_1)
+
+    # When
+    identity.identity_features.append(fs_2)
+
+    # Then
+    assert identity.identity_features == [
+        fs_1,
+        fs_2,
+    ]
 
 
 def test_append_feature_state(identity, feature_1):
