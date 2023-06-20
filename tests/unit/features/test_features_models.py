@@ -86,7 +86,7 @@ def test_feature_state_model__multivariate_feature_state_values__append_invalid_
     # Then
     assert (
         exc.value.args[0]
-        == "Total percentage allocation for feature must be less than 100 percent"
+        == "Total percentage allocation for feature must be less or equal to 100 percent"
     )
 
 

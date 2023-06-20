@@ -60,7 +60,7 @@ class MultivariateFeatureStateValueList(
             > 100
         ):
             raise InvalidPercentageAllocation(
-                "Total percentage allocation for feature must be less than 100 percent"
+                "Total percentage allocation for feature must be less or equal to 100 percent"
             )
         return value
 
