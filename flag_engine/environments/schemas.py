@@ -46,11 +46,15 @@ class BaseEnvironmentSchema(Schema):
     use_mv_v2_evaluation = fields.Bool(required=False, default=False)
     hide_sensitive_data = fields.Bool(required=False, default=False)
 
-    segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
-    heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
-    mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
     dynatrace_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+    heap_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+    mixpanel_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+    rudderstack_config = fields.Nested(
+        IntegrationSchema, required=False, allow_none=True
+    )
+    segment_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
+
     webhook_config = fields.Nested(WebhookSchema, required=False, allow_none=True)
 
 
