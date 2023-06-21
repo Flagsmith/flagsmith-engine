@@ -40,6 +40,7 @@ class EnvironmentModel(BaseModel):
     allow_client_traits: bool = True
     updated_at: datetime = Field(default_factory=utcnow_with_tz)
     hide_sensitive_data: bool = False
+    hide_disabled_flags: typing.Optional[bool] = None
     use_identity_composite_key_for_hashing: bool = False
 
     amplitude_config: typing.Optional[IntegrationModel] = None
@@ -48,10 +49,7 @@ class EnvironmentModel(BaseModel):
     mixpanel_config: typing.Optional[IntegrationModel] = None
     rudderstack_config: typing.Optional[IntegrationModel] = None
     segment_config: typing.Optional[IntegrationModel] = None
-
     webhook_config: typing.Optional[WebhookModel] = None
-
-    hide_disabled_flags: typing.Optional[bool] = None
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
