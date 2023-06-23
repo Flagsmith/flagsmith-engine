@@ -117,7 +117,7 @@ def test_appending_feature_states_raises_duplicate_feature_state_if_fs_for_the_f
         identity.identity_features.append(fs_2)
 
 
-def test_identity_model__identity_defatures__append__expected_result(
+def test_identity_model__identity_features__append__expected_result(
     identity: IdentityModel,
     feature_1: FeatureModel,
     feature_2: FeatureModel,
