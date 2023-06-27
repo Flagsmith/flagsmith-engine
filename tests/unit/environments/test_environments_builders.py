@@ -235,3 +235,63 @@ def test_build_environment_api_key_model():
 
     # Then
     assert environment_key_model.key == environment_key_dict["key"]
+
+
+def test_build_environment_model_with_deprecated_field():
+    # Given
+    environment_dict = {
+        "id": 1,
+        "api_key": "api-key",
+        "project": {
+            "id": 1,
+            "name": "test project",
+            "organisation": {
+                "id": 1,
+                "name": "Test Org",
+                "stop_serving_flags": False,
+                "persist_trait_data": True,
+                "feature_analytics": True,
+            },
+            "hide_disabled_flags": False,
+        },
+        "feature_states": [],
+        "use_mv_v2_evaluation": False,
+    }
+
+    # When
+    environment_model = build_environment_model(environment_dict)
+
+    # Then
+    assert environment_model
+    assert environment_model.use_identity_composite_key_for_hashing is False
+
+
+def test_build_environment_model_with_unknown_field():
+    """
+    Test to make sure that unknown fields are ignored when building an environment model.
+    """
+    # Given
+    environment_dict = {
+        "id": 1,
+        "api_key": "api-key",
+        "project": {
+            "id": 1,
+            "name": "test project",
+            "organisation": {
+                "id": 1,
+                "name": "Test Org",
+                "stop_serving_flags": False,
+                "persist_trait_data": True,
+                "feature_analytics": True,
+            },
+            "hide_disabled_flags": False,
+        },
+        "feature_states": [],
+        "unknown_field": "foooobaaarrr",
+    }
+
+    # When
+    environment_model = build_environment_model(environment_dict)
+
+    # Then
+    assert environment_model
