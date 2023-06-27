@@ -273,7 +273,7 @@ def test_build_environment_api_key_model():
     assert environment_key_model.key == environment_key_dict["key"]
 
 
-def test_build_environment_model_with_deprecated_field():
+def test_build_environment_model_with_deprecated_field() -> None:
     # Given
     environment_dict = {
         "id": 1,
@@ -302,7 +302,7 @@ def test_build_environment_model_with_deprecated_field():
     assert environment_model.use_identity_composite_key_for_hashing is False
 
 
-def test_build_environment_model_with_unknown_field():
+def test_build_environment_model_with_unknown_field() -> None:
     """
     Test to make sure that unknown fields are ignored when building an environment model.
     """
