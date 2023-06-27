@@ -49,6 +49,7 @@ class EnvironmentModel(BaseModel):
     mixpanel_config: typing.Optional[IntegrationModel] = None
     rudderstack_config: typing.Optional[IntegrationModel] = None
     segment_config: typing.Optional[IntegrationModel] = None
+
     webhook_config: typing.Optional[WebhookModel] = None
 
     _INTEGRATION_ATTS = [
