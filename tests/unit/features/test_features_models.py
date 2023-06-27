@@ -53,6 +53,10 @@ def test_feature_state_model__invalid_multivariate_feature_state_values__raises_
     [error_data] = exc.value.errors()
     assert error_data["loc"] == ("multivariate_feature_state_values",)
     assert error_data["type"] == "value_error.invalidpercentageallocation"
+    assert (
+        error_data["msg"]
+        == "Total percentage allocation for feature must be less or equal to 100 percent"
+    )
 
 
 def test_feature_state_model__multivariate_feature_state_values__append_invalid__raises_expected(
