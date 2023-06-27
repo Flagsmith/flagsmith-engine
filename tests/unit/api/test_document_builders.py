@@ -14,6 +14,7 @@ from tests.mock_django_classes import (
     DjangoFeature,
     DjangoFeatureState,
     DjangoIdentity,
+    DjangoProject,
 )
 
 
@@ -80,6 +81,25 @@ def test_build_environment_document(
     assert environment_document["webhook_config"] is not None
     assert environment_document["webhook_config"]["url"] == django_webhook.url
     assert environment_document["webhook_config"]["secret"] == django_webhook.secret
+
+
+def test_build_environment_document__project_has_server_key_only_feature_ids__return_expected(
+    django_environment: DjangoEnvironment,
+    django_project: DjangoProject,
+    django_enabled_feature_state: DjangoFeatureState,
+) -> None:
+    # Given
+    expected_server_key_only_feature_ids = [django_enabled_feature_state.feature.id]
+    django_project.server_key_only_feature_ids = expected_server_key_only_feature_ids
+
+    # When
+    environment_document = build_environment_document(django_environment)
+
+    # Then
+    assert (
+        environment_document["project"]["server_key_only_feature_ids"]
+        == expected_server_key_only_feature_ids
+    )
 
 
 def test_build_environment_api_key_document(django_environment_api_key):

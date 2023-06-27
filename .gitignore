@@ -19,7 +19,6 @@ checkstyle.txt
 *egg-info
 dist/
 
-# These get baked into the docker container on build
-src/CI_COMMIT_REF_NAME
-src/CI_COMMIT_SHA
-src/IMAGE_TAG
+# Coverage
+.coverage
+coverage.xml

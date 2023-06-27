@@ -68,6 +68,7 @@ from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
         (constants.IN, 1, "1,2,3,4", True),
         (constants.IN, 1, "", False),
         (constants.IN, 1, "1", True),
+        (constants.IN, 1, None, False),
     ),
 )
 def test_segment_condition_matches_trait_value(
@@ -128,6 +129,7 @@ def test_segment_condition_matches_trait_value_for_semver(
         ("dummy", "3|0", False),
         ("1.0.0", "3|0", False),
         (False, "1|3", False),
+        (1, "invalid|value", False),
     ],
 )
 def test_segment_condition_matches_trait_value_for_modulo(

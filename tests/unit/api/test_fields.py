@@ -4,14 +4,14 @@ from unittest import mock
 import pytest
 from marshmallow import fields
 
-from flag_engine.features.constants import STANDARD
-from flag_engine.utils.datetime import utcnow_with_tz
 from flag_engine.api.fields import (
     APITraitValueField,
     DjangoFeatureStatesRelatedManagerField,
     DjangoRelatedManagerField,
 )
-from tests.mock_django_classes import DjangoFeatureState, DjangoFeature
+from flag_engine.features.constants import STANDARD
+from flag_engine.utils.datetime import utcnow_with_tz
+from tests.mock_django_classes import DjangoFeature, DjangoFeatureState
 
 
 @pytest.mark.parametrize(

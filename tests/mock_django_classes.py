@@ -188,7 +188,7 @@ class DjangoFeatureState:
         FeatureState class in the django application.
         # TODO: remove this logic from the engine and move it to the django repo.
         """
-        if self.gt_mock is None:
+        if self.gt_mock is None:  # pragma: no cover
             raise NotImplementedError()
         return self.gt_mock(self, other)
 

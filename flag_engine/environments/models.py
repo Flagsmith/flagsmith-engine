@@ -44,20 +44,24 @@ class EnvironmentModel:
     hide_sensitive_data: bool = False
     use_identity_composite_key_for_hashing: bool = False
 
-    amplitude_config: IntegrationModel = None
-    segment_config: IntegrationModel = None
-    mixpanel_config: IntegrationModel = None
-    heap_config: IntegrationModel = None
-    dynatrace_config: IntegrationModel = None
-    webhook_config: WebhookModel = None
-    hide_disabled_flags: bool = None
+    amplitude_config: typing.Optional[IntegrationModel] = None
+    dynatrace_config: typing.Optional[IntegrationModel] = None
+    heap_config: typing.Optional[IntegrationModel] = None
+    mixpanel_config: typing.Optional[IntegrationModel] = None
+    rudderstack_config: typing.Optional[IntegrationModel] = None
+    segment_config: typing.Optional[IntegrationModel] = None
+
+    hide_disabled_flags: typing.Optional[bool] = None
+
+    webhook_config: typing.Optional[WebhookModel] = None
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
-        "segment_config",
-        "mixpanel_config",
-        "heap_config",
         "dynatrace_config",
+        "heap_config",
+        "mixpanel_config",
+        "rudderstack_config",
+        "segment_config",
     ]
 
     @property
@@ -67,8 +71,8 @@ class EnvironmentModel:
 
             e.g.
             {
-                "mixpanel_configuration": {"base_url": None, "api_key": "some-key"},
-                "segment_configuration": {
+                "mixpanel_config": {"base_url": None, "api_key": "some-key"},
+                "segment_config": {
                     "base_url": "https://api.segment.com",
                     "api_key": "some-key",
                 }
