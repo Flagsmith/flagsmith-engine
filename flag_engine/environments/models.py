@@ -41,8 +41,8 @@ class EnvironmentModel:
     name: str = None
     allow_client_traits: bool = True
     updated_at: datetime = field(default_factory=utcnow_with_tz)
-    use_mv_v2_evaluation: bool = False
     hide_sensitive_data: bool = False
+    use_identity_composite_key_for_hashing: bool = False
 
     amplitude_config: IntegrationModel = None
     segment_config: IntegrationModel = None

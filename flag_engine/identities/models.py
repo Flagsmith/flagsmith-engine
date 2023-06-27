@@ -3,6 +3,7 @@ import typing
 import uuid
 from dataclasses import dataclass, field
 
+from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.collections import IdentityFeaturesList
 from flag_engine.utils.datetime import utcnow_with_tz
@@ -28,8 +29,12 @@ class IdentityModel:
     def generate_composite_key(env_key: str, identifier: str) -> str:
         return f"{env_key}_{identifier}"
 
-    def get_hash_key(self, use_mv_v2_evaluation: bool) -> str:
-        return self.composite_key if use_mv_v2_evaluation else self.identifier
+    def get_hash_key(self, environment_model: EnvironmentModel) -> str:
+        return (
+            self.composite_key
+            if environment_model.use_identity_composite_key_for_hashing
+            else self.identifier
+        )
 
     def update_traits(
         self, traits: typing.List[TraitModel]
