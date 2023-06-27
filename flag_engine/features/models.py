@@ -40,16 +40,19 @@ class FeatureSegmentModel(BaseModel):
 class MultivariateFeatureStateValueList(
     BaseCollectionModel[MultivariateFeatureStateValueModel]
 ):
+    # TODO @khvn26 Consider dropping pydantic_collections in favour of a `list`/`set`
+    #      subclass after upgrading to Pydantic V2
+    #      or not use custom collections at all and move their validation/interfaces
+    #      to the parent model
     @classmethod
     def __get_validators__(
         cls,
     ) -> typing.Generator[typing.Callable[..., typing.Any], None, None]:
         yield cls.validate
-        yield cls.ensure_correct_percentage_allocations
+        yield cls._ensure_correct_percentage_allocations
 
-    @classmethod
-    def ensure_correct_percentage_allocations(
-        cls,
+    @staticmethod
+    def _ensure_correct_percentage_allocations(
         value: typing.List[MultivariateFeatureStateValueModel],
     ) -> typing.List[MultivariateFeatureStateValueModel]:
         if (
@@ -68,7 +71,7 @@ class MultivariateFeatureStateValueList(
         self,
         multivariate_feature_state_value: MultivariateFeatureStateValueModel,
     ) -> None:
-        self.ensure_correct_percentage_allocations(
+        self._ensure_correct_percentage_allocations(
             [*self, multivariate_feature_state_value],
         )
         super().append(multivariate_feature_state_value)

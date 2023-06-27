@@ -12,16 +12,20 @@ from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
 class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):
+    # TODO @khvn26 Consider dropping pydantic_collections in favour of a `list`/`set`
+    #      subclass after upgrading to Pydantic V2
+    #      or not use custom collections at all and move their validation/interfaces
+    #      to the parent model
     @classmethod
     def __get_validators__(
         cls,
     ) -> typing.Generator[typing.Callable[..., typing.Any], None, None]:
         yield cls.validate
-        yield cls.ensure_unique_feature_ids
+        yield cls._ensure_unique_feature_ids
 
-    @classmethod
-    def ensure_unique_feature_ids(
-        cls, value: "IdentityFeaturesList"
+    @staticmethod
+    def _ensure_unique_feature_ids(
+        value: "IdentityFeaturesList",
     ) -> "IdentityFeaturesList":
         for i, feature_state in enumerate(value, start=1):
             if feature_state.feature.id in [
@@ -33,7 +37,7 @@ class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):
         return value
 
     def append(self, feature_state: "FeatureStateModel") -> None:
-        self.ensure_unique_feature_ids([*self, feature_state])
+        self._ensure_unique_feature_ids([*self, feature_state])
         super().append(feature_state)
 
 
