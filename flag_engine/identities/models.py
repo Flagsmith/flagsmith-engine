@@ -16,6 +16,7 @@ class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):
     #      subclass after upgrading to Pydantic V2
     #      or not use custom collections at all and move their validation/interfaces
     #      to the parent model
+    #      https://github.com/Flagsmith/flagsmith-engine/issues/172
     @classmethod
     def __get_validators__(
         cls,
@@ -53,6 +54,7 @@ class IdentityModel(BaseModel):
     django_id: typing.Optional[int] = None
     composite_key: str = Field(default_factory=lambda: None)
 
+    # TODO @khvn26 Migrate to @computed_field https://github.com/Flagsmith/flagsmith-engine/issues/172
     @root_validator(skip_on_failure=True)
     def _generate_default_composite_key(
         cls,

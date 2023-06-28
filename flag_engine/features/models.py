@@ -44,6 +44,7 @@ class MultivariateFeatureStateValueList(
     #      subclass after upgrading to Pydantic V2
     #      or not use custom collections at all and move their validation/interfaces
     #      to the parent model
+    #      https://github.com/Flagsmith/flagsmith-engine/issues/172
     @classmethod
     def __get_validators__(
         cls,
