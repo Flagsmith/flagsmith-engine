@@ -28,8 +28,12 @@ class IdentityModel:
     def generate_composite_key(env_key: str, identifier: str) -> str:
         return f"{env_key}_{identifier}"
 
-    def get_hash_key(self, use_mv_v2_evaluation: bool) -> str:
-        return self.composite_key if use_mv_v2_evaluation else self.identifier
+    def get_hash_key(self, use_identity_composite_key_for_hashing: bool) -> str:
+        return (
+            self.composite_key
+            if use_identity_composite_key_for_hashing
+            else self.identifier
+        )
 
     def update_traits(
         self, traits: typing.List[TraitModel]

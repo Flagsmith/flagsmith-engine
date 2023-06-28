@@ -142,17 +142,15 @@ def test_prune_features_only_keeps_valid_features(
     assert identity.identity_features == [feature_state_1]
 
 
-def test_get_hash_key_with_use_mv_v2_evaluation_enabled(identity):
-    # Given
-    use_mv_v2_evaluations = True
+def test_get_hash_key_with_use_identity_composite_key_for_hashing_enabled(identity):
+    assert (
+        identity.get_hash_key(use_identity_composite_key_for_hashing=True)
+        == identity.composite_key
+    )
 
-    # When/ Then
-    assert identity.get_hash_key(use_mv_v2_evaluations) == identity.composite_key
 
-
-def test_get_hash_key_with_use_mv_v2_evaluation_disabled(identity):
-    # Given
-    use_mv_v2_evaluations = False
-
-    # When/ Then
-    assert identity.get_hash_key(use_mv_v2_evaluations) == identity.identifier
+def test_get_hash_key_with_use_identity_composite_key_for_hashing_disabled(identity):
+    assert (
+        identity.get_hash_key(use_identity_composite_key_for_hashing=False)
+        == identity.identifier
+    )

@@ -43,7 +43,7 @@ class BaseEnvironmentSchema(Schema):
     name = fields.Str(required=False)
     allow_client_traits = fields.Bool(required=False, default=True)
     hide_disabled_flags = fields.Bool(required=False, allow_none=True)
-    use_mv_v2_evaluation = fields.Bool(required=False, default=False)
+    use_identity_composite_key_for_hashing = fields.Bool(required=False, default=False)
     hide_sensitive_data = fields.Bool(required=False, default=False)
 
     amplitude_config = fields.Nested(IntegrationSchema, required=False, allow_none=True)
