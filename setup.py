@@ -12,7 +12,8 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     install_requires=[
-        "marshmallow>=3.14.1",
+        "pydantic>=1.10.8,<2",
+        "pydantic-collections>=0.4.0,<1",
         "dataclasses;python_version<'3.7'",
         "semver==2.13.0",
     ],

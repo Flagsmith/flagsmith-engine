@@ -1,37 +1,37 @@
 import re
 import typing
 from contextlib import suppress
-from dataclasses import dataclass, field
 
 import semver
+from pydantic import BaseModel, Field
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
+from flag_engine.segments.types import ConditionOperator, RuleType
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import get_casting_function
 
 
-@dataclass
-class SegmentConditionModel:
-    EXCEPTION_OPERATOR_METHODS = {
+class SegmentConditionModel(BaseModel):
+    _EXCEPTION_OPERATOR_METHODS = {
         constants.NOT_CONTAINS: "evaluate_not_contains",
         constants.REGEX: "evaluate_regex",
         constants.MODULO: "evaluate_modulo",
         constants.IN: "evaluate_in",
     }
 
-    operator: str
-    value: str = None
-    property_: str = None
+    operator: ConditionOperator
+    value: typing.Optional[str] = None
+    property_: typing.Optional[str] = None
 
     def matches_trait_value(self, trait_value: typing.Any) -> bool:
         # TODO: move this logic to the evaluator module
         with suppress(ValueError):
             if type(self.value) is str and is_semver(self.value):
                 trait_value = semver.VersionInfo.parse(trait_value)
-            if self.operator in self.EXCEPTION_OPERATOR_METHODS:
+            if self.operator in self._EXCEPTION_OPERATOR_METHODS:
                 evaluator_function = getattr(
-                    self, self.EXCEPTION_OPERATOR_METHODS.get(self.operator)
+                    self, self._EXCEPTION_OPERATOR_METHODS.get(self.operator)
                 )
                 return evaluator_function(trait_value)
 
@@ -79,11 +79,10 @@ class SegmentConditionModel:
             return False
 
 
-@dataclass
-class SegmentRuleModel:
-    type: str
-    rules: typing.List["SegmentRuleModel"] = field(default_factory=list)
-    conditions: typing.List[SegmentConditionModel] = field(default_factory=list)
+class SegmentRuleModel(BaseModel):
+    type: RuleType
+    rules: typing.List["SegmentRuleModel"] = Field(default_factory=list)
+    conditions: typing.List[SegmentConditionModel] = Field(default_factory=list)
 
     @staticmethod
     def none(iterable: typing.Iterable) -> bool:
@@ -98,9 +97,8 @@ class SegmentRuleModel:
         }.get(self.type)
 
 
-@dataclass
-class SegmentModel:
+class SegmentModel(BaseModel):
     id: int
     name: str
-    rules: typing.List[SegmentRuleModel] = field(default_factory=list)
-    feature_states: typing.List[FeatureStateModel] = field(default_factory=list)
+    rules: typing.List[SegmentRuleModel] = Field(default_factory=list)
+    feature_states: typing.List[FeatureStateModel] = Field(default_factory=list)

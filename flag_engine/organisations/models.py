@@ -1,8 +1,7 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class OrganisationModel:
+class OrganisationModel(BaseModel):
     id: int
     name: str
     feature_analytics: bool
