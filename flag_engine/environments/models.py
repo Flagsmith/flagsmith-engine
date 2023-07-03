@@ -54,7 +54,6 @@ class EnvironmentModel(BaseModel):
 
     _INTEGRATION_ATTS = [
         "amplitude_config",
-        "dynatrace_config",
         "heap_config",
         "mixpanel_config",
         "rudderstack_config",
