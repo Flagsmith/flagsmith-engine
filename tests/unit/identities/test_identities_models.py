@@ -1,3 +1,4 @@
+from typing import Any
 import pytest
 
 from flag_engine.features.models import FeatureModel, FeatureStateModel
@@ -174,3 +175,26 @@ def test_get_hash_key_with_use_identity_composite_key_for_hashing_disabled(ident
         identity.get_hash_key(use_identity_composite_key_for_hashing=False)
         == identity.identifier
     )
+
+
+@pytest.mark.parametrize(
+    "trait_value, expected_result",
+    [
+        (True, True),
+        (1.0, 1.0),
+        (1, 1),
+        (False, False),
+        (0.0, 0.0),
+        (0, 0),
+    ],
+)
+def test_trait_model__deserialize__expected_trait_value(
+    trait_value: Any,
+    expected_result: Any,
+) -> None:
+    # When
+    result = TraitModel.parse_obj({"trait_key": "test", "trait_value": trait_value})
+
+    # Then
+    assert isinstance(result.trait_value, type(expected_result))
+    assert result.trait_value == expected_result
