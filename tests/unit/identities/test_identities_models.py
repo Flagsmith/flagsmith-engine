@@ -1,4 +1,5 @@
 from typing import Any
+
 import pytest
 
 from flag_engine.features.models import FeatureModel, FeatureStateModel
@@ -186,6 +187,9 @@ def test_get_hash_key_with_use_identity_composite_key_for_hashing_disabled(ident
         (False, False),
         (0.0, 0.0),
         (0, 0),
+        (None, None),
+        ([], "[]"),
+        (["SUPERADMIN"], "['SUPERADMIN']"),
     ],
 )
 def test_trait_model__deserialize__expected_trait_value(
