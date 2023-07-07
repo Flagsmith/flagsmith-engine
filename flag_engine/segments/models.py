@@ -73,10 +73,7 @@ class SegmentConditionModel(BaseModel):
         return trait_value % divisor == remainder
 
     def evaluate_in(self, trait_value) -> bool:
-        try:
-            return str(trait_value) in self.value.split(",")
-        except AttributeError:
-            return False
+        return str(trait_value) in (self.value or "")
 
 
 class SegmentRuleModel(BaseModel):
