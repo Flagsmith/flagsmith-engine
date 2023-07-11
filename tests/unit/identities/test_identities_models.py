@@ -202,3 +202,18 @@ def test_trait_model__deserialize__expected_trait_value(
     # Then
     assert isinstance(result.trait_value, type(expected_result))
     assert result.trait_value == expected_result
+
+
+def test_identity_model__deserialize__handles_nan():
+    # When
+    result = IdentityModel.parse_obj(
+        {
+            "identifier": "identity",
+            "environment_api_key": "api-key",
+            "identity_traits": [{"trait_key": "nan_trait", "trait_value": "Nan"}],
+        }
+    )
+
+    # Then
+    assert result
+    assert result.identity_traits[0].trait_value == "Nan"
