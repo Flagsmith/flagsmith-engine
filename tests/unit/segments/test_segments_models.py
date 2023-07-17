@@ -71,6 +71,8 @@ from flag_engine.segments.models import SegmentConditionModel, SegmentRuleModel
         (constants.IN, 1, "", False),
         (constants.IN, 1, "1", True),
         (constants.IN, 1, None, False),
+        # Flagsmith's engine does not evaluate `IN` condition for floats/doubles and booleans
+        # due to ambiguous serialization across supported platforms.
         (constants.IN, 1.5, "1.5", False),
         (constants.IN, False, "False", False),
     ),
