@@ -6,6 +6,7 @@ import semver
 from pydantic import BaseModel, Field
 
 from flag_engine.features.models import FeatureStateModel
+from flag_engine.identities.traits.types import TraitValue
 from flag_engine.segments import constants
 from flag_engine.segments.types import ConditionOperator, RuleType
 from flag_engine.utils.semver import is_semver
@@ -72,11 +73,13 @@ class SegmentConditionModel(BaseModel):
             return False
         return trait_value % divisor == remainder
 
-    def evaluate_in(self, trait_value) -> bool:
-        try:
-            return str(trait_value) in self.value.split(",")
-        except AttributeError:
-            return False
+    def evaluate_in(self, trait_value: TraitValue) -> bool:
+        if self.value:
+            if isinstance(trait_value, str):
+                return trait_value in self.value.split(",")
+            elif isinstance(trait_value, int) and not isinstance(trait_value, bool):
+                return str(trait_value) in self.value.split(",")
+        return False
 
 
 class SegmentRuleModel(BaseModel):
