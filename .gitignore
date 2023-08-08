@@ -2,7 +2,7 @@ static/
 **/staticfiles/*
 *db.sqlite3*
 venv
-.venv
+.venv*
 *.pyc
 .idea
 .vscode
