@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any, get_args
 
 from pydantic import BaseModel, validator
@@ -15,6 +16,8 @@ class TraitModel(BaseModel):
     def convert_trait_value(cls, value: Any) -> TraitValue:
         if isinstance(value, TRAIT_VALUE_TYPES):
             return value
+        if isinstance(value, Decimal) and not value.as_tuple().exponent:
+            return int(value)
         return str(value)
 
     class Config:

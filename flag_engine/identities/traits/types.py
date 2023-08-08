@@ -6,8 +6,8 @@ from flag_engine.identities.traits.constants import TRAIT_STRING_VALUE_MAX_LENGT
 
 TraitValue = Union[
     None,
-    confloat(allow_inf_nan=False),
     int,
+    confloat(allow_inf_nan=False),
     bool,
     constr(max_length=TRAIT_STRING_VALUE_MAX_LENGTH),
 ]
