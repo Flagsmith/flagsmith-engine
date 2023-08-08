@@ -27,10 +27,12 @@ def test_trait_model__invalid_trait_value__raise_expected() -> None:
     [
         (Decimal("1"), 1),
         (Decimal("1.1"), 1.1),
+        ("1", 1),
+        ("1.0", 1.0),
     ],
 )
-def test_trait_model__decimal_trait_value__coerce_expected(
-    trait_value_argument: Decimal,
+def test_trait_model__trait_value__coerce_expected(
+    trait_value_argument: Union[Decimal, str],
     expected_trait_value: Union[int, float],
 ) -> None:
     # When
