@@ -1,13 +1,14 @@
 from typing import Union
 
-from pydantic.types import confloat, constr
+from pydantic.types import AllowInfNan, StringConstraints
+from typing_extensions import Annotated
 
 from flag_engine.identities.traits.constants import TRAIT_STRING_VALUE_MAX_LENGTH
 
 TraitValue = Union[
     None,
-    int,
-    confloat(allow_inf_nan=False),
     bool,
-    constr(max_length=TRAIT_STRING_VALUE_MAX_LENGTH),
+    Annotated[float, AllowInfNan(False)],
+    int,
+    Annotated[str, StringConstraints(max_length=TRAIT_STRING_VALUE_MAX_LENGTH)],
 ]

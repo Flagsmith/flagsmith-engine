@@ -1,3 +1,4 @@
 semver
 pydantic
 pydantic-collections
+typing_extensions

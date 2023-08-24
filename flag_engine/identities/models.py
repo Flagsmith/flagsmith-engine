@@ -2,7 +2,7 @@ import datetime
 import typing
 import uuid
 
-from pydantic import UUID4, BaseModel, Field, root_validator
+from pydantic import UUID4, BaseModel, Field, computed_field, model_validator
 from pydantic_collections import BaseCollectionModel
 
 from flag_engine.features.models import FeatureStateModel
@@ -12,22 +12,10 @@ from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
 class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):
-    # TODO @khvn26 Consider dropping pydantic_collections in favour of a `list`/`set`
-    #      subclass after upgrading to Pydantic V2
-    #      or not use custom collections at all and move their validation/interfaces
-    #      to the parent model
-    #      https://github.com/Flagsmith/flagsmith-engine/issues/172
-    @classmethod
-    def __get_validators__(
-        cls,
-    ) -> typing.Generator[typing.Callable[..., typing.Any], None, None]:
-        yield cls.validate
-        yield cls._ensure_unique_feature_ids
-
     @staticmethod
     def _ensure_unique_feature_ids(
-        value: "IdentityFeaturesList",
-    ) -> "IdentityFeaturesList":
+        value: typing.MutableSequence[FeatureStateModel],
+    ) -> typing.MutableSequence[FeatureStateModel]:
         for i, feature_state in enumerate(value, start=1):
             if feature_state.feature.id in [
                 feature_state.feature.id for feature_state in value[i:]
@@ -36,6 +24,10 @@ class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):
                     f"Feature state for feature id={feature_state.feature.id} already exists"
                 )
         return value
+
+    unique_feature_ids_validator = model_validator(mode="after")(
+        _ensure_unique_feature_ids
+    )
 
     def append(self, feature_state: "FeatureStateModel") -> None:
         self._ensure_unique_feature_ids([*self, feature_state])
@@ -52,20 +44,11 @@ class IdentityModel(BaseModel):
     identity_traits: typing.List[TraitModel] = Field(default_factory=list)
     identity_uuid: UUID4 = Field(default_factory=uuid.uuid4)
     django_id: typing.Optional[int] = None
-    composite_key: str = Field(default_factory=lambda: None)
 
-    # TODO @khvn26 Migrate to @computed_field https://github.com/Flagsmith/flagsmith-engine/issues/172
-    @root_validator(skip_on_failure=True)
-    def _generate_default_composite_key(
-        cls,
-        values: typing.Dict[str, typing.Any],
-    ) -> typing.Dict[str, typing.Any]:
-        if not values.get("composite_key"):
-            values["composite_key"] = cls.generate_composite_key(
-                values["environment_api_key"],
-                values["identifier"],
-            )
-        return values
+    @computed_field
+    @property
+    def composite_key(self) -> str:
+        return self.generate_composite_key(self.environment_api_key, self.identifier)
 
     @staticmethod
     def generate_composite_key(env_key: str, identifier: str) -> str:

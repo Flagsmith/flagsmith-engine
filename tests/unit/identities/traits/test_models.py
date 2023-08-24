@@ -18,7 +18,7 @@ def test_trait_model__invalid_trait_value__raise_expected() -> None:
     # Then
     assert (
         exc_info.value.errors()[-1]["msg"]
-        == "ensure this value has at most 2000 characters"
+        == "String should have at most 2000 characters"
     )
 
 
@@ -26,9 +26,9 @@ def test_trait_model__invalid_trait_value__raise_expected() -> None:
     "trait_value_argument, expected_trait_value",
     [
         (Decimal("1"), 1),
-        (Decimal("1.1"), 1.1),
-        ("1", 1),
-        ("1.0", 1.0),
+        (Decimal("1.1"), "1.1"),
+        ("1", "1"),
+        ("1.0", "1.0"),
     ],
 )
 def test_trait_model__trait_value__coerce_expected(

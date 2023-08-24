@@ -2,8 +2,10 @@ import math
 import typing
 import uuid
 
-from pydantic import UUID4, BaseModel, Field, confloat
+from annotated_types import Ge, Le
+from pydantic import UUID4, BaseModel, Field, model_validator
 from pydantic_collections import BaseCollectionModel
+from typing_extensions import Annotated
 
 from flag_engine.utils.exceptions import InvalidPercentageAllocation
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
@@ -28,30 +30,18 @@ class MultivariateFeatureOptionModel(BaseModel):
 
 class MultivariateFeatureStateValueModel(BaseModel):
     multivariate_feature_option: MultivariateFeatureOptionModel
-    percentage_allocation: confloat(ge=0, le=100)
-    id: int = None
+    percentage_allocation: Annotated[float, Ge(0), Le(100)]
+    id: typing.Optional[int] = None
     mv_fs_value_uuid: UUID4 = Field(default_factory=uuid.uuid4)
 
 
 class FeatureSegmentModel(BaseModel):
-    priority: int = None
+    priority: typing.Optional[int] = None
 
 
 class MultivariateFeatureStateValueList(
     BaseCollectionModel[MultivariateFeatureStateValueModel]
 ):
-    # TODO @khvn26 Consider dropping pydantic_collections in favour of a `list`/`set`
-    #      subclass after upgrading to Pydantic V2
-    #      or not use custom collections at all and move their validation/interfaces
-    #      to the parent model
-    #      https://github.com/Flagsmith/flagsmith-engine/issues/172
-    @classmethod
-    def __get_validators__(
-        cls,
-    ) -> typing.Generator[typing.Callable[..., typing.Any], None, None]:
-        yield cls.validate
-        yield cls._ensure_correct_percentage_allocations
-
     @staticmethod
     def _ensure_correct_percentage_allocations(
         value: typing.List[MultivariateFeatureStateValueModel],
@@ -68,6 +58,10 @@ class MultivariateFeatureStateValueList(
             )
         return value
 
+    percentage_allocations_model_validator = model_validator(mode="after")(
+        _ensure_correct_percentage_allocations
+    )
+
     def append(
         self,
         multivariate_feature_state_value: MultivariateFeatureStateValueModel,
@@ -78,10 +72,7 @@ class MultivariateFeatureStateValueList(
         super().append(multivariate_feature_state_value)
 
 
-class FeatureStateModel(BaseModel):
-    class Config:
-        validate_assignment: bool = True
-
+class FeatureStateModel(BaseModel, validate_assignment=True):
     feature: FeatureModel
     enabled: bool
     django_id: int = None
