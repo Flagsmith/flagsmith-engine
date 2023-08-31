@@ -4,8 +4,6 @@
 #
 #    pip-compile requirements-dev.in
 #
-attrs==21.4.0
-    # via pytest
 black==22.6.0
     # via -r requirements-dev.in
 build==0.10.0
@@ -38,8 +36,6 @@ platformdirs==2.5.2
     # via black
 pluggy==1.0.0
     # via pytest
-py==1.11.0
-    # via pytest
 pycodestyle==2.8.0
     # via flake8
 pyflakes==2.4.0
@@ -48,7 +44,7 @@ pyparsing==3.0.9
     # via packaging
 pyproject-hooks==1.0.0
     # via build
-pytest==7.1.2
+pytest==7.4.0
     # via
     #   -r requirements-dev.in
     #   pytest-cov
@@ -60,8 +56,6 @@ pytest-lazy-fixture==0.6.3
     # via -r requirements-dev.in
 pytest-mock==3.8.1
     # via -r requirements-dev.in
-tomli==2.0.1
-    # via pytest
 wheel==0.40.0
     # via pip-tools
 
