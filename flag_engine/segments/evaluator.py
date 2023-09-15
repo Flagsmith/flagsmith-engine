@@ -163,7 +163,7 @@ def _evaluate_in(segment_value: typing.Optional[str], trait_value: TraitValue) -
     if segment_value:
         if isinstance(trait_value, str):
             return trait_value in segment_value.split(",")
-        elif isinstance(trait_value, int) and not any(
+        if isinstance(trait_value, int) and not any(
             trait_value is x for x in (False, True)
         ):
             return str(trait_value) in segment_value.split(",")
