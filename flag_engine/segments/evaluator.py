@@ -2,6 +2,7 @@ import operator
 import re
 import typing
 from contextlib import suppress
+from functools import wraps
 
 import semver
 
@@ -118,15 +119,6 @@ def _matches_trait_value(
     if match_func := MATCH_FUNCS_BY_OPERATOR.get(condition.operator):
         return match_func(condition.value, trait_value)
 
-    if operator_func := OPERATOR_FUNCS_BY_OPERATOR.get(condition.operator):
-        with suppress(TypeError, ValueError):
-            if isinstance(trait_value, str) and is_semver(condition.value):
-                trait_value = semver.VersionInfo.parse(
-                    trait_value,
-                )
-            match_value = get_casting_function(trait_value)(condition.value)
-            return operator_func(trait_value, match_value)
-
     return False
 
 
@@ -178,6 +170,26 @@ def _evaluate_in(segment_value: typing.Optional[str], trait_value: TraitValue) -
     return False
 
 
+def _trait_value_typed(
+    func: typing.Callable[..., bool],
+) -> typing.Callable[[typing.Optional[str], TraitValue], bool]:
+    @wraps(func)
+    def inner(
+        segment_value: typing.Optional[str],
+        trait_value: TraitValue,
+    ) -> bool:
+        with suppress(TypeError, ValueError):
+            if isinstance(trait_value, str) and is_semver(segment_value):
+                trait_value = semver.VersionInfo.parse(
+                    trait_value,
+                )
+            match_value = get_casting_function(trait_value)(segment_value)
+            return func(trait_value, match_value)
+        return False
+
+    return inner
+
+
 MATCH_FUNCS_BY_OPERATOR: typing.Dict[
     ConditionOperator, typing.Callable[[typing.Optional[str], TraitValue], bool]
 ] = {
@@ -185,16 +197,11 @@ MATCH_FUNCS_BY_OPERATOR: typing.Dict[
     constants.REGEX: _evaluate_regex,
     constants.MODULO: _evaluate_modulo,
     constants.IN: _evaluate_in,
-}
-
-OPERATOR_FUNCS_BY_OPERATOR: typing.Dict[
-    ConditionOperator, typing.Callable[..., bool]
-] = {
-    constants.EQUAL: operator.eq,
-    constants.GREATER_THAN: operator.gt,
-    constants.GREATER_THAN_INCLUSIVE: operator.ge,
-    constants.LESS_THAN: operator.lt,
-    constants.LESS_THAN_INCLUSIVE: operator.le,
-    constants.NOT_EQUAL: operator.ne,
-    constants.CONTAINS: operator.contains,
+    constants.EQUAL: _trait_value_typed(operator.eq),
+    constants.GREATER_THAN: _trait_value_typed(operator.gt),
+    constants.GREATER_THAN_INCLUSIVE: _trait_value_typed(operator.ge),
+    constants.LESS_THAN: _trait_value_typed(operator.lt),
+    constants.LESS_THAN_INCLUSIVE: _trait_value_typed(operator.le),
+    constants.NOT_EQUAL: _trait_value_typed(operator.ne),
+    constants.CONTAINS: _trait_value_typed(operator.contains),
 }
