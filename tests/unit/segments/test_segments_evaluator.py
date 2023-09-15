@@ -283,6 +283,25 @@ def test_segment_condition_matches_trait_value(
     assert result == expected_result
 
 
+def test_segment_condition__unsupported_operator__return_false(
+    mocker: MockerFixture,
+) -> None:
+    # Given
+    mocker.patch("flag_engine.segments.evaluator.MATCH_FUNCS_BY_OPERATOR", new={})
+    segment_condition = SegmentConditionModel(
+        operator=constants.EQUAL,
+        property_="x",
+        value="foo",
+    )
+    trait_value = "foo"
+
+    # When
+    result = _matches_trait_value(segment_condition, trait_value)
+
+    # Then
+    assert result is False
+
+
 @pytest.mark.parametrize(
     "operator, trait_value, condition_value, expected_result",
     [
