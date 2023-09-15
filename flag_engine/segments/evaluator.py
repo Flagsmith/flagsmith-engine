@@ -118,23 +118,14 @@ def _matches_trait_value(
     if match_func := MATCH_FUNCS_BY_OPERATOR.get(condition.operator):
         return match_func(condition.value, trait_value)
 
-    maybe_semver_trait_value: typing.Union[
-        TraitValue,
-        semver.VersionInfo,
-    ] = trait_value
     if operator_func := OPERATOR_FUNCS_BY_OPERATOR.get(condition.operator):
         with suppress(TypeError, ValueError):
-            if isinstance(maybe_semver_trait_value, str) and is_semver(condition.value):
-                maybe_semver_trait_value = semver.VersionInfo.parse(
-                    maybe_semver_trait_value,
+            if isinstance(trait_value, str) and is_semver(condition.value):
+                trait_value = semver.VersionInfo.parse(
+                    trait_value,
                 )
-            match_value = get_casting_function(maybe_semver_trait_value)(
-                condition.value,
-            )
-            return operator_func(
-                maybe_semver_trait_value,
-                match_value,
-            )
+            match_value = get_casting_function(trait_value)(condition.value)
+            return operator_func(trait_value, match_value)
 
     return False
 
