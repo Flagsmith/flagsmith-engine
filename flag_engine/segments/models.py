@@ -8,13 +8,6 @@ from flag_engine.segments.types import ConditionOperator, RuleType
 
 
 class SegmentConditionModel(BaseModel):
-    _EXCEPTION_OPERATOR_METHODS = {
-        constants.NOT_CONTAINS: "evaluate_not_contains",
-        constants.REGEX: "evaluate_regex",
-        constants.MODULO: "evaluate_modulo",
-        constants.IN: "evaluate_in",
-    }
-
     operator: ConditionOperator
     value: typing.Optional[str] = None
     property_: typing.Optional[str] = None
