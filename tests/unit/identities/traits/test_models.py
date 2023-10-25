@@ -26,9 +26,9 @@ def test_trait_model__invalid_trait_value__raise_expected() -> None:
     "trait_value_argument, expected_trait_value",
     [
         (Decimal("1"), 1),
-        (Decimal("1.1"), "1.1"),
-        ("1", "1"),
-        ("1.0", "1.0"),
+        (Decimal("1.1"), 1.1),
+        ("1", 1),
+        ("1.0", 1.0),
     ],
 )
 def test_trait_model__trait_value__coerce_expected(
