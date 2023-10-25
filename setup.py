@@ -14,7 +14,7 @@ setup(
     install_requires=[
         "pydantic>=2.3.0,<3",
         "pydantic-collections>=0.5.1,<1",
-        "semver==2.13.0",
+        "semver>=3.0.1",
     ],
     classifiers=[
         "License :: OSI Approved :: BSD License",
