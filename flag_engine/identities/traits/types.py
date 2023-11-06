@@ -17,7 +17,16 @@ from flag_engine.identities.traits.constants import TRAIT_STRING_VALUE_MAX_LENGT
 _UnconstrainedTraitValue = Union[None, int, float, bool, str]
 
 
-def map_any_value_to_trait_value(value: Any) -> _UnconstrainedTraitValue:
+def _map_any_value_to_trait_value(value: Any) -> _UnconstrainedTraitValue:
+    """
+    Try to coerce a value of arbitrary type to a trait value type.
+    Union member-specific constraints, such as max string value length, are ignored here.
+    Replicate behaviour from marshmallow/pydantic V1 for number-like strings.
+    For decimals return an int in case of unset exponent.
+    When in doubt, return string.
+
+    Supposed to be used as a `pydantic.BeforeValidator`.
+    """
     if _is_trait_value(value):
         if isinstance(value, str):
             return _map_string_value_to_trait_value(value)
@@ -53,5 +62,5 @@ TraitValue = Annotated[
         int,
         Annotated[str, StringConstraints(max_length=TRAIT_STRING_VALUE_MAX_LENGTH)],
     ],
-    BeforeValidator(map_any_value_to_trait_value),
+    BeforeValidator(_map_any_value_to_trait_value),
 ]
