@@ -4,13 +4,21 @@
 #
 #    pip-compile
 #
-pydantic==1.10.8
+annotated-types==0.5.0
+    # via pydantic
+pydantic==2.3.0
     # via
     #   -r requirements.in
     #   pydantic-collections
-pydantic-collections==0.4.0
+pydantic-collections==0.5.1
     # via -r requirements.in
-semver==2.13.0
-    # via -r requirements.in
-typing-extensions==4.6.2
+pydantic-core==2.6.3
     # via pydantic
+semver==3.0.1
+    # via -r requirements.in
+typing-extensions==4.7.1
+    # via
+    #   -r requirements.in
+    #   pydantic
+    #   pydantic-collections
+    #   pydantic-core

@@ -1,15 +1,18 @@
 import typing
+from typing_extensions import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, BeforeValidator
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
 from flag_engine.segments.types import ConditionOperator, RuleType
 
+LaxStr = Annotated[str, BeforeValidator(lambda x: str(x))]
+
 
 class SegmentConditionModel(BaseModel):
     operator: ConditionOperator
-    value: typing.Optional[str] = None
+    value: typing.Optional[LaxStr] = None
     property_: typing.Optional[str] = None
 
 

@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="flagsmith-flag-engine",
-    version="4.1.0",
+    version="5.0.0",
     author="Flagsmith",
     author_email="support@flagsmith.com",
     packages=find_packages(include=["flag_engine", "flag_engine.*"]),
@@ -12,9 +12,9 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     install_requires=[
-        "pydantic>=1.10.8,<2",
-        "pydantic-collections>=0.4.0,<1",
-        "semver==2.13.0",
+        "pydantic>=2.3.0,<3",
+        "pydantic-collections>=0.5.1,<1",
+        "semver>=3.0.1",
     ],
     classifiers=[
         "License :: OSI Approved :: BSD License",

@@ -19,9 +19,9 @@ def test_decimal_encoder_converts_decimal():
     json_data = json.loads(json.dumps(data, cls=DecimalEncoder))
 
     # Then
-    assert type(json_data["int_decimal"]) == int
-    assert type(json_data["float_decimal"]) == float
-    assert type(json_data["str_value"]) == str
+    assert isinstance(json_data["int_decimal"], int)
+    assert isinstance(json_data["float_decimal"], float)
+    assert isinstance(json_data["str_value"], str)
 
     assert json_data == {
         "int_decimal": 1,

@@ -133,7 +133,7 @@ def test_identity_model__identity_features__append__expected_result(
     identity.identity_features.append(fs_2)
 
     # Then
-    assert identity.identity_features == [
+    assert list(identity.identity_features) == [
         fs_1,
         fs_2,
     ]
@@ -161,7 +161,7 @@ def test_prune_features_only_keeps_valid_features(
     identity.prune_features(valid_features)
 
     # Then
-    assert identity.identity_features == [feature_state_1]
+    assert list(identity.identity_features) == [feature_state_1]
 
 
 def test_get_hash_key_with_use_identity_composite_key_for_hashing_enabled(identity):
@@ -197,7 +197,9 @@ def test_trait_model__deserialize__expected_trait_value(
     expected_result: Any,
 ) -> None:
     # When
-    result = TraitModel.parse_obj({"trait_key": "test", "trait_value": trait_value})
+    result = TraitModel.model_validate(
+        {"trait_key": "test", "trait_value": trait_value}
+    )
 
     # Then
     assert isinstance(result.trait_value, type(expected_result))
@@ -206,7 +208,7 @@ def test_trait_model__deserialize__expected_trait_value(
 
 def test_identity_model__deserialize__handles_nan():
     # When
-    result = IdentityModel.parse_obj(
+    result = IdentityModel.model_validate(
         {
             "identifier": "identity",
             "environment_api_key": "api-key",

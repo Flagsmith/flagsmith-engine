@@ -180,7 +180,7 @@ def _trait_value_typed(
     ) -> bool:
         with suppress(TypeError, ValueError):
             if isinstance(trait_value, str) and is_semver(segment_value):
-                trait_value = semver.VersionInfo.parse(
+                trait_value = semver.Version.parse(
                     trait_value,
                 )
             match_value = get_casting_function(trait_value)(segment_value)
