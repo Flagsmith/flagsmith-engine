@@ -7,7 +7,7 @@ from pytest_mock import MockerFixture
 from flag_engine.utils.json.encoders import DecimalEncoder
 
 
-def test_decimal_encoder_converts_decimal():
+def test_decimal_encoder_converts_decimal() -> None:
     # Given
     data = {
         "int_decimal": Decimal(1),

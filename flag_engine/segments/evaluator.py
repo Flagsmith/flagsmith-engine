@@ -176,7 +176,7 @@ def _trait_value_typed(
     @wraps(func)
     def inner(
         segment_value: typing.Optional[str],
-        trait_value: TraitValue,
+        trait_value: typing.Union[TraitValue, semver.Version],
     ) -> bool:
         with suppress(TypeError, ValueError):
             if isinstance(trait_value, str) and is_semver(segment_value):

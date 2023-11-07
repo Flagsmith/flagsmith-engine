@@ -19,7 +19,7 @@ class EnvironmentAPIKeyModel(BaseModel):
     active: bool = True
 
     @property
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return self.active and (
             not self.expires_at or self.expires_at > utcnow_with_tz()
         )
@@ -52,7 +52,7 @@ class EnvironmentModel(BaseModel):
 
     webhook_config: typing.Optional[WebhookModel] = None
 
-    _INTEGRATION_ATTS = [
+    _INTEGRATION_ATTRS = [
         "amplitude_config",
         "heap_config",
         "mixpanel_config",
@@ -76,9 +76,9 @@ class EnvironmentModel(BaseModel):
         """
 
         integrations_data = {}
-        for integration_attr in self._INTEGRATION_ATTS:
-            integration_config: IntegrationModel = getattr(self, integration_attr, None)
-            if integration_config:
+        for integration_attr in self._INTEGRATION_ATTRS:
+            integration_config: typing.Optional[IntegrationModel]
+            if integration_config := getattr(self, integration_attr, None):
                 integrations_data[integration_attr] = {
                     "base_url": integration_config.base_url,
                     "api_key": integration_config.api_key,

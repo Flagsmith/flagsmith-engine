@@ -1,39 +1,22 @@
-# Segment Rules
-ALL_RULE = "ALL"
-ANY_RULE = "ANY"
-NONE_RULE = "NONE"
+from flag_engine.segments.types import ConditionOperator, RuleType
 
-RULE_TYPES = [ALL_RULE, ANY_RULE, NONE_RULE]
+# Segment Rules
+ALL_RULE: RuleType = "ALL"
+ANY_RULE: RuleType = "ANY"
+NONE_RULE: RuleType = "NONE"
 
 # Segment Condition Operators
-EQUAL = "EQUAL"
-GREATER_THAN = "GREATER_THAN"
-LESS_THAN = "LESS_THAN"
-LESS_THAN_INCLUSIVE = "LESS_THAN_INCLUSIVE"
-CONTAINS = "CONTAINS"
-GREATER_THAN_INCLUSIVE = "GREATER_THAN_INCLUSIVE"
-NOT_CONTAINS = "NOT_CONTAINS"
-NOT_EQUAL = "NOT_EQUAL"
-REGEX = "REGEX"
-PERCENTAGE_SPLIT = "PERCENTAGE_SPLIT"
-MODULO = "MODULO"
-IS_SET = "IS_SET"
-IS_NOT_SET = "IS_NOT_SET"
-IN = "IN"
-
-CONDITION_OPERATORS = [
-    EQUAL,
-    GREATER_THAN,
-    LESS_THAN,
-    LESS_THAN_INCLUSIVE,
-    CONTAINS,
-    GREATER_THAN_INCLUSIVE,
-    NOT_CONTAINS,
-    NOT_EQUAL,
-    REGEX,
-    PERCENTAGE_SPLIT,
-    MODULO,
-    IS_SET,
-    IS_NOT_SET,
-    IN,
-]
+EQUAL: ConditionOperator = "EQUAL"
+GREATER_THAN: ConditionOperator = "GREATER_THAN"
+LESS_THAN: ConditionOperator = "LESS_THAN"
+LESS_THAN_INCLUSIVE: ConditionOperator = "LESS_THAN_INCLUSIVE"
+CONTAINS: ConditionOperator = "CONTAINS"
+GREATER_THAN_INCLUSIVE: ConditionOperator = "GREATER_THAN_INCLUSIVE"
+NOT_CONTAINS: ConditionOperator = "NOT_CONTAINS"
+NOT_EQUAL: ConditionOperator = "NOT_EQUAL"
+REGEX: ConditionOperator = "REGEX"
+PERCENTAGE_SPLIT: ConditionOperator = "PERCENTAGE_SPLIT"
+MODULO: ConditionOperator = "MODULO"
+IS_SET: ConditionOperator = "IS_SET"
+IS_NOT_SET: ConditionOperator = "IS_NOT_SET"
+IN: ConditionOperator = "IN"

@@ -1,7 +1,7 @@
 import typing
-from typing_extensions import Annotated
 
-from pydantic import BaseModel, Field, BeforeValidator
+from pydantic import BaseModel, BeforeValidator, Field
+from typing_extensions import Annotated
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
@@ -22,16 +22,16 @@ class SegmentRuleModel(BaseModel):
     conditions: typing.List[SegmentConditionModel] = Field(default_factory=list)
 
     @staticmethod
-    def none(iterable: typing.Iterable) -> bool:
+    def none(iterable: typing.Iterable[object]) -> bool:
         return not any(iterable)
 
     @property
-    def matching_function(self) -> callable:
+    def matching_function(self) -> typing.Callable[[typing.Iterable[object]], bool]:
         return {
             constants.ANY_RULE: any,
             constants.ALL_RULE: all,
             constants.NONE_RULE: SegmentRuleModel.none,
-        }.get(self.type)
+        }[self.type]
 
 
 class SegmentModel(BaseModel):

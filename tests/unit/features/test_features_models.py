@@ -2,6 +2,7 @@ from unittest import mock
 
 import pytest
 from pydantic import ValidationError
+from pytest_mock import MockerFixture
 
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
@@ -13,12 +14,14 @@ from flag_engine.features.models import (
 from flag_engine.utils.exceptions import InvalidPercentageAllocation
 
 
-def test_initializing_feature_state_creates_default_feature_state_uuid(feature_1):
+def test_initializing_feature_state_creates_default_feature_state_uuid(
+    feature_1: FeatureModel,
+) -> None:
     feature_state = FeatureStateModel(django_id=1, feature=feature_1, enabled=True)
     assert feature_state.featurestate_uuid is not None
 
 
-def test_initializing_multivariate_feature_state_value_creates_default_uuid():
+def test_initializing_multivariate_feature_state_value_creates_default_uuid() -> None:
     mv_feature_option = MultivariateFeatureOptionModel(value="value")
     mv_fs_value_model = MultivariateFeatureStateValueModel(
         multivariate_feature_option=mv_feature_option, id=1, percentage_allocation=10
@@ -123,7 +126,7 @@ def test_feature_state_model__multivariate_feature_state_values__append__expecte
     ]
 
 
-def test_feature_state_get_value_no_mv_values(feature_1):
+def test_feature_state_get_value_no_mv_values(feature_1: FeatureModel) -> None:
     # Given
     value = "foo"
     feature_state = FeatureStateModel(django_id=1, feature=feature_1, enabled=True)
@@ -149,8 +152,10 @@ mv_feature_value_2 = "bar"
 )
 @mock.patch("flag_engine.features.models.get_hashed_percentage_for_object_ids")
 def test_feature_state_get_value_mv_values(
-    mock_get_hashed_percentage, percentage_value, expected_value
-):
+    mock_get_hashed_percentage: mock.Mock,
+    percentage_value: int,
+    expected_value: str,
+) -> None:
     # Given
     # a feature
     my_feature = FeatureModel(id=1, name="mv_feature", type=STANDARD)
@@ -189,8 +194,10 @@ def test_feature_state_get_value_mv_values(
 
 
 def test_get_value_uses_django_id_for_multivariate_value_calculation_if_not_none(
-    feature_1, mv_feature_state_value, mocker
-):
+    feature_1: FeatureModel,
+    mv_feature_state_value: MultivariateFeatureStateValueModel,
+    mocker: MockerFixture,
+) -> None:
     # Given
     mocked_get_hashed_percentage = mocker.patch(
         "flag_engine.features.models.get_hashed_percentage_for_object_ids",
@@ -212,8 +219,10 @@ def test_get_value_uses_django_id_for_multivariate_value_calculation_if_not_none
 
 
 def test_get_value_uses_featuestate_uuid_for_multivariate_value_calculation_if_django_id_is_not_present(
-    feature_1, mv_feature_state_value, mocker
-):
+    feature_1: FeatureModel,
+    mv_feature_state_value: MultivariateFeatureStateValueModel,
+    mocker: MockerFixture,
+) -> None:
     # Given
     mocked_get_hashed_percentage = mocker.patch(
         "flag_engine.features.models.get_hashed_percentage_for_object_ids",

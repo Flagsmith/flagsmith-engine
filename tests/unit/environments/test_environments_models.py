@@ -3,10 +3,12 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from flag_engine.environments.integrations.models import IntegrationModel
-from flag_engine.environments.models import EnvironmentAPIKeyModel
+from flag_engine.environments.models import EnvironmentAPIKeyModel, EnvironmentModel
 
 
-def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key():
+def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key() -> (
+    None
+):
     assert (
         EnvironmentAPIKeyModel(
             id=1,
@@ -19,7 +21,9 @@ def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key()
     )
 
 
-def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key_with_expired_date_in_future():
+def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key_with_expired_date_in_future() -> (
+    None
+):
     assert (
         EnvironmentAPIKeyModel(
             id=1,
@@ -33,7 +37,7 @@ def test_environment_api_key_model_is_valid_is_true_for_non_expired_active_key_w
     )
 
 
-def test_environment_api_key_model_is_valid_is_false_for_expired_active_key():
+def test_environment_api_key_model_is_valid_is_false_for_expired_active_key() -> None:
     assert (
         EnvironmentAPIKeyModel(
             id=1,
@@ -47,7 +51,9 @@ def test_environment_api_key_model_is_valid_is_false_for_expired_active_key():
     )
 
 
-def test_environment_api_key_model_is_valid_is_false_for_non_expired_inactive_key():
+def test_environment_api_key_model_is_valid_is_false_for_non_expired_inactive_key() -> (
+    None
+):
     assert (
         EnvironmentAPIKeyModel(
             id=1,
@@ -62,14 +68,14 @@ def test_environment_api_key_model_is_valid_is_false_for_non_expired_inactive_ke
 
 
 def test_environment_integrations_data_returns_empty_dict_when_no_integrations(
-    environment,
-):
+    environment: EnvironmentModel,
+) -> None:
     assert environment.integrations_data == {}
 
 
 def test_environment_integrations_data_returns_correct_data_when_multiple_integrations(
-    environment,
-):
+    environment: EnvironmentModel,
+) -> None:
     # Given
     example_key = "some-key"
     base_url = "https://some-integration-url"
@@ -108,8 +114,11 @@ def test_environment_integrations_data_returns_correct_data_when_multiple_integr
     ),
 )
 def test_environment_get_hide_disabled_flags(
-    environment, environment_value, project_value, expected_result
-):
+    environment: EnvironmentModel,
+    environment_value: bool,
+    project_value: bool,
+    expected_result: bool,
+) -> None:
     # Given
     environment.hide_disabled_flags = environment_value
     environment.project.hide_disabled_flags = project_value

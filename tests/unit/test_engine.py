@@ -9,15 +9,18 @@ from flag_engine.engine import (
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import FeatureModel, FeatureStateModel
-from flag_engine.identities.models import IdentityModel
+from flag_engine.identities.models import IdentityFeaturesList, IdentityModel
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.segments.models import SegmentModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
 from tests.unit.helpers import get_environment_feature_state_for_feature
 
 
 def test_identity_get_feature_state_without_any_override(
-    environment, identity, feature_1
-):
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+    feature_1: FeatureModel,
+) -> None:
     # When
     feature_state = get_identity_feature_state(environment, identity, feature_1.name)
     # Then
@@ -34,8 +37,11 @@ def test_identity_get_feature_state__nonexistent_feature__raise_expected(
 
 
 def test_identity_get_all_feature_states_no_segments(
-    feature_1, feature_2, environment, identity
-):
+    feature_1: FeatureModel,
+    feature_2: FeatureModel,
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+) -> None:
     # Given
     overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
 
@@ -45,9 +51,9 @@ def test_identity_get_all_feature_states_no_segments(
     )
 
     # but True for the identity
-    identity.identity_features = [
-        FeatureStateModel(django_id=4, feature=overridden_feature, enabled=True)
-    ]
+    identity.identity_features = IdentityFeaturesList(
+        [FeatureStateModel(django_id=4, feature=overridden_feature, enabled=True)]
+    )
 
     # When
     all_feature_states = get_identity_feature_states(
@@ -81,19 +87,21 @@ def test_identity_get_all_feature_states_no_segments(
     ),
 )
 def test_get_identity_feature_states_hides_disabled_flags(
-    environment,
-    identity,
-    feature_1,
-    feature_2,
-    environment_value,
-    project_value,
-    disabled_flag_returned,
-):
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+    feature_1: FeatureModel,
+    feature_2: FeatureModel,
+    environment_value: bool,
+    project_value: bool,
+    disabled_flag_returned: bool,
+) -> None:
     # Given - two identity overrides
-    identity.identity_features = [
-        FeatureStateModel(django_id=1, feature=feature_1, enabled=True),
-        FeatureStateModel(django_id=2, feature=feature_2, enabled=False),
-    ]
+    identity.identity_features = IdentityFeaturesList(
+        [
+            FeatureStateModel(django_id=1, feature=feature_1, enabled=True),
+            FeatureStateModel(django_id=2, feature=feature_2, enabled=False),
+        ]
+    )
 
     environment.hide_disabled_flags = environment_value
     environment.project.hide_disabled_flags = project_value
@@ -108,8 +116,12 @@ def test_get_identity_feature_states_hides_disabled_flags(
 
 
 def test_identity_get_all_feature_states_segments_only(
-    feature_1, feature_2, environment, segment, identity_in_segment
-):
+    feature_1: FeatureModel,
+    feature_2: FeatureModel,
+    environment: EnvironmentModel,
+    segment: SegmentModel,
+    identity_in_segment: IdentityModel,
+) -> None:
     # Given
     # a feature which we can override
     overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
@@ -145,12 +157,12 @@ def test_identity_get_all_feature_states_segments_only(
 
 
 def test_identity_get_all_feature_states_with_traits(
-    environment_with_segment_override,
-    identity_in_segment,
-    identity,
-    segment_condition_string_value,
-    segment_condition_property,
-):
+    environment_with_segment_override: EnvironmentModel,
+    identity_in_segment: IdentityModel,
+    identity: IdentityModel,
+    segment_condition_string_value: str,
+    segment_condition_property: str,
+) -> None:
     # Given
     trait_models = TraitModel(
         trait_key=segment_condition_property, trait_value=segment_condition_string_value
@@ -167,7 +179,7 @@ def test_identity_get_all_feature_states_with_traits(
     assert all_feature_states[0].get_value() == "segment_override"
 
 
-def test_environment_get_all_feature_states(environment):
+def test_environment_get_all_feature_states(environment: EnvironmentModel) -> None:
     # When
     feature_states = get_environment_feature_states(environment)
 
@@ -187,8 +199,11 @@ def test_environment_get_all_feature_states(environment):
     ),
 )
 def test_environment_get_feature_states_hide_disabled_flags(
-    environment, environment_value, project_value, disabled_flag_returned
-):
+    environment: EnvironmentModel,
+    environment_value: bool,
+    project_value: bool,
+    disabled_flag_returned: bool,
+) -> None:
     # Given
     environment.hide_disabled_flags = environment_value
     environment.project.hide_disabled_flags = project_value
@@ -200,7 +215,9 @@ def test_environment_get_feature_states_hide_disabled_flags(
     assert len(feature_states) == (2 if disabled_flag_returned else 1)
 
 
-def test_environment_get_feature_state(environment, feature_1):
+def test_environment_get_feature_state(
+    environment: EnvironmentModel, feature_1: FeatureModel
+) -> None:
     # When
     feature_state = get_environment_feature_state(environment, feature_1.name)
 
@@ -208,6 +225,8 @@ def test_environment_get_feature_state(environment, feature_1):
     assert feature_state.feature == feature_1
 
 
-def test_environment_get_feature_state_raises_feature_state_not_found(environment):
+def test_environment_get_feature_state_raises_feature_state_not_found(
+    environment: EnvironmentModel,
+) -> None:
     with pytest.raises(FeatureStateNotFound):
         get_environment_feature_state(environment, "not_a_feature_name")

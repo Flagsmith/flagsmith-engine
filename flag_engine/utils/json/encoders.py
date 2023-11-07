@@ -8,7 +8,7 @@ class DecimalEncoder(json.JSONEncoder):
     int/float(for us) converted to decimal by boto3/dynamodb.
     """
 
-    def default(self, obj):
+    def default(self, obj: object) -> object:
         if isinstance(obj, decimal.Decimal):
             if obj % 1 == 0:
                 return int(obj)

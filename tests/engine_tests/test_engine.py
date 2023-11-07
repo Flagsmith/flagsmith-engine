@@ -15,7 +15,9 @@ MODULE_PATH = Path(__file__).parent.resolve()
 
 def _extract_test_cases(
     file_path: Path,
-) -> typing.Iterable[typing.Tuple[EnvironmentModel, IdentityModel, dict]]:
+) -> typing.Iterable[
+    typing.Tuple[EnvironmentModel, IdentityModel, typing.Dict[str, typing.Any]],
+]:
     """
     Extract the test cases from the json data file which should be in the following
     format.
@@ -52,7 +54,11 @@ def _extract_test_cases(
         MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
     ),
 )
-def test_engine(environment_model, identity_model, api_response):
+def test_engine(
+    environment_model: EnvironmentModel,
+    identity_model: IdentityModel,
+    api_response: typing.Dict[str, typing.Any],
+) -> None:
     # When
     # we get the feature states from the engine
     engine_response = get_identity_feature_states(environment_model, identity_model)

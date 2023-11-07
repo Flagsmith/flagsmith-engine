@@ -5,7 +5,9 @@
 #    pip-compile
 #
 annotated-types==0.5.0
-    # via pydantic
+    # via
+    #   -r requirements.in
+    #   pydantic
 pydantic==2.3.0
     # via
     #   -r requirements.in
@@ -16,7 +18,7 @@ pydantic-core==2.6.3
     # via pydantic
 semver==3.0.1
     # via -r requirements.in
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via
     #   -r requirements.in
     #   pydantic

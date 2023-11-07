@@ -9,5 +9,5 @@ class OrganisationModel(BaseModel):
     persist_trait_data: bool
 
     @property
-    def unique_slug(self):
+    def unique_slug(self) -> str:
         return str(self.id) + "-" + self.name
