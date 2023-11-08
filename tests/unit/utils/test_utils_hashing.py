@@ -1,4 +1,5 @@
 import itertools
+import typing
 import uuid
 from unittest import mock
 
@@ -17,8 +18,8 @@ from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
     ),
 )
 def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_exc(
-    object_ids,
-):
+    object_ids: typing.List[typing.Union[uuid.UUID, int, str]],
+) -> None:
     assert 100 > get_hashed_percentage_for_object_ids(object_ids) >= 0
 
 
@@ -31,7 +32,9 @@ def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_ex
         [str(uuid.uuid4), str(uuid.uuid4())],
     ),
 )
-def test_get_hashed_percentage_for_object_ids_is_the_same_each_time(object_ids):
+def test_get_hashed_percentage_for_object_ids_is_the_same_each_time(
+    object_ids: typing.List[typing.Union[uuid.UUID, int, str]],
+) -> None:
     # When
     result_1 = get_hashed_percentage_for_object_ids(object_ids)
     result_2 = get_hashed_percentage_for_object_ids(object_ids)
@@ -40,7 +43,7 @@ def test_get_hashed_percentage_for_object_ids_is_the_same_each_time(object_ids):
     assert result_1 == result_2
 
 
-def test_percentage_value_is_unique_for_different_identities():
+def test_percentage_value_is_unique_for_different_identities() -> None:
     # Given
     first_object_ids = [14, 106]
     second_object_ids = [53, 200]
@@ -53,7 +56,7 @@ def test_percentage_value_is_unique_for_different_identities():
     assert result_1 != result_2
 
 
-def test_get_hashed_percentage_for_object_ids_should_be_evenly_distributed():
+def test_get_hashed_percentage_for_object_ids_should_be_evenly_distributed() -> None:
     """
     This test checks if the percentage value returned by the helper function returns
     evenly distributed values.
@@ -93,7 +96,7 @@ def test_get_hashed_percentage_for_object_ids_should_be_evenly_distributed():
 
 
 @mock.patch("flag_engine.utils.hashing.hashlib")
-def test_get_hashed_percentage_does_not_return_1(mock_hashlib):
+def test_get_hashed_percentage_does_not_return_1(mock_hashlib: mock.Mock) -> None:
     """
     Quite complex test to ensure that the function will never return 1.
 
@@ -113,7 +116,7 @@ def test_get_hashed_percentage_does_not_return_1(mock_hashlib):
     hash_string_to_return_0 = "270f"
     hashed_values = [hash_string_to_return_0, hash_string_to_return_1]
 
-    def hexdigest_side_effect():
+    def hexdigest_side_effect() -> str:
         return hashed_values.pop()
 
     mock_hash = mock.MagicMock()

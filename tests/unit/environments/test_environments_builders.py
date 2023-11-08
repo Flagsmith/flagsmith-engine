@@ -11,7 +11,7 @@ from flag_engine.features.models import (
 from tests.unit.helpers import get_environment_feature_state_for_feature_by_name
 
 
-def test_build_environment_model():
+def test_build_environment_model() -> None:
     """Test to exercise the basic fields on the schema."""
     # Given
     webhook_url = "https://my.webhook.com/hook"
@@ -51,10 +51,11 @@ def test_build_environment_model():
     assert environment_model
 
     assert len(environment_model.feature_states) == 1
+    assert environment_model.webhook_config
     assert environment_model.webhook_config.url == webhook_url
 
 
-def test_build_environment_model_with_name():
+def test_build_environment_model_with_name() -> None:
     # Given
     environment_name = "some_environment"
     environment_dict = {
@@ -119,7 +120,9 @@ def test_build_environment_model__project_has_server_key_only_feature_ids__retur
     )
 
 
-def test_get_flags_for_environment_returns_feature_states_for_environment_dictionary():
+def test_get_flags_for_environment_returns_feature_states_for_environment_dictionary() -> (
+    None
+):
     # Given
     # some variables for use later
     string_value = "foo"
@@ -190,7 +193,7 @@ def test_get_flags_for_environment_returns_feature_states_for_environment_dictio
     )
 
 
-def test_build_environment_model_with_multivariate_flag():
+def test_build_environment_model_with_multivariate_flag() -> None:
     # Given
     variate_1_value = "value-1"
     variate_2_value = "value-2"
@@ -255,7 +258,7 @@ def test_build_environment_model_with_multivariate_flag():
     )
 
 
-def test_build_environment_api_key_model():
+def test_build_environment_api_key_model() -> None:
     # Given
     environment_key_dict = {
         "key": "ser.7duQYrsasJXqdGsdaagyfU",

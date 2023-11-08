@@ -8,7 +8,9 @@ from flag_engine.segments.evaluator import get_identity_segments
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
-def get_environment_feature_states(environment: EnvironmentModel):
+def get_environment_feature_states(
+    environment: EnvironmentModel,
+) -> typing.List[FeatureStateModel]:
     """
     Get a list of feature states for a given environment
 
@@ -19,7 +21,9 @@ def get_environment_feature_states(environment: EnvironmentModel):
     return environment.feature_states
 
 
-def get_environment_feature_state(environment: EnvironmentModel, feature_name: str):
+def get_environment_feature_state(
+    environment: EnvironmentModel, feature_name: str
+) -> FeatureStateModel:
     """
     Get a specific feature state for a given feature_name in a given environment
 
@@ -38,7 +42,7 @@ def get_environment_feature_state(environment: EnvironmentModel, feature_name: s
 def get_identity_feature_states(
     environment: EnvironmentModel,
     identity: IdentityModel,
-    override_traits: typing.List[TraitModel] = None,
+    override_traits: typing.Optional[typing.List[TraitModel]] = None,
 ) -> typing.List[FeatureStateModel]:
     """
     Get a list of feature states for a given identity in a given environment.
@@ -63,8 +67,8 @@ def get_identity_feature_state(
     environment: EnvironmentModel,
     identity: IdentityModel,
     feature_name: str,
-    override_traits: typing.List[TraitModel] = None,
-):
+    override_traits: typing.Optional[typing.List[TraitModel]] = None,
+) -> FeatureStateModel:
     """
     Get a specific feature state for a given identity in a given environment.
 

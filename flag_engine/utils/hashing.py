@@ -1,9 +1,11 @@
 import hashlib
 import typing
 
+from flag_engine.utils.types import SupportsStr
+
 
 def get_hashed_percentage_for_object_ids(
-    object_ids: typing.Iterable[typing.Any], iterations: int = 1
+    object_ids: typing.Iterable[SupportsStr], iterations: int = 1
 ) -> float:
     """
     Given a list of object ids, get a floating point number between 0 (inclusive) and

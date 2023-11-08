@@ -2,7 +2,7 @@ import math
 import typing
 import uuid
 
-from annotated_types import Ge, Le
+from annotated_types import Ge, Le, SupportsLt
 from pydantic import UUID4, BaseModel, Field, model_validator
 from pydantic_collections import BaseCollectionModel
 from typing_extensions import Annotated
@@ -16,16 +16,16 @@ class FeatureModel(BaseModel):
     name: str
     type: str
 
-    def __eq__(self, other):
-        return self.id == other.id
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, FeatureModel) and self.id == other.id
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.id)
 
 
 class MultivariateFeatureOptionModel(BaseModel):
     value: typing.Any
-    id: int = None
+    id: typing.Optional[int] = None
 
 
 class MultivariateFeatureStateValueModel(BaseModel):
@@ -40,7 +40,7 @@ class FeatureSegmentModel(BaseModel):
 
 
 class MultivariateFeatureStateValueList(
-    BaseCollectionModel[MultivariateFeatureStateValueModel]
+    BaseCollectionModel[MultivariateFeatureStateValueModel]  # type: ignore[misc,no-any-unimported]
 ):
     @staticmethod
     def _ensure_correct_percentage_allocations(
@@ -75,15 +75,15 @@ class MultivariateFeatureStateValueList(
 class FeatureStateModel(BaseModel, validate_assignment=True):
     feature: FeatureModel
     enabled: bool
-    django_id: int = None
-    feature_segment: FeatureSegmentModel = None
+    django_id: typing.Optional[int] = None
+    feature_segment: typing.Optional[FeatureSegmentModel] = None
     featurestate_uuid: UUID4 = Field(default_factory=uuid.uuid4)
     feature_state_value: typing.Any = None
     multivariate_feature_state_values: MultivariateFeatureStateValueList = Field(
         default_factory=MultivariateFeatureStateValueList
     )
 
-    def set_value(self, value: typing.Any):
+    def set_value(self, value: typing.Any) -> None:
         self.feature_state_value = value
 
     def get_value(self, identity_id: typing.Union[None, int, str] = None) -> typing.Any:
@@ -113,18 +113,19 @@ class FeatureStateModel(BaseModel, validate_assignment=True):
 
         """
 
-        try:
-            return (
-                getattr(
-                    self.feature_segment,
-                    "priority",
-                    math.inf,
+        if other_feature_segment := other.feature_segment:
+            if (
+                other_feature_segment_priority := other_feature_segment.priority
+            ) is not None:
+                return (
+                    getattr(
+                        self.feature_segment,
+                        "priority",
+                        math.inf,
+                    )
+                    < other_feature_segment_priority
                 )
-                < other.feature_segment.priority
-            )
-
-        except (TypeError, AttributeError):
-            return False
+        return False
 
     def _get_multivariate_value(
         self, identity_id: typing.Union[int, str]
@@ -138,10 +139,14 @@ class FeatureStateModel(BaseModel, validate_assignment=True):
         # the percentage allocations of the multivariate options. This gives us a
         # way to ensure that the same value is returned every time we use the same
         # percentage value.
-        start_percentage = 0
+        start_percentage = 0.0
+
+        def _mv_fs_sort_key(mv_value: MultivariateFeatureStateValueModel) -> SupportsLt:
+            return mv_value.id or mv_value.mv_fs_value_uuid
+
         for mv_value in sorted(
             self.multivariate_feature_state_values,
-            key=lambda v: v.id or v.mv_fs_value_uuid,
+            key=_mv_fs_sort_key,
         ):
             limit = mv_value.percentage_allocation + start_percentage
             if start_percentage <= percentage_value < limit:

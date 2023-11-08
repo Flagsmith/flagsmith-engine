@@ -4,7 +4,7 @@ from flag_engine.identities.builders import build_identity_dict, build_identity_
 from flag_engine.identities.models import IdentityFeaturesList, IdentityModel
 
 
-def test_build_identity_model_from_dictionary_no_feature_states():
+def test_build_identity_model_from_dictionary_no_feature_states() -> None:
     # Given
     identity = {
         "id": 1,
@@ -23,7 +23,9 @@ def test_build_identity_model_from_dictionary_no_feature_states():
     assert len(identity_model.identity_traits) == 1
 
 
-def test_build_identity_model_from_dictionary_uses_identity_feature_list_for_identity_features():
+def test_build_identity_model_from_dictionary_uses_identity_feature_list_for_identity_features() -> (
+    None
+):
     # Given
     identity_dict = {
         "id": 1,
@@ -50,14 +52,14 @@ def test_build_identity_model_from_dictionary_uses_identity_feature_list_for_ide
     assert isinstance(identity_model.identity_features, IdentityFeaturesList)
 
 
-def test_build_build_identity_model_from_dict_creates_identity_uuid():
+def test_build_build_identity_model_from_dict_creates_identity_uuid() -> None:
     identity_model = build_identity_model(
         {"identifier": "test_user", "environment_api_key": "some_key"}
     )
     assert identity_model.identity_uuid is not None
 
 
-def test_build_identity_model_from_dictionary_with_feature_states():
+def test_build_identity_model_from_dictionary_with_feature_states() -> None:
     # Given
     identity_dict = {
         "id": 1,
@@ -87,7 +89,7 @@ def test_build_identity_model_from_dictionary_with_feature_states():
     assert isinstance(identity_model.identity_features[0], FeatureStateModel)
 
 
-def test_identity_dict_created_using_model_can_convert_back_to_model():
+def test_identity_dict_created_using_model_can_convert_back_to_model() -> None:
     # Given
     identity_model = IdentityModel(
         environment_api_key="some_key", identifier="test_identifier"

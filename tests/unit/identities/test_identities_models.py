@@ -8,7 +8,7 @@ from flag_engine.identities.traits.models import TraitModel
 from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
-def test_composite_key():
+def test_composite_key() -> None:
     # Given
     environment_api_key = "abc123"
     identifier = "identity"
@@ -21,12 +21,12 @@ def test_composite_key():
     assert identity_model.composite_key == f"{environment_api_key}_{identifier}"
 
 
-def test_identiy_model_creates_default_identity_uuid():
+def test_identiy_model_creates_default_identity_uuid() -> None:
     identity_model = IdentityModel(identifier="test", environment_api_key="some_key")
     assert identity_model.identity_uuid is not None
 
 
-def test_generate_composite_key():
+def test_generate_composite_key() -> None:
     # Given
     environment_api_key = "abc123"
     identifier = "identity"
@@ -40,7 +40,9 @@ def test_generate_composite_key():
     )
 
 
-def test_update_traits_remove_traits_with_none_value(identity_in_segment):
+def test_update_traits_remove_traits_with_none_value(
+    identity_in_segment: IdentityModel,
+) -> None:
     # Given
     trait_key = identity_in_segment.identity_traits[0].trait_key
     trait_to_remove = TraitModel(trait_key=trait_key, trait_value=None)
@@ -55,7 +57,9 @@ def test_update_traits_remove_traits_with_none_value(identity_in_segment):
     assert traits_updated is True
 
 
-def test_update_identity_traits_updates_trait_value(identity_in_segment):
+def test_update_identity_traits_updates_trait_value(
+    identity_in_segment: IdentityModel,
+) -> None:
     # Given
     trait_key = identity_in_segment.identity_traits[0].trait_key
     trait_value = "updated_trait_value"
@@ -73,7 +77,9 @@ def test_update_identity_traits_updates_trait_value(identity_in_segment):
     assert traits_updated is True
 
 
-def test_update_traits_adds_new_traits(identity_in_segment):
+def test_update_traits_adds_new_traits(
+    identity_in_segment: IdentityModel,
+) -> None:
     # Given
     new_trait = TraitModel(trait_key="new_key", trait_value="foobar")
 
@@ -87,7 +93,9 @@ def test_update_traits_adds_new_traits(identity_in_segment):
     assert traits_updated is True
 
 
-def test_update_traits_returns_false_if_traits_are_not_updated(identity_in_segment):
+def test_update_traits_returns_false_if_traits_are_not_updated(
+    identity_in_segment: IdentityModel,
+) -> None:
     # Given
     trait_key = identity_in_segment.identity_traits[0].trait_key
     trait_value = identity_in_segment.identity_traits[0].trait_value
@@ -107,8 +115,9 @@ def test_update_traits_returns_false_if_traits_are_not_updated(identity_in_segme
 
 
 def test_appending_feature_states_raises_duplicate_feature_state_if_fs_for_the_feature_already_exists(
-    identity, feature_1
-):
+    identity: IdentityModel,
+    feature_1: FeatureModel,
+) -> None:
     # Given
     fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
     fs_2 = FeatureStateModel(feature=feature_1, enabled=True)
@@ -139,7 +148,7 @@ def test_identity_model__identity_features__append__expected_result(
     ]
 
 
-def test_append_feature_state(identity, feature_1):
+def test_append_feature_state(identity: IdentityModel, feature_1: FeatureModel) -> None:
     # Given
     fs_1 = FeatureStateModel(feature=feature_1, enabled=False)
     # When
@@ -149,8 +158,10 @@ def test_append_feature_state(identity, feature_1):
 
 
 def test_prune_features_only_keeps_valid_features(
-    identity, feature_state_1, feature_state_2
-):
+    identity: IdentityModel,
+    feature_state_1: FeatureStateModel,
+    feature_state_2: FeatureStateModel,
+) -> None:
     # Given
     identity.identity_features.append(feature_state_1)
     identity.identity_features.append(feature_state_2)
@@ -164,18 +175,42 @@ def test_prune_features_only_keeps_valid_features(
     assert list(identity.identity_features) == [feature_state_1]
 
 
-def test_get_hash_key_with_use_identity_composite_key_for_hashing_enabled(identity):
+def test_get_hash_key_with_use_identity_composite_key_for_hashing_enabled(
+    identity: IdentityModel,
+) -> None:
     assert (
         identity.get_hash_key(use_identity_composite_key_for_hashing=True)
         == identity.composite_key
     )
 
 
-def test_get_hash_key_with_use_identity_composite_key_for_hashing_disabled(identity):
+def test_get_hash_key_with_use_identity_composite_key_for_hashing_disabled(
+    identity: IdentityModel,
+) -> None:
     assert (
         identity.get_hash_key(use_identity_composite_key_for_hashing=False)
         == identity.identifier
     )
+
+
+def test_get_hash_key_with_use_mv_v2_evaluation_enabled(
+    identity: IdentityModel,
+) -> None:
+    # Given
+    use_mv_v2_evaluations = True
+
+    # When/ Then
+    assert identity.get_hash_key(use_mv_v2_evaluations) == identity.composite_key
+
+
+def test_get_hash_key_with_use_mv_v2_evaluation_disabled(
+    identity: IdentityModel,
+) -> None:
+    # Given
+    use_mv_v2_evaluations = False
+
+    # When/ Then
+    assert identity.get_hash_key(use_mv_v2_evaluations) == identity.identifier
 
 
 @pytest.mark.parametrize(
@@ -206,7 +241,7 @@ def test_trait_model__deserialize__expected_trait_value(
     assert result.trait_value == expected_result
 
 
-def test_identity_model__deserialize__handles_nan():
+def test_identity_model__deserialize__handles_nan() -> None:
     # When
     result = IdentityModel.model_validate(
         {

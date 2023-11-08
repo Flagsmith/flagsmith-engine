@@ -1,4 +1,15 @@
 repos:
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.5.1
+      hooks:
+          - id: mypy
+            args: [--strict]
+            additional_dependencies:
+                [pydantic, pytest, pytest_mock, types-pytest-lazy-fixture, types-setuptools, semver]
+    - repo: https://github.com/MarcoGorelli/absolufy-imports
+      rev: v0.3.1
+      hooks:
+          - id: absolufy-imports
     - repo: https://github.com/PyCQA/isort
       rev: 5.12.0
       hooks:

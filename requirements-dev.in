@@ -6,3 +6,7 @@ pytest-mock
 pytest-lazy-fixture
 pytest-cov
 pip-tools
+types-pytest-lazy-fixture
+types-setuptools
+mypy
+absolufy-imports

@@ -23,17 +23,20 @@ from flag_engine.segments.models import (
 
 
 @pytest.fixture()
-def segment_condition_property():
+def segment_condition_property() -> str:
     return "foo"
 
 
 @pytest.fixture()
-def segment_condition_string_value():
+def segment_condition_string_value() -> str:
     return "bar"
 
 
 @pytest.fixture()
-def segment_condition(segment_condition_property, segment_condition_string_value):
+def segment_condition(
+    segment_condition_property: str,
+    segment_condition_string_value: str,
+) -> SegmentConditionModel:
     return SegmentConditionModel(
         operator=constants.EQUAL,
         property_=segment_condition_property,
@@ -42,17 +45,17 @@ def segment_condition(segment_condition_property, segment_condition_string_value
 
 
 @pytest.fixture()
-def segment_rule(segment_condition):
+def segment_rule(segment_condition: SegmentConditionModel) -> SegmentRuleModel:
     return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
 
 
 @pytest.fixture()
-def segment(segment_rule):
+def segment(segment_rule: SegmentRuleModel) -> SegmentModel:
     return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
 
 
 @pytest.fixture()
-def organisation():
+def organisation() -> OrganisationModel:
     return OrganisationModel(
         id=1,
         name="test Org",
@@ -63,7 +66,10 @@ def organisation():
 
 
 @pytest.fixture()
-def project(organisation, segment):
+def project(
+    organisation: OrganisationModel,
+    segment: SegmentModel,
+) -> ProjectModel:
     return ProjectModel(
         id=1,
         name="Test Project",
@@ -74,27 +80,31 @@ def project(organisation, segment):
 
 
 @pytest.fixture()
-def feature_1():
+def feature_1() -> FeatureModel:
     return FeatureModel(id=1, name="feature_1", type=STANDARD)
 
 
 @pytest.fixture()
-def feature_2():
+def feature_2() -> FeatureModel:
     return FeatureModel(id=2, name="feature_2", type=STANDARD)
 
 
 @pytest.fixture()
-def feature_state_1(feature_1):
+def feature_state_1(feature_1: FeatureModel) -> FeatureStateModel:
     return FeatureStateModel(feature=feature_1, enabled=True)
 
 
 @pytest.fixture()
-def feature_state_2(feature_2):
+def feature_state_2(feature_2: FeatureModel) -> FeatureStateModel:
     return FeatureStateModel(feature=feature_2, enabled=True)
 
 
 @pytest.fixture()
-def environment(feature_1, feature_2, project):
+def environment(
+    feature_1: FeatureModel,
+    feature_2: FeatureModel,
+    project: ProjectModel,
+) -> EnvironmentModel:
     return EnvironmentModel(
         id=1,
         api_key="api-key",
@@ -107,7 +117,7 @@ def environment(feature_1, feature_2, project):
 
 
 @pytest.fixture()
-def identity(environment):
+def identity(environment: EnvironmentModel) -> IdentityModel:
     return IdentityModel(
         identifier="identity_1",
         environment_api_key=environment.api_key,
@@ -116,14 +126,18 @@ def identity(environment):
 
 
 @pytest.fixture()
-def trait_matching_segment(segment_condition):
+def trait_matching_segment(segment_condition: SegmentConditionModel) -> TraitModel:
     return TraitModel(
-        trait_key=segment_condition.property_, trait_value=segment_condition.value
+        trait_key=segment_condition.property_,
+        trait_value=segment_condition.value,
     )
 
 
 @pytest.fixture()
-def identity_in_segment(trait_matching_segment, environment):
+def identity_in_segment(
+    trait_matching_segment: TraitModel,
+    environment: EnvironmentModel,
+) -> IdentityModel:
     return IdentityModel(
         identifier="identity_2",
         environment_api_key=environment.api_key,
@@ -132,7 +146,10 @@ def identity_in_segment(trait_matching_segment, environment):
 
 
 @pytest.fixture()
-def segment_override_fs(segment, feature_1):
+def segment_override_fs(
+    segment: SegmentModel,
+    feature_1: FeatureModel,
+) -> FeatureStateModel:
     fs = FeatureStateModel(
         django_id=4,
         feature=feature_1,
@@ -143,7 +160,7 @@ def segment_override_fs(segment, feature_1):
 
 
 @pytest.fixture()
-def mv_feature_state_value():
+def mv_feature_state_value() -> MultivariateFeatureStateValueModel:
     return MultivariateFeatureStateValueModel(
         id=1,
         multivariate_feature_option=MultivariateFeatureOptionModel(
@@ -154,7 +171,11 @@ def mv_feature_state_value():
 
 
 @pytest.fixture()
-def environment_with_segment_override(environment, segment_override_fs, segment):
+def environment_with_segment_override(
+    environment: EnvironmentModel,
+    segment_override_fs: FeatureStateModel,
+    segment: SegmentModel,
+) -> EnvironmentModel:
     segment.feature_states.append(segment_override_fs)
     environment.project.segments.append(segment)
     return environment

@@ -1,7 +1,7 @@
 from flag_engine.organisations.models import OrganisationModel
 
 
-def test_unique_slug_property():
+def test_unique_slug_property() -> None:
     # Given
     org_id = 1
     org_name = "test"

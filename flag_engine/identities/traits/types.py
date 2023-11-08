@@ -1,16 +1,10 @@
 import re
 from decimal import Decimal
+from typing import Any, Union, get_args
 
-from typing import Union, Any, get_args
-from typing_extensions import TypeGuard
-
-from pydantic.types import (
-    AllowInfNan,
-    StringConstraints,
-    StrictBool,
-)
 from pydantic import BeforeValidator
-from typing_extensions import Annotated
+from pydantic.types import AllowInfNan, StrictBool, StringConstraints
+from typing_extensions import Annotated, TypeGuard
 
 from flag_engine.identities.traits.constants import TRAIT_STRING_VALUE_MAX_LENGTH
 

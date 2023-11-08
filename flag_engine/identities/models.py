@@ -11,7 +11,7 @@ from flag_engine.utils.datetime import utcnow_with_tz
 from flag_engine.utils.exceptions import DuplicateFeatureState
 
 
-class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):
+class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):  # type: ignore[misc,no-any-unimported]
     @staticmethod
     def _ensure_unique_feature_ids(
         value: typing.MutableSequence[FeatureStateModel],
@@ -45,7 +45,7 @@ class IdentityModel(BaseModel):
     identity_uuid: UUID4 = Field(default_factory=uuid.uuid4)
     django_id: typing.Optional[int] = None
 
-    @computed_field
+    @computed_field  # type: ignore[misc]
     @property
     def composite_key(self) -> str:
         return self.generate_composite_key(self.environment_api_key, self.identifier)
