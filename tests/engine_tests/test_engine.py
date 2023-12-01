@@ -1,23 +1,31 @@
-import json
 import typing
 from pathlib import Path
 
 import pytest
+from pydantic import BaseModel
 
 from flag_engine.engine import get_identity_feature_states
-from flag_engine.environments.builders import build_environment_model
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.identities.builders import build_identity_model
 from flag_engine.identities.models import IdentityModel
 
 MODULE_PATH = Path(__file__).parent.resolve()
 
+APIResponse = typing.Dict[str, typing.Any]
+
+
+class EngineTestCase(BaseModel):
+    identity: IdentityModel
+    response: APIResponse
+
+
+class EngineTestData(BaseModel):
+    environment: EnvironmentModel
+    identities_and_responses: typing.List[EngineTestCase]
+
 
 def _extract_test_cases(
     file_path: Path,
-) -> typing.Iterable[
-    typing.Tuple[EnvironmentModel, IdentityModel, typing.Dict[str, typing.Any]],
-]:
+) -> typing.Iterable[typing.Tuple[EnvironmentModel, IdentityModel, APIResponse]]:
     """
     Extract the test cases from the json data file which should be in the following
     format.
@@ -36,15 +44,10 @@ def _extract_test_cases(
     :return: a list of tuples containing the environment, identity and api response
     """
     with open(file_path, "r") as f:
-        test_data = json.loads(f.read())
-        environment_model = build_environment_model(test_data["environment"])
+        test_data = EngineTestData.model_validate_json(f.read())
         return [
-            (
-                environment_model,
-                build_identity_model(test_case["identity"]),
-                test_case["response"],
-            )
-            for test_case in test_data["identities_and_responses"]
+            (test_data.environment, test_case.identity, test_case.response)
+            for test_case in test_data.identities_and_responses
         ]
 
 
