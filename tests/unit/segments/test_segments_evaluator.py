@@ -268,7 +268,7 @@ def test_identity_in_segment_is_set_and_is_not_set(
         (constants.IN, 1, None, False),
     ),
 )
-def test_segment_condition_condition_matches_value(
+def test_segment_condition_matches_value(
     operator: ConditionOperator,
     trait_value: typing.Union[None, int, str, float],
     condition_value: object,
@@ -332,7 +332,7 @@ def test_segment_condition__unsupported_operator__return_false(
         (constants.LESS_THAN_INCLUSIVE, "1.0.1", "1.0.0:semver", False),
     ],
 )
-def test_segment_condition_condition_matches_value_for_semver(
+def test_segment_condition_matches_value_for_semver(
     operator: ConditionOperator,
     trait_value: str,
     condition_value: str,
@@ -367,7 +367,7 @@ def test_segment_condition_condition_matches_value_for_semver(
         (1, None, False),
     ],
 )
-def test_segment_condition_condition_matches_value_for_modulo(
+def test_segment_condition_matches_value_for_modulo(
     trait_value: typing.Union[int, float, str, bool],
     condition_value: typing.Optional[str],
     expected_result: bool,
