@@ -8,7 +8,7 @@ from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
-    _matches_trait_value,
+    _condition_matches_value,
     evaluate_identity_in_segment,
 )
 from flag_engine.segments.models import (
@@ -19,7 +19,9 @@ from flag_engine.segments.models import (
 from flag_engine.segments.types import ConditionOperator
 from tests.unit.segments.fixtures import (
     empty_segment,
+    identifier,
     segment_conditions_and_nested_rules,
+    segment_identity_override,
     segment_multiple_conditions_all,
     segment_multiple_conditions_any,
     segment_nested_rules,
@@ -106,6 +108,7 @@ from tests.unit.segments.fixtures import (
             ],
             True,
         ),
+        (segment_identity_override, [], True),
     ),
 )
 def test_identity_in_segment(
@@ -114,7 +117,7 @@ def test_identity_in_segment(
     expected_result: bool,
 ) -> None:
     identity = IdentityModel(
-        identifier="foo",
+        identifier=identifier,
         identity_traits=identity_traits,
         environment_api_key="api-key",
     )
@@ -265,7 +268,7 @@ def test_identity_in_segment_is_set_and_is_not_set(
         (constants.IN, 1, None, False),
     ),
 )
-def test_segment_condition_matches_trait_value(
+def test_segment_condition_condition_matches_value(
     operator: ConditionOperator,
     trait_value: typing.Union[None, int, str, float],
     condition_value: object,
@@ -279,7 +282,7 @@ def test_segment_condition_matches_trait_value(
     )
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _condition_matches_value(segment_condition, trait_value)
 
     # Then
     assert result == expected_result
@@ -298,7 +301,7 @@ def test_segment_condition__unsupported_operator__return_false(
     trait_value = "foo"
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _condition_matches_value(segment_condition, trait_value)
 
     # Then
     assert result is False
@@ -329,7 +332,7 @@ def test_segment_condition__unsupported_operator__return_false(
         (constants.LESS_THAN_INCLUSIVE, "1.0.1", "1.0.0:semver", False),
     ],
 )
-def test_segment_condition_matches_trait_value_for_semver(
+def test_segment_condition_condition_matches_value_for_semver(
     operator: ConditionOperator,
     trait_value: str,
     condition_value: str,
@@ -343,7 +346,7 @@ def test_segment_condition_matches_trait_value_for_semver(
     )
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _condition_matches_value(segment_condition, trait_value)
 
     # Then
     assert result == expected_result
@@ -364,7 +367,7 @@ def test_segment_condition_matches_trait_value_for_semver(
         (1, None, False),
     ],
 )
-def test_segment_condition_matches_trait_value_for_modulo(
+def test_segment_condition_condition_matches_value_for_modulo(
     trait_value: typing.Union[int, float, str, bool],
     condition_value: typing.Optional[str],
     expected_result: bool,
@@ -377,7 +380,7 @@ def test_segment_condition_matches_trait_value_for_modulo(
     )
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _condition_matches_value(segment_condition, trait_value)
 
     # Then
     assert result == expected_result

@@ -51,10 +51,10 @@ def evaluate_identity_in_segment(
     """
     return len(segment.rules) > 0 and all(
         _traits_match_segment_rule(
-            override_traits or identity.identity_traits,
-            rule,
-            segment.id,
-            identity.django_id or identity.composite_key,
+            identity_traits=override_traits or identity.identity_traits,
+            rule=rule,
+            segment_id=segment.id,
+            identity=identity,
         )
         for rule in segment.rules
     )
@@ -64,13 +64,16 @@ def _traits_match_segment_rule(
     identity_traits: typing.List[TraitModel],
     rule: SegmentRuleModel,
     segment_id: typing.Union[int, str],
-    identity_id: typing.Union[int, str],
+    identity: IdentityModel,
 ) -> bool:
     matches_conditions = (
         rule.matching_function(
             [
                 _traits_match_segment_condition(
-                    identity_traits, condition, segment_id, identity_id
+                    identity_traits=identity_traits,
+                    condition=condition,
+                    segment_id=segment_id,
+                    identity=identity,
                 )
                 for condition in rule.conditions
             ]
@@ -80,7 +83,7 @@ def _traits_match_segment_rule(
     )
 
     return matches_conditions and all(
-        _traits_match_segment_rule(identity_traits, rule, segment_id, identity_id)
+        _traits_match_segment_rule(identity_traits, rule, segment_id, identity)
         for rule in rule.rules
     )
 
@@ -89,15 +92,20 @@ def _traits_match_segment_condition(
     identity_traits: typing.List[TraitModel],
     condition: SegmentConditionModel,
     segment_id: typing.Union[int, str],
-    identity_id: typing.Union[int, str],
+    identity: IdentityModel,
 ) -> bool:
     if condition.operator == constants.PERCENTAGE_SPLIT:
         assert condition.value
         float_value = float(condition.value)
         return (
-            get_hashed_percentage_for_object_ids([segment_id, identity_id])
+            get_hashed_percentage_for_object_ids(
+                [segment_id, identity.django_id or identity.composite_key]
+            )
             <= float_value
         )
+
+    if condition.property_ == constants.SEGMENT_IDENTIFIER_PROPERTY_NAME:
+        return _condition_matches_value(condition, identity.identifier)
 
     trait = next(
         filter(lambda t: t.trait_key == condition.property_, identity_traits), None
@@ -109,41 +117,41 @@ def _traits_match_segment_condition(
     if condition.operator == constants.IS_SET:
         return trait is not None
 
-    return _matches_trait_value(condition, trait.trait_value) if trait else False
+    return _condition_matches_value(condition, trait.trait_value) if trait else False
 
 
-def _matches_trait_value(
+def _condition_matches_value(
     condition: SegmentConditionModel,
-    trait_value: TraitValue,
+    matched_value: TraitValue,
 ) -> bool:
     if match_func := MATCH_FUNCS_BY_OPERATOR.get(condition.operator):
-        return match_func(condition.value, trait_value)
+        return match_func(condition.value, matched_value)
 
     return False
 
 
 def _evaluate_not_contains(
     segment_value: typing.Optional[str],
-    trait_value: TraitValue,
+    matched_value: TraitValue,
 ) -> bool:
-    return isinstance(trait_value, str) and str(segment_value) not in trait_value
+    return isinstance(matched_value, str) and str(segment_value) not in matched_value
 
 
 def _evaluate_regex(
     segment_value: typing.Optional[str],
-    trait_value: TraitValue,
+    matched_value: TraitValue,
 ) -> bool:
     return (
-        trait_value is not None
-        and re.compile(str(segment_value)).match(str(trait_value)) is not None
+        matched_value is not None
+        and re.compile(str(segment_value)).match(str(matched_value)) is not None
     )
 
 
 def _evaluate_modulo(
     segment_value: typing.Optional[str],
-    trait_value: TraitValue,
+    matched_value: TraitValue,
 ) -> bool:
-    if not isinstance(trait_value, (int, float)):
+    if not isinstance(matched_value, (int, float)):
         return False
 
     if segment_value is None:
@@ -156,35 +164,37 @@ def _evaluate_modulo(
     except ValueError:
         return False
 
-    return trait_value % divisor == remainder
+    return matched_value % divisor == remainder
 
 
-def _evaluate_in(segment_value: typing.Optional[str], trait_value: TraitValue) -> bool:
+def _evaluate_in(
+    segment_value: typing.Optional[str], matched_value: TraitValue
+) -> bool:
     if segment_value:
-        if isinstance(trait_value, str):
-            return trait_value in segment_value.split(",")
-        if isinstance(trait_value, int) and not any(
-            trait_value is x for x in (False, True)
+        if isinstance(matched_value, str):
+            return matched_value in segment_value.split(",")
+        if isinstance(matched_value, int) and not any(
+            matched_value is x for x in (False, True)
         ):
-            return str(trait_value) in segment_value.split(",")
+            return str(matched_value) in segment_value.split(",")
     return False
 
 
-def _trait_value_typed(
+def _matched_value_typed(
     func: typing.Callable[..., bool],
 ) -> typing.Callable[[typing.Optional[str], TraitValue], bool]:
     @wraps(func)
     def inner(
         segment_value: typing.Optional[str],
-        trait_value: typing.Union[TraitValue, semver.Version],
+        matched_value: typing.Union[TraitValue, semver.Version],
     ) -> bool:
         with suppress(TypeError, ValueError):
-            if isinstance(trait_value, str) and is_semver(segment_value):
-                trait_value = semver.Version.parse(
-                    trait_value,
+            if isinstance(matched_value, str) and is_semver(segment_value):
+                matched_value = semver.Version.parse(
+                    matched_value,
                 )
-            match_value = get_casting_function(trait_value)(segment_value)
-            return func(trait_value, match_value)
+            matched_against_value = get_casting_function(matched_value)(segment_value)
+            return func(matched_value, matched_against_value)
         return False
 
     return inner
@@ -197,11 +207,11 @@ MATCH_FUNCS_BY_OPERATOR: typing.Dict[
     constants.REGEX: _evaluate_regex,
     constants.MODULO: _evaluate_modulo,
     constants.IN: _evaluate_in,
-    constants.EQUAL: _trait_value_typed(operator.eq),
-    constants.GREATER_THAN: _trait_value_typed(operator.gt),
-    constants.GREATER_THAN_INCLUSIVE: _trait_value_typed(operator.ge),
-    constants.LESS_THAN: _trait_value_typed(operator.lt),
-    constants.LESS_THAN_INCLUSIVE: _trait_value_typed(operator.le),
-    constants.NOT_EQUAL: _trait_value_typed(operator.ne),
-    constants.CONTAINS: _trait_value_typed(operator.contains),
+    constants.EQUAL: _matched_value_typed(operator.eq),
+    constants.GREATER_THAN: _matched_value_typed(operator.gt),
+    constants.GREATER_THAN_INCLUSIVE: _matched_value_typed(operator.ge),
+    constants.LESS_THAN: _matched_value_typed(operator.lt),
+    constants.LESS_THAN_INCLUSIVE: _matched_value_typed(operator.le),
+    constants.NOT_EQUAL: _matched_value_typed(operator.ne),
+    constants.CONTAINS: _matched_value_typed(operator.contains),
 }

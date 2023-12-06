@@ -5,7 +5,7 @@ from typing_extensions import Annotated
 
 from flag_engine.features.models import FeatureStateModel
 from flag_engine.segments import constants
-from flag_engine.segments.types import ConditionOperator, RuleType
+from flag_engine.segments.types import ConditionOperator, RuleType, SegmentType
 
 LaxStr = Annotated[str, BeforeValidator(lambda x: str(x))]
 
@@ -34,8 +34,15 @@ class SegmentRuleModel(BaseModel):
         }[self.type]
 
 
+class SegmentMetadata(BaseModel):
+    type: SegmentType = "SEGMENT"
+    identity_identifier: typing.Optional[str] = None
+    identity_uuid: typing.Optional[str] = None
+
+
 class SegmentModel(BaseModel):
     id: int
     name: str
     rules: typing.List[SegmentRuleModel] = Field(default_factory=list)
     feature_states: typing.List[FeatureStateModel] = Field(default_factory=list)
+    meta: typing.Optional[SegmentMetadata] = None
