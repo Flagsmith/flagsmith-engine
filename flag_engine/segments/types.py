@@ -22,9 +22,3 @@ RuleType = Literal[
     "ANY",
     "NONE",
 ]
-
-SegmentType = Literal[
-    "SEGMENT",
-    "IDENTITY_OVERRIDE",
-    "SEGMENT_OVERRIDE",
-]
