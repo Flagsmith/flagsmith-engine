@@ -151,7 +151,7 @@ segment_conditions_and_nested_rules = SegmentModel(
 )
 segment_identity_override = SegmentModel(
     id=7,
-    name="segment_identity_override",
+    name="dentity_override_identity_1_b6c2e2",
     rules=[
         SegmentRuleModel(
             type=constants.ALL_RULE,
@@ -165,6 +165,7 @@ segment_identity_override = SegmentModel(
         )
     ],
     meta={
+        "identity_uuid": "d049c16b-e4dd-4830-b238-db2241c159e6",
         "identity_identifier": identifier,
         "type": "IDENTITY_OVERRIDE",
     },
