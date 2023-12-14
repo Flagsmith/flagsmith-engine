@@ -35,6 +35,7 @@ class EnvironmentModel(BaseModel):
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = Field(default_factory=list)
+    identity_overrides: typing.List[FeatureStateModel] = Field(default_factory=list)
 
     name: typing.Optional[str] = None
     allow_client_traits: bool = True
