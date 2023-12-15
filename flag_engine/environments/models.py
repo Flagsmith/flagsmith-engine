@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from flag_engine.environments.integrations.models import IntegrationModel
 from flag_engine.features.models import FeatureStateModel
+from flag_engine.identities.models import IdentityModel
 from flag_engine.projects.models import ProjectModel
 from flag_engine.utils.datetime import utcnow_with_tz
 
@@ -35,6 +36,7 @@ class EnvironmentModel(BaseModel):
     api_key: str
     project: ProjectModel
     feature_states: typing.List[FeatureStateModel] = Field(default_factory=list)
+    identity_overrides: typing.List[IdentityModel] = Field(default_factory=list)
 
     name: typing.Optional[str] = None
     allow_client_traits: bool = True
