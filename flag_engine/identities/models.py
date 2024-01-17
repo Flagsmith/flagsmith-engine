@@ -14,8 +14,8 @@ from flag_engine.utils.exceptions import DuplicateFeatureState
 class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):  # type: ignore[misc,no-any-unimported]
     @staticmethod
     def _ensure_unique_feature_ids(
-        value: typing.MutableSequence[FeatureStateModel],
-    ) -> typing.MutableSequence[FeatureStateModel]:
+        value: typing.Sequence[FeatureStateModel],
+    ) -> None:
         for i, feature_state in enumerate(value, start=1):
             if feature_state.feature.id in [
                 feature_state.feature.id for feature_state in value[i:]
@@ -23,11 +23,11 @@ class IdentityFeaturesList(BaseCollectionModel[FeatureStateModel]):  # type: ign
                 raise DuplicateFeatureState(
                     f"Feature state for feature id={feature_state.feature.id} already exists"
                 )
-        return value
 
-    unique_feature_ids_validator = model_validator(mode="after")(
-        _ensure_unique_feature_ids
-    )
+    @model_validator(mode="after")
+    def ensure_unique_feature_ids(self) -> "IdentityFeaturesList":
+        self._ensure_unique_feature_ids(self.root)
+        return self
 
     def append(self, feature_state: "FeatureStateModel") -> None:
         self._ensure_unique_feature_ids([*self, feature_state])
