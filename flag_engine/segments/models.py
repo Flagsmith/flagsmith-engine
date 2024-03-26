@@ -39,3 +39,4 @@ class SegmentModel(BaseModel):
     name: str
     rules: typing.List[SegmentRuleModel] = Field(default_factory=list)
     feature_states: typing.List[FeatureStateModel] = Field(default_factory=list)
+    meta: typing.Optional[typing.Dict[str, str]] = None
