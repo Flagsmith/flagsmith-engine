@@ -19,18 +19,15 @@ jobs:
 
         steps:
             - name: Cloning repo
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
               with:
                   fetch-depth: 0
                   submodules: recursive
 
             - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v2
+              uses: actions/setup-python@v5
               with:
                   python-version: ${{ matrix.python-version }}
-
-            - name: Cache pip download
-              uses: syphar/restore-pip-download-cache@v1
 
             - name: Install Dependencies
               run: |
@@ -55,7 +52,7 @@ jobs:
               run: pytest -p no:warnings
 
             - name: Check Coverage
-              uses: 5monkeys/cobertura-action@v13
+              uses: 5monkeys/cobertura-action@v14
               with:
                   minimum_coverage: 100
                   fail_below_threshold: true
