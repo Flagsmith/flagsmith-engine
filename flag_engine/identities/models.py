@@ -45,6 +45,8 @@ class IdentityModel(BaseModel):
     identity_uuid: UUID4 = Field(default_factory=uuid.uuid4)
     django_id: typing.Optional[int] = None
 
+    dashboard_alias: typing.Optional[str] = None
+
     @computed_field  # type: ignore[misc]
     @property
     def composite_key(self) -> str:
