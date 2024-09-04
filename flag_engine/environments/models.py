@@ -44,6 +44,7 @@ class EnvironmentModel(BaseModel):
     hide_sensitive_data: bool = False
     hide_disabled_flags: typing.Optional[bool] = None
     use_identity_composite_key_for_hashing: bool = False
+    use_identity_overrides_in_local_eval: bool = False
 
     amplitude_config: typing.Optional[IntegrationModel] = None
     dynatrace_config: typing.Optional[IntegrationModel] = None
