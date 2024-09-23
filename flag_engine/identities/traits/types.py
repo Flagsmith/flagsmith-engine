@@ -11,7 +11,7 @@ from flag_engine.identities.traits.constants import TRAIT_STRING_VALUE_MAX_LENGT
 _UnconstrainedTraitValue = Union[None, int, float, bool, str]
 
 
-def _map_any_value_to_trait_value(value: Any) -> _UnconstrainedTraitValue:
+def map_any_value_to_trait_value(value: Any) -> _UnconstrainedTraitValue:
     """
     Try to coerce a value of arbitrary type to a trait value type.
     Union member-specific constraints, such as max string value length, are ignored here.
@@ -56,5 +56,5 @@ TraitValue = Annotated[
         int,
         Annotated[str, StringConstraints(max_length=TRAIT_STRING_VALUE_MAX_LENGTH)],
     ],
-    BeforeValidator(_map_any_value_to_trait_value),
+    BeforeValidator(map_any_value_to_trait_value),
 ]
