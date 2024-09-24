@@ -14,6 +14,7 @@ trait_value_2 = "12"
 trait_key_3 = "date_joined"
 trait_value_3 = "2021-01-01"
 
+identifier = "identity_1"
 
 empty_segment = SegmentModel(id=1, name="empty_segment")
 segment_single_condition = SegmentModel(
@@ -147,4 +148,25 @@ segment_conditions_and_nested_rules = SegmentModel(
             ],
         )
     ],
+)
+segment_identity_override = SegmentModel(
+    id=7,
+    name="dentity_override_identity_1_b6c2e2",
+    rules=[
+        SegmentRuleModel(
+            type=constants.ALL_RULE,
+            conditions=[
+                SegmentConditionModel(
+                    operator=constants.EQUAL,
+                    property_=constants.SEGMENT_IDENTIFIER_PROPERTY_NAME,
+                    value=identifier,
+                )
+            ],
+        )
+    ],
+    meta={
+        "identity_uuid": "d049c16b-e4dd-4830-b238-db2241c159e6",
+        "identity_identifier": identifier,
+        "type": "IDENTITY_OVERRIDE",
+    },
 )

@@ -20,3 +20,5 @@ MODULO: ConditionOperator = "MODULO"
 IS_SET: ConditionOperator = "IS_SET"
 IS_NOT_SET: ConditionOperator = "IS_NOT_SET"
 IN: ConditionOperator = "IN"
+
+SEGMENT_IDENTIFIER_PROPERTY_NAME: str = "_$identity.identifier"
