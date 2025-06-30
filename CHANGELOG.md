@@ -1,5 +1,20 @@
+# Changelog
+
+## [5.3.1](https://github.com/Flagsmith/flagsmith-engine/compare/v5.3.0...v5.3.1) (2025-06-30)
+
+
+### CI
+
+* add release please ([#214](https://github.com/Flagsmith/flagsmith-engine/issues/214)) ([6ff5a0a](https://github.com/Flagsmith/flagsmith-engine/commit/6ff5a0a3ccda254943426c732912dfa29661b88a))
+
+
+### Other
+
+* add sane model defaults to OrganisationModel and ProjectModel ([#213](https://github.com/Flagsmith/flagsmith-engine/issues/213)) ([d909c2f](https://github.com/Flagsmith/flagsmith-engine/commit/d909c2f040512cecd88fb629405673daccc6d1d7))
+* **deps:** bump pydantic from 2.3.0 to 2.4.0 ([#206](https://github.com/Flagsmith/flagsmith-engine/issues/206)) ([eb02943](https://github.com/Flagsmith/flagsmith-engine/commit/eb029439dde033fe5c03cb567393d3d8b36446d9))
+
 <a id="v5.3.0"></a>
-# [v5.3.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.3.0) - 2024-09-24
+## [v5.3.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.3.0) - 2024-09-24
 
 ## What's Changed
 * feat: make map_any_value_to_trait_value public to allow trait value parsing in core by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#211](https://github.com/Flagsmith/flagsmith-engine/pull/211)
@@ -12,7 +27,7 @@
 
 
 <a id="v5.2.0"></a>
-# [v5.2.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.2.0) - 2024-09-04
+## [v5.2.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.2.0) - 2024-09-04
 
 ## What's Changed
 * chore(deps-dev): bump black from 23.7.0 to 24.3.0 by [@dependabot](https://github.com/dependabot) in [Flagsmith/flagsmith-engine#203](https://github.com/Flagsmith/flagsmith-engine/pull/203)
@@ -30,7 +45,7 @@
 
 
 <a id="v5.1.1"></a>
-# [Version 5.1.1 (v5.1.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.1.1) - 2024-01-17
+## [Version 5.1.1 (v5.1.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.1.1) - 2024-01-17
 
 ## What's Changed
 * fix: Avoid recursion during identity features validation by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#201](https://github.com/Flagsmith/flagsmith-engine/pull/201)
@@ -41,7 +56,7 @@
 
 
 <a id="v5.1.0"></a>
-# [Version 5.1.0 (v5.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.1.0) - 2023-12-15
+## [Version 5.1.0 (v5.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.1.0) - 2023-12-15
 
 ## What's Changed
 * feat: remove builders modules by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#195](https://github.com/Flagsmith/flagsmith-engine/pull/195)
@@ -53,7 +68,7 @@
 
 
 <a id="v5.0.0"></a>
-# [Version 5.0.0 (v5.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.0.0) - 2023-11-08
+## [Version 5.0.0 (v5.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v5.0.0) - 2023-11-08
 
 ## What's Changed
 * feat: pydantic V2 by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#190](https://github.com/Flagsmith/flagsmith-engine/pull/190)
@@ -66,7 +81,7 @@
 
 
 <a id="v4.1.0"></a>
-# [Version 4.1.0 (v4.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.1.0) - 2023-09-19
+## [Version 4.1.0 (v4.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.1.0) - 2023-09-19
 
 ## What's Changed
 * feat: evaluator module by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#192](https://github.com/Flagsmith/flagsmith-engine/pull/192)
@@ -78,7 +93,7 @@
 
 
 <a id="v4.0.4"></a>
-# [Version 4.0.4 (v4.0.4)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.4) - 2023-08-08
+## [Version 4.0.4 (v4.0.4)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.4) - 2023-08-08
 
 ## What's Changed
 * fix: decimal trait values by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#187](https://github.com/Flagsmith/flagsmith-engine/pull/187)
@@ -90,7 +105,7 @@
 
 
 <a id="v4.0.3"></a>
-# [Version 4.0.3 (v4.0.3)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.3) - 2023-07-12
+## [Version 4.0.3 (v4.0.3)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.3) - 2023-07-12
 
 ## What's Changed
 * Fix Nan validation by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#184](https://github.com/Flagsmith/flagsmith-engine/pull/184)
@@ -102,7 +117,7 @@
 
 
 <a id="v4.0.2"></a>
-# [Version 4.0.2 (v4.0.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.2) - 2023-07-04
+## [Version 4.0.2 (v4.0.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.2) - 2023-07-04
 
 ## What's Changed
 * fix: restore trait value coercion to string by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#179](https://github.com/Flagsmith/flagsmith-engine/pull/179)
@@ -114,7 +129,7 @@
 
 
 <a id="v4.0.1"></a>
-# [Version 4.0.1 (v4.0.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.1) - 2023-07-03
+## [Version 4.0.1 (v4.0.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.1) - 2023-07-03
 
 ## What's Changed
 * fix: use `Config.smart_union` to avoid type coercion for `TraitModel.trait_value` by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#177](https://github.com/Flagsmith/flagsmith-engine/pull/177)
@@ -126,7 +141,7 @@
 
 
 <a id="v4.0.0"></a>
-# [Version 4.0.0 (v4.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.0) - 2023-06-29
+## [Version 4.0.0 (v4.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v4.0.0) - 2023-06-29
 
 ## What's Changed
 
@@ -144,7 +159,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.6.0"></a>
-# [Version 3.6.0 (v3.6.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.6.0) - 2023-06-29
+## [Version 3.6.0 (v3.6.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.6.0) - 2023-06-29
 
 ## What's Changed
 * Ensure percentage split evaluations are consistent in Core API and Local Evaluation by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#171](https://github.com/Flagsmith/flagsmith-engine/pull/171)
@@ -156,7 +171,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.5.1"></a>
-# [v3.5.1](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.5.1) - 2023-06-26
+## [v3.5.1](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.5.1) - 2023-06-26
 
 ## What's Changed
 * feat: add Rudderstack support by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#169](https://github.com/Flagsmith/flagsmith-engine/pull/169)
@@ -167,7 +182,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.5.0"></a>
-# [v3.5.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.5.0) - 2023-05-19
+## [v3.5.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.5.0) - 2023-05-19
 
 ## What's Changed
 * feat: add `Project.server_key_only_feature_ids` by [@khvn26](https://github.com/khvn26) in [Flagsmith/flagsmith-engine#164](https://github.com/Flagsmith/flagsmith-engine/pull/164)
@@ -179,7 +194,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.4.0"></a>
-# [v3.4.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.4.0) - 2023-04-11
+## [v3.4.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.4.0) - 2023-04-11
 
 ## What's Changed
 * feat(environment): Add hide_sensitive_data field by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#161](https://github.com/Flagsmith/flagsmith-engine/pull/161)
@@ -191,7 +206,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.3.2"></a>
-# [Version 3.3.2 (v3.3.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.3.2) - 2023-03-29
+## [Version 3.3.2 (v3.3.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.3.2) - 2023-03-29
 
 ## What's Changed
 * Update feature state version logic by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#159](https://github.com/Flagsmith/flagsmith-engine/pull/159)
@@ -203,7 +218,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.3.1"></a>
-# [Version 3.3.1 (v3.3.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.3.1) - 2023-03-16
+## [Version 3.3.1 (v3.3.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.3.1) - 2023-03-16
 
 ## What's Changed
 * Fix regex evaluations for non string trait values by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#157](https://github.com/Flagsmith/flagsmith-engine/pull/157)
@@ -215,7 +230,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.3.0"></a>
-# [v3.3.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.3.0) - 2023-03-03
+## [v3.3.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.3.0) - 2023-03-03
 
 ## What's Changed
 * feat(environment): Add name by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#154](https://github.com/Flagsmith/flagsmith-engine/pull/154)
@@ -228,7 +243,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="3.2.0"></a>
-# [3.2.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/3.2.0) - 2023-02-02
+## [3.2.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/3.2.0) - 2023-02-02
 
 ## What's Changed
 * Feat(identity/get_hash_key): Add method to help generate consistent mv values  by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#152](https://github.com/Flagsmith/flagsmith-engine/pull/152)
@@ -241,7 +256,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.1.0"></a>
-# [v3.1.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.1.0) - 2023-01-16
+## [v3.1.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.1.0) - 2023-01-16
 
 ## What's Changed
 * In segment operator added by [@EdsnLoor](https://github.com/EdsnLoor) in [Flagsmith/flagsmith-engine#149](https://github.com/Flagsmith/flagsmith-engine/pull/149)
@@ -256,7 +271,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v3.0.0"></a>
-# [v3.0.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.0.0) - 2022-11-11
+## [v3.0.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v3.0.0) - 2022-11-11
 
 ## What's Changed
 * feat(identity/update_traits): update return type by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#146](https://github.com/Flagsmith/flagsmith-engine/pull/146)
@@ -271,7 +286,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.3.0"></a>
-# [v2.3.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.3.0) - 2022-10-13
+## [v2.3.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.3.0) - 2022-10-13
 
 ## What's Changed
 * feat(modulo): Add support for modulo operator by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#144](https://github.com/Flagsmith/flagsmith-engine/pull/144)
@@ -285,7 +300,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.2.0"></a>
-# [v2.2.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.2.0) - 2022-09-13
+## [v2.2.0](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.2.0) - 2022-09-13
 
 ## What's Changed
 * Release v2.2.0 by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#142](https://github.com/Flagsmith/flagsmith-engine/pull/142)
@@ -297,7 +312,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.1.2"></a>
-# [v2.1.2](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.1.2) - 2022-09-13
+## [v2.1.2](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.1.2) - 2022-09-13
 
 ## What's Changed
 * Add pip-tools for managing dev requirements by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#138](https://github.com/Flagsmith/flagsmith-engine/pull/138)
@@ -311,7 +326,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.1.1"></a>
-# [Version 2.1.1 (v2.1.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.1.1) - 2022-07-01
+## [Version 2.1.1 (v2.1.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.1.1) - 2022-07-01
 
 ## What's Changed
 * Add allow_client_traits field to EnvironmentModel and schema by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#137](https://github.com/Flagsmith/flagsmith-engine/pull/137)
@@ -324,7 +339,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.1.0"></a>
-# [Version 2.1.0 (v2.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.1.0) - 2022-06-29
+## [Version 2.1.0 (v2.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.1.0) - 2022-06-29
 
 ## What's Changed
 * Replace environment webhooks with webhook config by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#134](https://github.com/Flagsmith/flagsmith-engine/pull/134)
@@ -338,7 +353,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.7"></a>
-# [Version 2.0.7 (v2.0.7)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.7) - 2022-05-27
+## [Version 2.0.7 (v2.0.7)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.7) - 2022-05-27
 
 ## What's Changed
 * Remove webhooks from _INTEGRATION_ATTS by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#130](https://github.com/Flagsmith/flagsmith-engine/pull/130)
@@ -351,7 +366,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.6"></a>
-# [Version 2.0.6 (v2.0.6)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.6) - 2022-05-24
+## [Version 2.0.6 (v2.0.6)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.6) - 2022-05-24
 
 ## What's Changed
 * fix(segment-priority): use priority on evaluation  by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#128](https://github.com/Flagsmith/flagsmith-engine/pull/128)
@@ -364,7 +379,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.5"></a>
-# [Version 2.0.5 (v2.0.5)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.5) - 2022-05-12
+## [Version 2.0.5 (v2.0.5)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.5) - 2022-05-12
 
 ## What's Changed
 * Return updated traits when updating by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#126](https://github.com/Flagsmith/flagsmith-engine/pull/126)
@@ -377,7 +392,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.4"></a>
-# [v2.0.4](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.4) - 2022-05-12
+## [v2.0.4](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.4) - 2022-05-12
 
 ## What's Changed
 * Add webhooks
@@ -391,7 +406,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.3"></a>
-# [v2.0.3](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.3) - 2022-05-09
+## [v2.0.3](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.3) - 2022-05-09
 
 ## What's Changed
 * Fix missing `feature_state_value` field on dump using engine models
@@ -404,7 +419,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.2"></a>
-# [v2.0.2](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.2) - 2022-04-25
+## [v2.0.2](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.2) - 2022-04-25
 
 ## What's Changed
 * fix(traits/float_value): Add custom field to serialize/deserialize trait_value
@@ -417,7 +432,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.1"></a>
-# [Version 2.0.1 (v2.0.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.1) - 2022-04-21
+## [Version 2.0.1 (v2.0.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.1) - 2022-04-21
 
 ## What's Changed
 * Add semver to install_requires by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#113](https://github.com/Flagsmith/flagsmith-engine/pull/113)
@@ -430,7 +445,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.0-alpha.1"></a>
-# [Version 2.0.0 - alpha 1 (v2.0.0-alpha.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.0-alpha.1) - 2022-04-21
+## [Version 2.0.0 - alpha 1 (v2.0.0-alpha.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.0-alpha.1) - 2022-04-21
 
 
 
@@ -438,7 +453,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v2.0.0"></a>
-# [Version 2.0.0 (v2.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.0) - 2022-04-21
+## [Version 2.0.0 (v2.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v2.0.0) - 2022-04-21
 
 ## What's Changed
 * Use feature state is_live by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#111](https://github.com/Flagsmith/flagsmith-engine/pull/111)
@@ -451,7 +466,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.6"></a>
-# [Version 1.6.6 (v1.6.6)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.6) - 2022-04-21
+## [Version 1.6.6 (v1.6.6)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.6) - 2022-04-21
 
 ## What's Changed
 * Use timezone aware datetimes by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#110](https://github.com/Flagsmith/flagsmith-engine/pull/110)
@@ -464,7 +479,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.5"></a>
-# [Version 1.6.5 (v1.6.5)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.5) - 2022-04-20
+## [Version 1.6.5 (v1.6.5)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.5) - 2022-04-20
 
 ## What's Changed
 * Update comments by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#98](https://github.com/Flagsmith/flagsmith-engine/pull/98)
@@ -484,7 +499,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.4"></a>
-# [v1.6.4](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.4) - 2022-02-10
+## [v1.6.4](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.4) - 2022-02-10
 
 ## What's Changed
 * Fix build_environment_api_key_model by adding correct parent class to schema by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#95](https://github.com/Flagsmith/flagsmith-engine/pull/95)
@@ -496,7 +511,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.3"></a>
-# [v1.6.3](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.3) - 2022-02-04
+## [v1.6.3](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.3) - 2022-02-04
 
 ## What's Changed
 * Fix(feature/schema): only run validation if field the is present by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#94](https://github.com/Flagsmith/flagsmith-engine/pull/94)
@@ -508,7 +523,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.2"></a>
-# [Version 1.6.2 (v1.6.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.2) - 2022-02-03
+## [Version 1.6.2 (v1.6.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.2) - 2022-02-03
 
 ## What's Changed
 * Fix type error when sorting feature segments by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#91](https://github.com/Flagsmith/flagsmith-engine/pull/91)
@@ -520,7 +535,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.1"></a>
-# [Version 1.6.1 (v1.6.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.1) - 2022-02-02
+## [Version 1.6.1 (v1.6.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.1) - 2022-02-02
 
 ## What's Changed
 * Refactor django_transform module to allow for better query optimisation by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#89](https://github.com/Flagsmith/flagsmith-engine/pull/89)
@@ -532,7 +547,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.6.0"></a>
-# [Version 1.6.0 (v1.6.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.0) - 2022-01-27
+## [Version 1.6.0 (v1.6.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.6.0) - 2022-01-27
 
 ## What's Changed
 * Feat(environment-api-key): Add environment api key model by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#86](https://github.com/Flagsmith/flagsmith-engine/pull/86)
@@ -546,7 +561,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.5.1"></a>
-# [Version 1.5.1 (v1.5.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.5.1) - 2022-01-07
+## [Version 1.5.1 (v1.5.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.5.1) - 2022-01-07
 
 ## What's Changed
 * fix(multivariate_feature_option): Add id by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#74](https://github.com/Flagsmith/flagsmith-engine/pull/74)
@@ -565,7 +580,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.5.0"></a>
-# [Version 1.5.0 (v1.5.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.5.0) - 2021-12-15
+## [Version 1.5.0 (v1.5.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.5.0) - 2021-12-15
 
 ## What's Changed
 * feat(engine): move public environment function to engine (BREAKING CHANGE)
@@ -577,7 +592,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.4.3"></a>
-# [Version 1.4.3 (v1.4.3)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.3) - 2021-12-15
+## [Version 1.4.3 (v1.4.3)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.3) - 2021-12-15
 
 ## What's Changed
 * fix(identity/schema): use dump_default instead of default by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#65](https://github.com/Flagsmith/flagsmith-engine/pull/65)
@@ -591,7 +606,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.4.2"></a>
-# [Version 1.4.2 (v1.4.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.2) - 2021-12-07
+## [Version 1.4.2 (v1.4.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.2) - 2021-12-07
 
 ## What's Changed
 * Add integer IDs back to engine models by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#63](https://github.com/Flagsmith/flagsmith-engine/pull/63)
@@ -603,7 +618,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.4.1"></a>
-# [Version 1.4.1 (v1.4.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.1) - 2021-12-07
+## [Version 1.4.1 (v1.4.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.1) - 2021-12-07
 
 ## What's Changed
 * Upgrade marshmallow and pin in setup.py by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#60](https://github.com/Flagsmith/flagsmith-engine/pull/60)
@@ -616,7 +631,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.4.0"></a>
-# [Version 1.4.0 (v1.4.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.0) - 2021-12-06
+## [Version 1.4.0 (v1.4.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.4.0) - 2021-12-06
 
 ## What's Changed
 * Refactor django transformation logic to location outside of the core engine by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#57](https://github.com/Flagsmith/flagsmith-engine/pull/57)
@@ -628,7 +643,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.3.4"></a>
-# [Version 1.3.4 (v1.3.4)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.4) - 2021-12-02
+## [Version 1.3.4 (v1.3.4)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.4) - 2021-12-02
 
 ## What's Changed
 * Fix json decimal encoder by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#54](https://github.com/Flagsmith/flagsmith-engine/pull/54)
@@ -641,7 +656,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.3.3"></a>
-# [Version 1.3.3 (v1.3.3)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.3) - 2021-11-30
+## [Version 1.3.3 (v1.3.3)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.3) - 2021-11-30
 
 ## What's Changed
 * feat(identity): Add uuid to identity model/schema by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#46](https://github.com/Flagsmith/flagsmith-engine/pull/46)
@@ -654,7 +669,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.3.2"></a>
-# [Version 1.3.2 (v1.3.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.2) - 2021-11-30
+## [Version 1.3.2 (v1.3.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.2) - 2021-11-30
 
 ## What's Changed
 * Fix segment condition deserialization when property is None by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#44](https://github.com/Flagsmith/flagsmith-engine/pull/44)
@@ -667,7 +682,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.3.1"></a>
-# [Version 1.3.1 (v1.3.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.1) - 2021-11-29
+## [Version 1.3.1 (v1.3.1)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.1) - 2021-11-29
 
 ## What's Changed
 * Fix segment condition serialization when `property` is None by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#42](https://github.com/Flagsmith/flagsmith-engine/pull/42)
@@ -680,7 +695,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.3.0"></a>
-# [Version 1.3.0 (v1.3.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.0) - 2021-11-26
+## [Version 1.3.0 (v1.3.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.3.0) - 2021-11-26
 
 ## What's Changed
 * fix(ident/models): Allow trait value to support multiple type by [@gagantrivedi](https://github.com/gagantrivedi) in [Flagsmith/flagsmith-engine#39](https://github.com/Flagsmith/flagsmith-engine/pull/39)
@@ -693,7 +708,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.2.0"></a>
-# [Version 1.2.0 (v1.2.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.2.0) - 2021-11-25
+## [Version 1.2.0 (v1.2.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.2.0) - 2021-11-25
 
 ## What's Changed
 * Rename value -> feature_state_value for consistency by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#36](https://github.com/Flagsmith/flagsmith-engine/pull/36)
@@ -706,7 +721,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.1.0"></a>
-# [Version 1.1.0 (v1.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.1.0) - 2021-11-25
+## [Version 1.1.0 (v1.1.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.1.0) - 2021-11-25
 
 ## What's Changed
 * Add update traits functionality by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#34](https://github.com/Flagsmith/flagsmith-engine/pull/34)
@@ -718,7 +733,7 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v1.0.0"></a>
-# [Version 1.0.0 (v1.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.0.0) - 2021-11-25
+## [Version 1.0.0 (v1.0.0)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v1.0.0) - 2021-11-25
 
 ## What's Changed
 * Add django_id attribute to identity document by [@matthewelwell](https://github.com/matthewelwell) in [Flagsmith/flagsmith-engine#27](https://github.com/Flagsmith/flagsmith-engine/pull/27)
@@ -732,9 +747,9 @@ This release removes the functionality that supported Flagsmith's Core API <> Ed
 
 
 <a id="v0.1.2"></a>
-# [Version 0.1.2 (v0.1.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v0.1.2) - 2021-11-24
+## [Version 0.1.2 (v0.1.2)](https://github.com/flagsmith/flagsmith-engine/releases/tag/v0.1.2) - 2021-11-24
 
-# Release Notes
+## Release Notes
 
  * Restrict dataclasses dependency to python<3.7
 
