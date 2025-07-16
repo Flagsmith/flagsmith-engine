@@ -4,13 +4,9 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
-from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.traits.models import TraitModel
+from flag_engine.context.types import EvaluationContext
 from flag_engine.segments import constants
-from flag_engine.segments.evaluator import (
-    _matches_trait_value,
-    evaluate_identity_in_segment,
-)
+from flag_engine.segments.evaluator import _matches_context_value, is_context_in_segment
 from flag_engine.segments.models import (
     SegmentConditionModel,
     SegmentModel,
@@ -34,92 +30,188 @@ from tests.unit.segments.fixtures import (
 
 
 @pytest.mark.parametrize(
-    "segment, identity_traits, expected_result",
+    "segment, context, expected_result",
     (
-        (empty_segment, [], False),
-        (segment_single_condition, [], False),
+        (empty_segment, {"environment": {"key": "key", "name": "Environment"}}, False),
         (
             segment_single_condition,
-            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
+            {"environment": {"key": "key", "name": "Environment"}},
+            False,
+        ),
+        (
+            segment_single_condition,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                    },
+                },
+            },
             True,
         ),
-        (segment_multiple_conditions_all, [], False),
         (
             segment_multiple_conditions_all,
-            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
+            {"environment": {"key": "key", "name": "Environment"}},
             False,
         ),
         (
             segment_multiple_conditions_all,
-            [
-                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
-                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
-            ],
-            True,
-        ),
-        (segment_multiple_conditions_any, [], False),
-        (
-            segment_multiple_conditions_any,
-            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
-            True,
-        ),
-        (
-            segment_multiple_conditions_any,
-            [TraitModel(trait_key=trait_key_2, trait_value=trait_value_2)],
-            True,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                    },
+                },
+            },
+            False,
         ),
         (
-            segment_multiple_conditions_any,
-            [
-                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
-                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
-            ],
+            segment_multiple_conditions_all,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                        trait_key_2: trait_value_2,
+                    },
+                },
+            },
             True,
         ),
-        (segment_nested_rules, [], False),
+        (
+            segment_multiple_conditions_any,
+            {"environment": {"key": "key", "name": "Environment"}},
+            False,
+        ),
+        (
+            segment_multiple_conditions_any,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                    },
+                },
+            },
+            True,
+        ),
+        (
+            segment_multiple_conditions_any,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_2: trait_value_2,
+                    },
+                },
+            },
+            True,
+        ),
+        (
+            segment_multiple_conditions_any,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                        trait_key_2: trait_value_2,
+                    },
+                },
+            },
+            True,
+        ),
         (
             segment_nested_rules,
-            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
+            {"environment": {"key": "key", "name": "Environment"}},
             False,
         ),
         (
             segment_nested_rules,
-            [
-                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
-                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
-                TraitModel(trait_key=trait_key_3, trait_value=trait_value_3),
-            ],
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                    },
+                },
+            },
+            False,
+        ),
+        (
+            segment_nested_rules,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identifier": "foo",
+                "key": "key_foo",
+                "identity": {
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                        trait_key_2: trait_value_2,
+                        trait_key_3: trait_value_3,
+                    }
+                },
+            },
             True,
         ),
-        (segment_conditions_and_nested_rules, [], False),
         (
             segment_conditions_and_nested_rules,
-            [TraitModel(trait_key=trait_key_1, trait_value=trait_value_1)],
+            {"environment": {"key": "key", "name": "Environment"}},
             False,
         ),
         (
             segment_conditions_and_nested_rules,
-            [
-                TraitModel(trait_key=trait_key_1, trait_value=trait_value_1),
-                TraitModel(trait_key=trait_key_2, trait_value=trait_value_2),
-                TraitModel(trait_key=trait_key_3, trait_value=trait_value_3),
-            ],
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identifier": "foo",
+                "key": "key_foo",
+                "identity": {
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                    }
+                },
+            },
+            False,
+        ),
+        (
+            segment_conditions_and_nested_rules,
+            {
+                "environment": {"key": "key", "name": "Environment"},
+                "identity": {
+                    "identifier": "foo",
+                    "key": "key_foo",
+                    "traits": {
+                        trait_key_1: trait_value_1,
+                        trait_key_2: trait_value_2,
+                        trait_key_3: trait_value_3,
+                    },
+                },
+            },
             True,
         ),
     ),
 )
-def test_identity_in_segment(
+def test_context_in_segment(
     segment: SegmentModel,
-    identity_traits: typing.List[TraitModel],
+    context: EvaluationContext,
     expected_result: bool,
 ) -> None:
-    identity = IdentityModel(
-        identifier="foo",
-        identity_traits=identity_traits,
-        environment_api_key="api-key",
-    )
-
-    assert evaluate_identity_in_segment(identity, segment) == expected_result
+    assert is_context_in_segment(context, segment) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -128,7 +220,7 @@ def test_identity_in_segment(
 )
 def test_identity_in_segment_percentage_split(
     mocker: MockerFixture,
-    identity: IdentityModel,
+    context: EvaluationContext,
     segment_split_value: int,
     identity_hashed_percentage: int,
     expected_result: bool,
@@ -148,7 +240,7 @@ def test_identity_in_segment_percentage_split(
     mock_get_hashed_percentage.return_value = identity_hashed_percentage
 
     # When
-    result = evaluate_identity_in_segment(identity=identity, segment=segment)
+    result = is_context_in_segment(context=context, segment=segment)
 
     # Then
     assert result == expected_result
@@ -163,8 +255,8 @@ def test_identity_in_segment_percentage_split(
         (constants.IS_NOT_SET, "random_property", True),
     ),
 )
-def test_identity_in_segment_is_set_and_is_not_set(
-    identity_in_segment: IdentityModel,
+def test_context_in_segment_is_set_and_is_not_set(
+    context_in_segment: EvaluationContext,
     operator: ConditionOperator,
     property_: str,
     expected_result: bool,
@@ -181,7 +273,7 @@ def test_identity_in_segment_is_set_and_is_not_set(
     segment = SegmentModel(id=1, name="segment model", rules=[rule])
 
     # When
-    result = evaluate_identity_in_segment(identity=identity_in_segment, segment=segment)
+    result = is_context_in_segment(context=context_in_segment, segment=segment)
 
     # Then
     assert result is expected_result
@@ -265,7 +357,7 @@ def test_identity_in_segment_is_set_and_is_not_set(
         (constants.IN, 1, None, False),
     ),
 )
-def test_segment_condition_matches_trait_value(
+def test_segment_condition_matches_context_value(
     operator: ConditionOperator,
     trait_value: typing.Union[None, int, str, float],
     condition_value: object,
@@ -279,7 +371,7 @@ def test_segment_condition_matches_trait_value(
     )
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _matches_context_value(segment_condition, trait_value)
 
     # Then
     assert result == expected_result
@@ -289,7 +381,7 @@ def test_segment_condition__unsupported_operator__return_false(
     mocker: MockerFixture,
 ) -> None:
     # Given
-    mocker.patch("flag_engine.segments.evaluator.MATCH_FUNCS_BY_OPERATOR", new={})
+    mocker.patch("flag_engine.segments.evaluator.MATCHERS_BY_OPERATOR", new={})
     segment_condition = SegmentConditionModel(
         operator=constants.EQUAL,
         property_="x",
@@ -298,7 +390,7 @@ def test_segment_condition__unsupported_operator__return_false(
     trait_value = "foo"
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _matches_context_value(segment_condition, trait_value)
 
     # Then
     assert result is False
@@ -329,7 +421,7 @@ def test_segment_condition__unsupported_operator__return_false(
         (constants.LESS_THAN_INCLUSIVE, "1.0.1", "1.0.0:semver", False),
     ],
 )
-def test_segment_condition_matches_trait_value_for_semver(
+def test_segment_condition_matches_context_value_for_semver(
     operator: ConditionOperator,
     trait_value: str,
     condition_value: str,
@@ -343,7 +435,7 @@ def test_segment_condition_matches_trait_value_for_semver(
     )
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _matches_context_value(segment_condition, trait_value)
 
     # Then
     assert result == expected_result
@@ -364,7 +456,7 @@ def test_segment_condition_matches_trait_value_for_semver(
         (1, None, False),
     ],
 )
-def test_segment_condition_matches_trait_value_for_modulo(
+def test_segment_condition_matches_context_value_for_modulo(
     trait_value: typing.Union[int, float, str, bool],
     condition_value: typing.Optional[str],
     expected_result: bool,
@@ -377,7 +469,7 @@ def test_segment_condition_matches_trait_value_for_modulo(
     )
 
     # When
-    result = _matches_trait_value(segment_condition, trait_value)
+    result = _matches_context_value(segment_condition, trait_value)
 
     # Then
     assert result == expected_result

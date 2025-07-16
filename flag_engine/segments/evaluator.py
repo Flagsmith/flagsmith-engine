@@ -2,13 +2,12 @@ import operator
 import re
 import typing
 from contextlib import suppress
-from functools import wraps
+from functools import partial, wraps
+from operator import itemgetter
 
 import semver
 
-from flag_engine.environments.models import EnvironmentModel
-from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.traits.models import TraitModel
+from flag_engine.context.types import EvaluationContext
 from flag_engine.identities.traits.types import TraitValue
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
@@ -19,131 +18,144 @@ from flag_engine.segments.models import (
 from flag_engine.segments.types import ConditionOperator
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 from flag_engine.utils.semver import is_semver
-from flag_engine.utils.types import get_casting_function
+from flag_engine.utils.types import SupportsStr, get_casting_function
 
 
-def get_identity_segments(
-    environment: EnvironmentModel,
-    identity: IdentityModel,
-    override_traits: typing.Optional[typing.List[TraitModel]] = None,
+def get_context_segments(
+    context: EvaluationContext,
+    segments: typing.List[SegmentModel],
 ) -> typing.List[SegmentModel]:
-    return list(
-        filter(
-            lambda s: evaluate_identity_in_segment(identity, s, override_traits),
-            environment.project.segments,
+    return [
+        segment
+        for segment in segments
+        if is_context_in_segment(
+            context=context,
+            segment=segment,
         )
-    )
+    ]
 
 
-def evaluate_identity_in_segment(
-    identity: IdentityModel,
+def is_context_in_segment(
+    context: EvaluationContext,
     segment: SegmentModel,
-    override_traits: typing.Optional[typing.List[TraitModel]] = None,
 ) -> bool:
-    """
-    Evaluates whether a given identity is in the provided segment.
-
-    :param identity: identity model object to evaluate
-    :param segment: segment model object to evaluate
-    :param override_traits: pass in a list of traits to use instead of those on the
-        identity model itself
-    :return: True if the identity is in the segment, False otherwise
-    """
-    return len(segment.rules) > 0 and all(
-        _traits_match_segment_rule(
-            override_traits or identity.identity_traits,
-            rule,
-            segment.id,
-            identity.django_id or identity.composite_key,
-        )
-        for rule in segment.rules
+    return bool(rules := segment.rules) and all(
+        context_matches_rule(context=context, rule=rule, segment_key=segment.id)
+        for rule in rules
     )
 
 
-def _traits_match_segment_rule(
-    identity_traits: typing.List[TraitModel],
+def context_matches_rule(
+    context: EvaluationContext,
     rule: SegmentRuleModel,
-    segment_id: typing.Union[int, str],
-    identity_id: typing.Union[int, str],
+    segment_key: SupportsStr,
 ) -> bool:
     matches_conditions = (
         rule.matching_function(
             [
-                _traits_match_segment_condition(
-                    identity_traits, condition, segment_id, identity_id
+                context_matches_condition(
+                    context=context,
+                    condition=condition,
+                    segment_key=segment_key,
                 )
-                for condition in rule.conditions
+                for condition in conditions
             ]
         )
-        if len(rule.conditions) > 0
+        if (conditions := rule.conditions)
         else True
     )
 
     return matches_conditions and all(
-        _traits_match_segment_rule(identity_traits, rule, segment_id, identity_id)
+        context_matches_rule(
+            context=context,
+            rule=rule,
+            segment_key=segment_key,
+        )
         for rule in rule.rules
     )
 
 
-def _traits_match_segment_condition(
-    identity_traits: typing.List[TraitModel],
+def context_matches_condition(
+    context: EvaluationContext,
     condition: SegmentConditionModel,
-    segment_id: typing.Union[int, str],
-    identity_id: typing.Union[int, str],
+    segment_key: SupportsStr,
 ) -> bool:
-    if condition.operator == constants.PERCENTAGE_SPLIT:
-        assert condition.value
-        float_value = float(condition.value)
-        return (
-            get_hashed_percentage_for_object_ids([segment_id, identity_id])
-            <= float_value
-        )
-
-    trait = next(
-        filter(lambda t: t.trait_key == condition.property_, identity_traits), None
+    context_value = (
+        get_context_value(context, condition.property_) if condition.property_ else None
     )
 
+    if condition.operator == constants.PERCENTAGE_SPLIT:
+        assert condition.value
+
+        if context_value is not None:
+            object_ids = [segment_key, context_value]
+        else:
+            object_ids = [segment_key, get_context_value(context, "$.identity.key")]
+
+        float_value = float(condition.value)
+        return get_hashed_percentage_for_object_ids(object_ids) <= float_value
+
     if condition.operator == constants.IS_NOT_SET:
-        return trait is None
+        return context_value is None
 
     if condition.operator == constants.IS_SET:
-        return trait is not None
+        return context_value is not None
 
-    return _matches_trait_value(condition, trait.trait_value) if trait else False
+    return _matches_context_value(condition, context_value) if context_value else False
 
 
-def _matches_trait_value(
+def _get_trait(context: EvaluationContext, trait_key: str) -> TraitValue:
+    if identity_context := context["identity"]:
+        return identity_context["traits"][trait_key]
+    return None
+
+
+def get_context_value(
+    context: EvaluationContext,
+    property: str,
+) -> TraitValue:
+    getter = CONTEXT_VALUE_GETTERS_BY_PROPERTY.get(property) or partial(
+        _get_trait,
+        trait_key=property,
+    )
+    try:
+        return getter(context)
+    except KeyError:
+        return None
+
+
+def _matches_context_value(
     condition: SegmentConditionModel,
-    trait_value: TraitValue,
+    context_value: TraitValue,
 ) -> bool:
-    if match_func := MATCH_FUNCS_BY_OPERATOR.get(condition.operator):
-        return match_func(condition.value, trait_value)
+    if matcher := MATCHERS_BY_OPERATOR.get(condition.operator):
+        return matcher(condition.value, context_value)
 
     return False
 
 
 def _evaluate_not_contains(
     segment_value: typing.Optional[str],
-    trait_value: TraitValue,
+    context_value: TraitValue,
 ) -> bool:
-    return isinstance(trait_value, str) and str(segment_value) not in trait_value
+    return isinstance(context_value, str) and str(segment_value) not in context_value
 
 
 def _evaluate_regex(
     segment_value: typing.Optional[str],
-    trait_value: TraitValue,
+    context_value: TraitValue,
 ) -> bool:
     return (
-        trait_value is not None
-        and re.compile(str(segment_value)).match(str(trait_value)) is not None
+        context_value is not None
+        and re.compile(str(segment_value)).match(str(context_value)) is not None
     )
 
 
 def _evaluate_modulo(
     segment_value: typing.Optional[str],
-    trait_value: TraitValue,
+    context_value: TraitValue,
 ) -> bool:
-    if not isinstance(trait_value, (int, float)):
+    if not isinstance(context_value, (int, float)):
         return False
 
     if segment_value is None:
@@ -156,52 +168,61 @@ def _evaluate_modulo(
     except ValueError:
         return False
 
-    return trait_value % divisor == remainder
+    return context_value % divisor == remainder
 
 
-def _evaluate_in(segment_value: typing.Optional[str], trait_value: TraitValue) -> bool:
+def _evaluate_in(
+    segment_value: typing.Optional[str], context_value: TraitValue
+) -> bool:
     if segment_value:
-        if isinstance(trait_value, str):
-            return trait_value in segment_value.split(",")
-        if isinstance(trait_value, int) and not any(
-            trait_value is x for x in (False, True)
+        if isinstance(context_value, str):
+            return context_value in segment_value.split(",")
+        if isinstance(context_value, int) and not any(
+            context_value is x for x in (False, True)
         ):
-            return str(trait_value) in segment_value.split(",")
+            return str(context_value) in segment_value.split(",")
     return False
 
 
-def _trait_value_typed(
+def _context_value_typed(
     func: typing.Callable[..., bool],
 ) -> typing.Callable[[typing.Optional[str], TraitValue], bool]:
     @wraps(func)
     def inner(
         segment_value: typing.Optional[str],
-        trait_value: typing.Union[TraitValue, semver.Version],
+        context_value: typing.Union[TraitValue, semver.Version],
     ) -> bool:
         with suppress(TypeError, ValueError):
-            if isinstance(trait_value, str) and is_semver(segment_value):
-                trait_value = semver.Version.parse(
-                    trait_value,
+            if isinstance(context_value, str) and is_semver(segment_value):
+                context_value = semver.Version.parse(
+                    context_value,
                 )
-            match_value = get_casting_function(trait_value)(segment_value)
-            return func(trait_value, match_value)
+            match_value = get_casting_function(context_value)(segment_value)
+            return func(context_value, match_value)
         return False
 
     return inner
 
 
-MATCH_FUNCS_BY_OPERATOR: typing.Dict[
+MATCHERS_BY_OPERATOR: typing.Dict[
     ConditionOperator, typing.Callable[[typing.Optional[str], TraitValue], bool]
 ] = {
     constants.NOT_CONTAINS: _evaluate_not_contains,
     constants.REGEX: _evaluate_regex,
     constants.MODULO: _evaluate_modulo,
     constants.IN: _evaluate_in,
-    constants.EQUAL: _trait_value_typed(operator.eq),
-    constants.GREATER_THAN: _trait_value_typed(operator.gt),
-    constants.GREATER_THAN_INCLUSIVE: _trait_value_typed(operator.ge),
-    constants.LESS_THAN: _trait_value_typed(operator.lt),
-    constants.LESS_THAN_INCLUSIVE: _trait_value_typed(operator.le),
-    constants.NOT_EQUAL: _trait_value_typed(operator.ne),
-    constants.CONTAINS: _trait_value_typed(operator.contains),
+    constants.EQUAL: _context_value_typed(operator.eq),
+    constants.GREATER_THAN: _context_value_typed(operator.gt),
+    constants.GREATER_THAN_INCLUSIVE: _context_value_typed(operator.ge),
+    constants.LESS_THAN: _context_value_typed(operator.lt),
+    constants.LESS_THAN_INCLUSIVE: _context_value_typed(operator.le),
+    constants.NOT_EQUAL: _context_value_typed(operator.ne),
+    constants.CONTAINS: _context_value_typed(operator.contains),
+}
+
+
+CONTEXT_VALUE_GETTERS_BY_PROPERTY = {
+    "$.identity.identifier": itemgetter("identity", "identifier"),
+    "$.identity.key": itemgetter("identity", "key"),
+    "$.environment.name": itemgetter("environment", "name"),
 }
