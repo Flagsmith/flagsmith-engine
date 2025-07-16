@@ -218,7 +218,7 @@ def test_context_in_segment(
     "segment_split_value, identity_hashed_percentage, expected_result",
     ((10, 1, True), (100, 50, True), (0, 1, False), (10, 20, False)),
 )
-def test_identity_in_segment_percentage_split(
+def test_context_in_segment_percentage_split(
     mocker: MockerFixture,
     context: EvaluationContext,
     segment_split_value: int,
@@ -244,6 +244,36 @@ def test_identity_in_segment_percentage_split(
 
     # Then
     assert result == expected_result
+
+
+def test_context_in_segment_percentage_split__trait_value__calls_expected(
+    mocker: MockerFixture,
+    context: EvaluationContext,
+) -> None:
+    # Given
+    assert context["identity"] is not None
+    context["identity"]["traits"]["custom_trait"] = "custom_value"
+    percentage_split_condition = SegmentConditionModel(
+        operator=constants.PERCENTAGE_SPLIT,
+        value="10",
+        property_="custom_trait",
+    )
+    rule = SegmentRuleModel(
+        type=constants.ALL_RULE, conditions=[percentage_split_condition]
+    )
+    segment = SegmentModel(id=1, name="% split", rules=[rule])
+
+    mock_get_hashed_percentage = mocker.patch(
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
+    )
+    mock_get_hashed_percentage.return_value = 1
+
+    # When
+    result = is_context_in_segment(context=context, segment=segment)
+
+    # Then
+    mock_get_hashed_percentage.assert_called_once_with([segment.id, "custom_value"])
+    assert result
 
 
 @pytest.mark.parametrize(

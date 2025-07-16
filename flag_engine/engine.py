@@ -107,7 +107,7 @@ def _get_identity_feature_states_dict(
         identity=identity,
     )
     if override_traits:
-        if typing.TYPE_CHECKING:
+        if typing.TYPE_CHECKING:  # pragma: no cover
             assert context["identity"]
         context["identity"].setdefault("traits", {}).update(
             {trait.trait_key: trait.trait_value for trait in override_traits}

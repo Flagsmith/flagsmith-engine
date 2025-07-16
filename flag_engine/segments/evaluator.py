@@ -105,9 +105,11 @@ def context_matches_condition(
 
 
 def _get_trait(context: EvaluationContext, trait_key: str) -> TraitValue:
-    if identity_context := context["identity"]:
-        return identity_context["traits"][trait_key]
-    return None
+    return (
+        identity_context["traits"][trait_key]
+        if (identity_context := context["identity"])
+        else None
+    )
 
 
 def get_context_value(
