@@ -1,6 +1,7 @@
 import typing
 
 from flag_engine.context.mappers import map_environment_identity_to_context
+from flag_engine.context.types import EvaluationContext
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
@@ -54,9 +55,17 @@ def get_identity_feature_states(
     :return: list of feature state models based on the environment, any matching
         segments and any specific identity overrides
     """
+    context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=override_traits,
+    )
+
     feature_states = list(
         _get_identity_feature_states_dict(
-            environment, identity, override_traits
+            environment=environment,
+            identity=identity,
+            context=context,
         ).values()
     )
     if environment.get_hide_disabled_flags():
@@ -80,8 +89,16 @@ def get_identity_feature_state(
     :return: feature state model based on the environment, any matching
         segments and any specific identity overrides
     """
+    context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=override_traits,
+    )
+
     feature_states = _get_identity_feature_states_dict(
-        environment, identity, override_traits
+        environment=environment,
+        identity=identity,
+        context=context,
     )
     matching_feature = next(
         filter(lambda feature: feature.name == feature_name, feature_states.keys()),
@@ -97,21 +114,10 @@ def get_identity_feature_state(
 def _get_identity_feature_states_dict(
     environment: EnvironmentModel,
     identity: IdentityModel,
-    override_traits: typing.Optional[typing.List[TraitModel]],
+    context: EvaluationContext,
 ) -> typing.Dict[FeatureModel, FeatureStateModel]:
     # Get feature states from the environment
     feature_states_by_feature = {fs.feature: fs for fs in environment.feature_states}
-
-    context = map_environment_identity_to_context(
-        environment=environment,
-        identity=identity,
-    )
-    if override_traits:
-        if typing.TYPE_CHECKING:  # pragma: no cover
-            assert context["identity"]
-        context["identity"].setdefault("traits", {}).update(
-            {trait.trait_key: trait.trait_value for trait in override_traits}
-        )
 
     # Override with any feature states defined by matching segments
     for context_segment in get_context_segments(

@@ -129,11 +129,13 @@ def identity(environment: EnvironmentModel) -> IdentityModel:
 
 @pytest.fixture
 def context(
-    environment: EnvironmentModel, identity: IdentityModel
+    environment: EnvironmentModel,
+    identity: IdentityModel,
 ) -> EvaluationContext:
     return map_environment_identity_to_context(
         environment=environment,
         identity=identity,
+        override_traits=None,
     )
 
 
@@ -165,6 +167,7 @@ def context_in_segment(
     return map_environment_identity_to_context(
         environment=environment,
         identity=identity_in_segment,
+        override_traits=None,
     )
 
 
