@@ -8,7 +8,7 @@ from operator import itemgetter
 import semver
 
 from flag_engine.context.types import EvaluationContext
-from flag_engine.identities.traits.types import TraitValue
+from flag_engine.identities.traits.types import ContextValue
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
     SegmentConditionModel,
@@ -104,7 +104,7 @@ def context_matches_condition(
     return _matches_context_value(condition, context_value) if context_value else False
 
 
-def _get_trait(context: EvaluationContext, trait_key: str) -> TraitValue:
+def _get_trait(context: EvaluationContext, trait_key: str) -> ContextValue:
     return (
         identity_context["traits"][trait_key]
         if (identity_context := context["identity"])
@@ -115,7 +115,7 @@ def _get_trait(context: EvaluationContext, trait_key: str) -> TraitValue:
 def get_context_value(
     context: EvaluationContext,
     property: str,
-) -> TraitValue:
+) -> ContextValue:
     getter = CONTEXT_VALUE_GETTERS_BY_PROPERTY.get(property) or partial(
         _get_trait,
         trait_key=property,
@@ -128,7 +128,7 @@ def get_context_value(
 
 def _matches_context_value(
     condition: SegmentConditionModel,
-    context_value: TraitValue,
+    context_value: ContextValue,
 ) -> bool:
     if matcher := MATCHERS_BY_OPERATOR.get(condition.operator):
         return matcher(condition.value, context_value)
@@ -138,14 +138,14 @@ def _matches_context_value(
 
 def _evaluate_not_contains(
     segment_value: typing.Optional[str],
-    context_value: TraitValue,
+    context_value: ContextValue,
 ) -> bool:
     return isinstance(context_value, str) and str(segment_value) not in context_value
 
 
 def _evaluate_regex(
     segment_value: typing.Optional[str],
-    context_value: TraitValue,
+    context_value: ContextValue,
 ) -> bool:
     return (
         context_value is not None
@@ -155,7 +155,7 @@ def _evaluate_regex(
 
 def _evaluate_modulo(
     segment_value: typing.Optional[str],
-    context_value: TraitValue,
+    context_value: ContextValue,
 ) -> bool:
     if not isinstance(context_value, (int, float)):
         return False
@@ -174,7 +174,7 @@ def _evaluate_modulo(
 
 
 def _evaluate_in(
-    segment_value: typing.Optional[str], context_value: TraitValue
+    segment_value: typing.Optional[str], context_value: ContextValue
 ) -> bool:
     if segment_value:
         if isinstance(context_value, str):
@@ -188,11 +188,11 @@ def _evaluate_in(
 
 def _context_value_typed(
     func: typing.Callable[..., bool],
-) -> typing.Callable[[typing.Optional[str], TraitValue], bool]:
+) -> typing.Callable[[typing.Optional[str], ContextValue], bool]:
     @wraps(func)
     def inner(
         segment_value: typing.Optional[str],
-        context_value: typing.Union[TraitValue, semver.Version],
+        context_value: typing.Union[ContextValue, semver.Version],
     ) -> bool:
         with suppress(TypeError, ValueError):
             if isinstance(context_value, str) and is_semver(segment_value):
@@ -207,7 +207,7 @@ def _context_value_typed(
 
 
 MATCHERS_BY_OPERATOR: typing.Dict[
-    ConditionOperator, typing.Callable[[typing.Optional[str], TraitValue], bool]
+    ConditionOperator, typing.Callable[[typing.Optional[str], ContextValue], bool]
 ] = {
     constants.NOT_CONTAINS: _evaluate_not_contains,
     constants.REGEX: _evaluate_regex,

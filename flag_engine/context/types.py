@@ -8,7 +8,7 @@ from typing import Dict, Optional, TypedDict
 
 from typing_extensions import NotRequired
 
-from flag_engine.identities.traits.types import TraitValue
+from flag_engine.identities.traits.types import ContextValue
 from flag_engine.utils.types import SupportsStr
 
 
@@ -20,7 +20,7 @@ class EnvironmentContext(TypedDict):
 class IdentityContext(TypedDict):
     identifier: str
     key: SupportsStr
-    traits: NotRequired[Dict[str, TraitValue]]
+    traits: NotRequired[Dict[str, ContextValue]]
 
 
 class EvaluationContext(TypedDict):

@@ -3,7 +3,7 @@ from functools import singledispatch
 
 import semver
 
-from flag_engine.identities.traits.types import TraitValue
+from flag_engine.identities.traits.types import ContextValue
 from flag_engine.utils.semver import remove_semver_suffix
 
 
@@ -15,7 +15,7 @@ class SupportsStr(typing.Protocol):
 @singledispatch
 def get_casting_function(
     input_: object,
-) -> typing.Callable[..., TraitValue]:
+) -> typing.Callable[..., ContextValue]:
     """
     This function returns a callable to cast a value to the same type as input_
     >>> assert get_casting_function("a string") == str
