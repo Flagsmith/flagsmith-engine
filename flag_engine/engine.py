@@ -126,12 +126,10 @@ def _get_identity_feature_states_dict(
     ):
         for segment_feature_state in context_segment.feature_states:
             if (
-                environment_feature_state := feature_states_by_feature.get(
+                feature_state := feature_states_by_feature.get(
                     segment_feature := segment_feature_state.feature
                 )
-            ) and environment_feature_state.is_higher_segment_priority(
-                segment_feature_state
-            ):
+            ) and feature_state.is_higher_segment_priority(segment_feature_state):
                 continue
             feature_states_by_feature[segment_feature] = segment_feature_state
 
