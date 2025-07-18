@@ -223,7 +223,19 @@ MATCHERS_BY_OPERATOR: typing.Dict[
 
 
 CONTEXT_VALUE_GETTERS_BY_PROPERTY = {
-    "$.identity.identifier": partial(reduce, dict.__getitem__, ["identity", "identifier"]),
-    "$.identity.key": partial(reduce, dict.__getitem__, ["identity", "key"]),
-    "$.environment.name": partial(reduce, dict.__getitem__, ["environment", "name"]),
+    "$.identity.identifier": partial(
+        reduce,
+        dict.__getitem__,
+        ["identity", "identifier"],
+    ),
+    "$.identity.key": partial(
+        reduce,
+        dict.__getitem__,
+        ["identity", "key"],
+    ),
+    "$.environment.name": partial(
+        reduce,
+        dict.__getitem__,
+        ["environment", "name"],
+    ),
 }
