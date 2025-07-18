@@ -2,8 +2,7 @@ import operator
 import re
 import typing
 from contextlib import suppress
-from functools import partial, wraps
-from operator import itemgetter
+from functools import partial, reduce, wraps
 
 import semver
 
@@ -224,7 +223,7 @@ MATCHERS_BY_OPERATOR: typing.Dict[
 
 
 CONTEXT_VALUE_GETTERS_BY_PROPERTY = {
-    "$.identity.identifier": itemgetter("identity", "identifier"),
-    "$.identity.key": itemgetter("identity", "key"),
-    "$.environment.name": itemgetter("environment", "name"),
+    "$.identity.identifier": partial(reduce, dict.__getitem__, ["identity", "identifier"]),
+    "$.identity.key": partial(reduce, dict.__getitem__, ["identity", "key"]),
+    "$.environment.name": partial(reduce, dict.__getitem__, ["environment", "name"]),
 }
