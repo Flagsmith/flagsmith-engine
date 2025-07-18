@@ -16,6 +16,7 @@ def map_environment_identity_to_context(
 
     :param environment: The environment model object.
     :param identity: The identity model object.
+    :param override_traits: A list of TraitModel objects, to be used in place of `identity.identity_traits` if provided.
     :return: An EvaluationContext containing the environment and identity.
     """
     return {
