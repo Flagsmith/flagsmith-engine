@@ -232,7 +232,11 @@ def test_context_in_segment_percentage_split(
     rule = SegmentRuleModel(
         type=constants.ALL_RULE, conditions=[percentage_split_condition]
     )
-    segment = SegmentModel(id=1, name="% split", rules=[rule])
+    segment = SegmentModel(
+        id=1,
+        name="% split",
+        rules=[SegmentRuleModel(type=constants.ALL_RULE, conditions=[], rules=[rule])],
+    )
 
     mock_get_hashed_percentage = mocker.patch(
         "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
@@ -261,7 +265,11 @@ def test_context_in_segment_percentage_split__trait_value__calls_expected(
     rule = SegmentRuleModel(
         type=constants.ALL_RULE, conditions=[percentage_split_condition]
     )
-    segment = SegmentModel(id=1, name="% split", rules=[rule])
+    segment = SegmentModel(
+        id=1,
+        name="% split",
+        rules=[SegmentRuleModel(type=constants.ALL_RULE, conditions=[], rules=[rule])],
+    )
 
     mock_get_hashed_percentage = mocker.patch(
         "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
