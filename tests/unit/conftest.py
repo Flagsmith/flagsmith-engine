@@ -2,6 +2,8 @@ from datetime import datetime
 
 import pytest
 
+from flag_engine.context.mappers import map_environment_identity_to_context
+from flag_engine.context.types import EvaluationContext
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
@@ -125,6 +127,18 @@ def identity(environment: EnvironmentModel) -> IdentityModel:
     )
 
 
+@pytest.fixture
+def context(
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+) -> EvaluationContext:
+    return map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=None,
+    )
+
+
 @pytest.fixture()
 def trait_matching_segment(segment_condition: SegmentConditionModel) -> TraitModel:
     return TraitModel(
@@ -142,6 +156,18 @@ def identity_in_segment(
         identifier="identity_2",
         environment_api_key=environment.api_key,
         identity_traits=[trait_matching_segment],
+    )
+
+
+@pytest.fixture
+def context_in_segment(
+    identity_in_segment: IdentityModel,
+    environment: EnvironmentModel,
+) -> EvaluationContext:
+    return map_environment_identity_to_context(
+        environment=environment,
+        identity=identity_in_segment,
+        override_traits=None,
     )
 
 

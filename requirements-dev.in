@@ -10,3 +10,4 @@ types-pytest-lazy-fixture
 types-setuptools
 mypy
 absolufy-imports
+datamodel-code-generator

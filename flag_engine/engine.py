@@ -1,10 +1,12 @@
 import typing
 
+from flag_engine.context.mappers import map_environment_identity_to_context
+from flag_engine.context.types import EvaluationContext
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
-from flag_engine.segments.evaluator import get_identity_segments
+from flag_engine.segments.evaluator import get_context_segments
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
@@ -53,9 +55,17 @@ def get_identity_feature_states(
     :return: list of feature state models based on the environment, any matching
         segments and any specific identity overrides
     """
+    context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=override_traits,
+    )
+
     feature_states = list(
         _get_identity_feature_states_dict(
-            environment, identity, override_traits
+            environment=environment,
+            identity=identity,
+            context=context,
         ).values()
     )
     if environment.get_hide_disabled_flags():
@@ -79,8 +89,16 @@ def get_identity_feature_state(
     :return: feature state model based on the environment, any matching
         segments and any specific identity overrides
     """
+    context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=override_traits,
+    )
+
     feature_states = _get_identity_feature_states_dict(
-        environment, identity, override_traits
+        environment=environment,
+        identity=identity,
+        context=context,
     )
     matching_feature = next(
         filter(lambda feature: feature.name == feature_name, feature_states.keys()),
@@ -96,29 +114,33 @@ def get_identity_feature_state(
 def _get_identity_feature_states_dict(
     environment: EnvironmentModel,
     identity: IdentityModel,
-    override_traits: typing.Optional[typing.List[TraitModel]],
+    context: EvaluationContext,
 ) -> typing.Dict[FeatureModel, FeatureStateModel]:
     # Get feature states from the environment
-    feature_states = {fs.feature: fs for fs in environment.feature_states}
+    feature_states_by_feature = {fs.feature: fs for fs in environment.feature_states}
 
     # Override with any feature states defined by matching segments
-    identity_segments = get_identity_segments(environment, identity, override_traits)
-    for matching_segment in identity_segments:
-        for feature_state in matching_segment.feature_states:
-            if feature_state.feature in feature_states:
-                if feature_states[feature_state.feature].is_higher_segment_priority(
-                    feature_state
-                ):
-                    continue
-            feature_states[feature_state.feature] = feature_state
+    for context_segment in get_context_segments(
+        context=context,
+        segments=environment.project.segments,
+    ):
+        for segment_feature_state in context_segment.feature_states:
+            if (
+                feature_state := feature_states_by_feature.get(
+                    segment_feature := segment_feature_state.feature
+                )
+            ) and feature_state.is_higher_segment_priority(segment_feature_state):
+                continue
+            feature_states_by_feature[segment_feature] = segment_feature_state
 
     # Override with any feature states defined directly the identity
-    feature_states.update(
+    feature_states_by_feature.update(
         {
-            fs.feature: fs
-            for fs in identity.identity_features
-            if fs.feature in feature_states
+            identity_feature: identity_feature_state
+            for identity_feature_state in identity.identity_features
+            if (identity_feature := identity_feature_state.feature)
+            in feature_states_by_feature
         }
     )
 
-    return feature_states
+    return feature_states_by_feature
