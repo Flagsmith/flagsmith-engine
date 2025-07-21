@@ -58,3 +58,5 @@ ContextValue = Annotated[
     ],
     BeforeValidator(map_any_value_to_trait_value),
 ]
+
+TraitValue = ContextValue
