@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.1](https://github.com/Flagsmith/flagsmith-engine/compare/v5.4.0...v5.4.1) (2025-07-21)
+
+
+### Bug Fixes
+
+* `ImportError` when trying to import the `TraitValue` type ([#224](https://github.com/Flagsmith/flagsmith-engine/issues/224)) ([6133b96](https://github.com/Flagsmith/flagsmith-engine/commit/6133b96921a21c195f7ee7eb1c09004ed87de81f))
+
 ## [5.4.0](https://github.com/Flagsmith/flagsmith-engine/compare/v5.3.1...v5.4.0) (2025-07-21)
 
 
