@@ -1,5 +1,16 @@
 # Changelog
 
+## [6.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v5.4.1...v6.0.0) (2025-07-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* Release latest changes as breaking ([#227](https://github.com/Flagsmith/flagsmith-engine/issues/227))
+
+### Features
+
+* Release latest changes as breaking ([#227](https://github.com/Flagsmith/flagsmith-engine/issues/227)) ([a6d42b2](https://github.com/Flagsmith/flagsmith-engine/commit/a6d42b2b625dd6a3278daabb05fabcd4850a02ae))
+
 ## [5.4.1](https://github.com/Flagsmith/flagsmith-engine/compare/v5.4.0...v5.4.1) (2025-07-21)
 
 
