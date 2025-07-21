@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.4.0](https://github.com/Flagsmith/flagsmith-engine/compare/v5.3.1...v5.4.0) (2025-07-21)
+
+
+### Features
+
+* Context values for Segments ([#220](https://github.com/Flagsmith/flagsmith-engine/issues/220)) ([01e7a56](https://github.com/Flagsmith/flagsmith-engine/commit/01e7a56ad040aaf17ddc6e1ccc3c0bf9b5f24864))
+
 ## [5.3.1](https://github.com/Flagsmith/flagsmith-engine/compare/v5.3.0...v5.3.1) (2025-06-30)
 
 
