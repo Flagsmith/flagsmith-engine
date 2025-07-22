@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.0...v6.0.1) (2025-07-22)
+
+
+### CI
+
+* Publish a wheel, move on from deprecated `setup.py` usage ([#230](https://github.com/Flagsmith/flagsmith-engine/issues/230)) ([f43dcc8](https://github.com/Flagsmith/flagsmith-engine/commit/f43dcc83d60b6f5ad478e6382ba451d29c441474))
+
 ## [6.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v5.4.1...v6.0.0) (2025-07-21)
 
 
