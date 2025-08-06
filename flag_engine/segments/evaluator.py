@@ -7,9 +7,7 @@ from functools import partial, wraps
 import semver
 
 from flag_engine.context.types import EvaluationContext
-from flag_engine.identities.traits.types import (
-    ContextValue,
-)
+from flag_engine.identities.traits.types import ContextValue
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
     SegmentConditionModel,
