@@ -528,7 +528,7 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
     ),
 )
-def test_context_matches_condition_evaluates_with_correct_casting(
+def test_context_matches_condition(
     context: EvaluationContext,
     condition: SegmentConditionModel,
     segment_key: str,
