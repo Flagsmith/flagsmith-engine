@@ -4,7 +4,10 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
+from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import EvaluationContext
+from flag_engine.environments.models import EnvironmentModel
+from flag_engine.identities.models import IdentityModel
 from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
     _matches_context_value,
@@ -12,15 +15,12 @@ from flag_engine.segments.evaluator import (
     get_identity_segments,
     is_context_in_segment,
 )
-from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.segments.models import (
     SegmentConditionModel,
     SegmentModel,
     SegmentRuleModel,
 )
 from flag_engine.segments.types import ConditionOperator
-from flag_engine.identities.models import IdentityModel
-from flag_engine.environments.models import EnvironmentModel
 from tests.unit.segments.fixtures import (
     empty_segment,
     segment_conditions_and_nested_rules,
