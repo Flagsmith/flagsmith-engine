@@ -7,7 +7,10 @@ from functools import partial, wraps
 import semver
 
 from flag_engine.context.types import EvaluationContext
-from flag_engine.identities.traits.types import ContextValue
+from flag_engine.identities.traits.types import (
+    ContextValue,
+    map_any_value_to_trait_value,
+)
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
     SegmentConditionModel,
@@ -100,7 +103,11 @@ def context_matches_condition(
     if condition.operator == constants.IS_SET:
         return context_value is not None
 
-    return _matches_context_value(condition, context_value) if context_value else False
+    return (
+        _matches_context_value(condition, context_value)
+        if context_value is not None
+        else False
+    )
 
 
 def _get_trait(context: EvaluationContext, trait_key: str) -> ContextValue:

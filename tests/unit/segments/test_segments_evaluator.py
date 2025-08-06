@@ -6,7 +6,11 @@ from pytest_mock import MockerFixture
 
 from flag_engine.context.types import EvaluationContext
 from flag_engine.segments import constants
-from flag_engine.segments.evaluator import _matches_context_value, is_context_in_segment
+from flag_engine.segments.evaluator import (
+    _matches_context_value,
+    context_matches_condition,
+    is_context_in_segment,
+)
 from flag_engine.segments.models import (
     SegmentConditionModel,
     SegmentModel,
@@ -475,6 +479,63 @@ def test_segment_condition_matches_context_value_for_semver(
     # When
     result = _matches_context_value(segment_condition, trait_value)
 
+    # Then
+    assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "context,condition,segment_key,expected_result",
+    (
+        (
+            {"identity": {"traits": {trait_key_1: False}}},
+            SegmentConditionModel(
+                operator=constants.EQUAL,
+                property_=trait_key_1,
+                value="false",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: True}}},
+            SegmentConditionModel(
+                operator=constants.EQUAL,
+                property_=trait_key_1,
+                value="true",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 12}}},
+            SegmentConditionModel(
+                operator=constants.EQUAL,
+                property_=trait_key_1,
+                value="12",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: None}}},
+            SegmentConditionModel(
+                operator=constants.IS_SET,
+                property_=trait_key_1,
+                value="false",
+            ),
+            "segment_key",
+            False,
+        ),
+    ),
+)
+def test_context_matches_condition_evaluates_with_correct_casting(
+    context: EvaluationContext,
+    condition: SegmentConditionModel,
+    segment_key: str,
+    expected_result: bool,
+) -> None:
+    # Given / When
+    result = context_matches_condition(context, condition, segment_key)
     # Then
     assert result == expected_result
 
