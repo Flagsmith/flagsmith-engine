@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.0...v6.0.1) (2025-08-06)
+
+
+### Bug Fixes
+
+* added-none-check-in-context-matches-condition ([#236](https://github.com/Flagsmith/flagsmith-engine/issues/236)) ([fc5bf44](https://github.com/Flagsmith/flagsmith-engine/commit/fc5bf448d780acd78b614996151252eef59864a3))
+
+
+### CI
+
+* Publish a wheel, move on from deprecated `setup.py` usage ([#230](https://github.com/Flagsmith/flagsmith-engine/issues/230)) ([f43dcc8](https://github.com/Flagsmith/flagsmith-engine/commit/f43dcc83d60b6f5ad478e6382ba451d29c441474))
+
 ## [6.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v5.4.1...v6.0.0) (2025-07-21)
 
 
