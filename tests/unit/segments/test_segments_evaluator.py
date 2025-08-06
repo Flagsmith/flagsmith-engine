@@ -4,11 +4,15 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
+from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import EvaluationContext
+from flag_engine.environments.models import EnvironmentModel
+from flag_engine.identities.models import IdentityModel
 from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
+    get_identity_segments,
     is_context_in_segment,
 )
 from flag_engine.segments.models import (
@@ -252,6 +256,26 @@ def test_context_in_segment_percentage_split(
 
     # Then
     assert result == expected_result
+
+
+def test_get_identity_segments_calls_get_context_segments(
+    mocker: MockerFixture,
+    environment: EnvironmentModel,
+    identity: IdentityModel,
+) -> None:
+    # Given
+    mock_get_context_segments = mocker.patch(
+        "flag_engine.segments.evaluator.get_context_segments"
+    )
+
+    context = map_environment_identity_to_context(environment, identity, None)
+    # When
+    get_identity_segments(identity, environment)
+
+    # Then
+    mock_get_context_segments.assert_called_once_with(
+        context, environment.project.segments
+    )
 
 
 def test_context_in_segment_percentage_split__trait_value__calls_expected(
