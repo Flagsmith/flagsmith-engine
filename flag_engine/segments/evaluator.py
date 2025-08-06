@@ -6,7 +6,10 @@ from functools import partial, wraps
 
 import semver
 
+from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import EvaluationContext
+from flag_engine.environments.models import EnvironmentModel
+from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.types import ContextValue
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
@@ -18,6 +21,25 @@ from flag_engine.segments.types import ConditionOperator
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
+
+
+def get_identity_segments(
+    identity: IdentityModel,
+    environment: EnvironmentModel,
+) -> typing.List[SegmentModel]:
+    """
+    Get a list of segments for a given identity in a given environment.
+
+    :param identity: the identity model object to get the segments for
+    :param environment: the environment model object the identity belongs to
+    :return: list of segments that the identity belongs to in the environment
+    """
+    context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=None,
+    )
+    return get_context_segments(context, environment.project.segments)
 
 
 def get_context_segments(
