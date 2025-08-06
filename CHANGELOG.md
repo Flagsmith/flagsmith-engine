@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.2](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.1...v6.0.2) (2025-08-06)
+
+
+### Bug Fixes
+
+* reintroduced-get-identity-segments ([#237](https://github.com/Flagsmith/flagsmith-engine/issues/237)) ([efe710c](https://github.com/Flagsmith/flagsmith-engine/commit/efe710ce456064f7e01934f18f4773e24ae3d266))
+
 ## [6.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.0...v6.0.1) (2025-08-06)
 
 
