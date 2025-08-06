@@ -100,7 +100,11 @@ def context_matches_condition(
     if condition.operator == constants.IS_SET:
         return context_value is not None
 
-    return _matches_context_value(condition, context_value) if context_value else False
+    return (
+        _matches_context_value(condition, context_value)
+        if context_value is not None
+        else False
+    )
 
 
 def _get_trait(context: EvaluationContext, trait_key: str) -> ContextValue:
