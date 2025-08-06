@@ -9,7 +9,6 @@ import semver
 from flag_engine.context.types import EvaluationContext
 from flag_engine.identities.traits.types import (
     ContextValue,
-    map_any_value_to_trait_value,
 )
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
