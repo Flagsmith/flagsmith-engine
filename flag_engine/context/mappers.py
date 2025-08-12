@@ -152,10 +152,8 @@ def map_feature_states_to_feature_contexts(
                 )
             ]
         if feature_segment := feature_state.feature_segment:
-            # If for some reason the feature segment priority is not set,
-            # default to lowest possible priority
-            priority = feature_segment.priority or float("inf")
-            feature_ctx_data["priority"] = priority
+            if (priority := feature_segment.priority) is not None:
+                feature_ctx_data["priority"] = priority
         features[feature_state.feature.name] = feature_ctx_data
     return features
 
