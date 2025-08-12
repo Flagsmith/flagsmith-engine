@@ -1,8 +1,4 @@
-from flag_engine.context.types import (
-    SegmentCondition,
-    SegmentContext,
-    SegmentRule,
-)
+from flag_engine.context.types import SegmentCondition, SegmentContext, SegmentRule
 from flag_engine.segments import constants
 
 trait_key_1 = "email"

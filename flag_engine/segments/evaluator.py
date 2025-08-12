@@ -19,9 +19,7 @@ from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.types import ContextValue
 from flag_engine.result.types import EvaluationResult, FlagResult, SegmentResult
 from flag_engine.segments import constants
-from flag_engine.segments.models import (
-    SegmentModel,
-)
+from flag_engine.segments.models import SegmentModel
 from flag_engine.segments.types import ConditionOperator
 from flag_engine.segments.utils import get_matching_function
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
@@ -89,21 +87,23 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                     segment_feature_contexts[feature_key] = override_feature_context
 
     flags: list[FlagResult] = [
-        {
-            "enabled": segment_feature_context["enabled"],
-            "feature_key": segment_feature_context["feature_key"],
-            "name": segment_feature_context["name"],
-            "reason": f"TARGETING_MATCH; segment={segment_context['name']}",
-            "value": segment_feature_context.get("value"),
-        }
-        if (
-            segment_feature_context := segment_feature_contexts.get(
-                feature_context["feature_key"],
+        (
+            {
+                "enabled": segment_feature_context["enabled"],
+                "feature_key": segment_feature_context["feature_key"],
+                "name": segment_feature_context["name"],
+                "reason": f"TARGETING_MATCH; segment={segment_context['name']}",
+                "value": segment_feature_context.get("value"),
+            }
+            if (
+                segment_feature_context := segment_feature_contexts.get(
+                    feature_context["feature_key"],
+                )
             )
-        )
-        else get_flag_result_from_feature_context(
-            feature_context,
-            get_context_value(context, "$.identity.key"),
+            else get_flag_result_from_feature_context(
+                feature_context,
+                get_context_value(context, "$.identity.key"),
+            )
         )
         for feature_context in (context.get("features") or {}).values()
     ]
