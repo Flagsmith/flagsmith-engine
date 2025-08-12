@@ -296,7 +296,7 @@ def _evaluate_modulo(
     if not isinstance(context_value, (int, float)):
         return False
 
-    if segment_value is None:
+    if not segment_value:
         return False
 
     try:

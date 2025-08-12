@@ -4,21 +4,26 @@ import pytest
 from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
+import flag_engine.segments.evaluator
 from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import (
     EvaluationContext,
+    FeatureContext,
     SegmentCondition,
     SegmentContext,
 )
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.models import IdentityModel
+from flag_engine.result.types import FlagResult
 from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
+    get_flag_result_from_feature_context,
     get_identity_segments,
     is_context_in_segment,
 )
+from flag_engine.segments.models import SegmentModel
 from flag_engine.segments.types import ConditionOperator
 from tests.unit.segments.fixtures import (
     empty_segment,
@@ -269,22 +274,27 @@ def test_context_in_segment_percentage_split(
     assert result == expected_result
 
 
-def test_get_identity_segments_calls_get_context_segments(
+def test_get_identity_segments__calls__returns_expected(
     mocker: MockerFixture,
     environment: EnvironmentModel,
-    identity: IdentityModel,
+    identity_in_segment: IdentityModel,
 ) -> None:
     # Given
-    mock_get_context_segments = mocker.patch(
-        "flag_engine.segments.evaluator.get_context_segments"
+    get_context_segments_spy = mocker.spy(
+        flag_engine.segments.evaluator, "get_context_segments"
+    )
+    expected_context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity_in_segment,
+        override_traits=None,
     )
 
-    context = map_environment_identity_to_context(environment, identity, None)
     # When
-    get_identity_segments(identity, environment)
+    result = get_identity_segments(identity_in_segment, environment)
 
     # Then
-    mock_get_context_segments.assert_called_once_with(context)
+    get_context_segments_spy.assert_called_once_with(expected_context)
+    assert result == [SegmentModel(id=1, name="my_segment")]
 
 
 def test_context_in_segment_percentage_split__trait_value__calls_expected(
@@ -625,3 +635,85 @@ def test_segment_condition_matches_context_value_for_modulo(
 
     # Then
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "percentage_value, expected_result",
+    (
+        (
+            10,
+            {
+                "enabled": False,
+                "feature_key": "1",
+                "name": "my_feature",
+                "reason": "SPLIT",
+                "value": "foo",
+            },
+        ),
+        (
+            40,
+            {
+                "enabled": False,
+                "feature_key": "1",
+                "name": "my_feature",
+                "reason": "SPLIT",
+                "value": "bar",
+            },
+        ),
+        (
+            70,
+            {
+                "enabled": False,
+                "feature_key": "1",
+                "name": "my_feature",
+                "reason": "DEFAULT",
+                "value": "control",
+            },
+        ),
+    ),
+)
+def test_get_flag_result_from_feature_context__call_return_expected(
+    percentage_value: int,
+    expected_result: FlagResult,
+    mocker: MockerFixture,
+) -> None:
+    # Given
+    expected_feature_context_key = "2"
+    expected_key = "test_identifier"
+
+    # we mock the function which gets the percentage value for an identity to
+    # return a deterministic value so we know which value to expect
+    get_hashed_percentage_for_object_ids_mock = mocker.patch(
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids",
+    )
+    get_hashed_percentage_for_object_ids_mock.return_value = percentage_value
+
+    # and have a feature context with some multivariate feature options and associated values
+    feature_context: FeatureContext = {
+        "key": expected_feature_context_key,
+        "feature_key": "1",
+        "enabled": False,
+        "name": "my_feature",
+        "value": "control",
+        "variants": [
+            {"value": "foo", "weight": 30},
+            {"value": "bar", "weight": 30},
+        ],
+    }
+
+    # When
+    result = get_flag_result_from_feature_context(
+        feature_context=feature_context,
+        key=expected_key,
+    )
+
+    # the value of the feature state is correct based on the percentage value returned
+    assert result == expected_result
+
+    # the function is called with the expected key
+    get_hashed_percentage_for_object_ids_mock.assert_called_once_with(
+        [
+            expected_feature_context_key,
+            expected_key,
+        ]
+    )

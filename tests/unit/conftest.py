@@ -9,8 +9,6 @@ from flag_engine.features.constants import STANDARD
 from flag_engine.features.models import (
     FeatureModel,
     FeatureStateModel,
-    MultivariateFeatureOptionModel,
-    MultivariateFeatureStateValueModel,
 )
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
@@ -183,17 +181,6 @@ def segment_override_fs(
     )
     fs.set_value("segment_override")
     return fs
-
-
-@pytest.fixture()
-def mv_feature_state_value() -> MultivariateFeatureStateValueModel:
-    return MultivariateFeatureStateValueModel(
-        id=1,
-        multivariate_feature_option=MultivariateFeatureOptionModel(
-            id=1, value="test_value"
-        ),
-        percentage_allocation=100,
-    )
 
 
 @pytest.fixture()
