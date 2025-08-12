@@ -100,6 +100,7 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                 ):
                     segment_feature_contexts[feature_key] = override_feature_context
 
+    identity_key = get_context_value(context, "$.identity.key")
     flags: typing.List[FlagResult] = [
         (
             {
@@ -115,8 +116,8 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                 )
             )
             else get_flag_result_from_feature_context(
-                feature_context,
-                get_context_value(context, "$.identity.key"),
+                feature_context=feature_context,
+                key=identity_key,
             )
         )
         for feature_context in (context.get("features") or {}).values()
