@@ -1,4 +1,5 @@
 import pytest
+import pytest_mock
 
 from flag_engine.engine import (
     get_environment_feature_state,
@@ -13,7 +14,6 @@ from flag_engine.identities.models import IdentityFeaturesList, IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.segments.models import SegmentModel
 from flag_engine.utils.exceptions import FeatureStateNotFound
-from tests.unit.helpers import get_environment_feature_state_for_feature
 
 
 def test_identity_get_feature_state_without_any_override(
@@ -41,6 +41,7 @@ def test_identity_get_all_feature_states_no_segments(
     feature_2: FeatureModel,
     environment: EnvironmentModel,
     identity: IdentityModel,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     # Given
     overridden_feature = FeatureModel(id=3, name="overridden_feature", type=STANDARD)
@@ -56,23 +57,26 @@ def test_identity_get_all_feature_states_no_segments(
     )
 
     # When
-    all_feature_states = get_identity_feature_states(
-        environment=environment, identity=identity
-    )
+    result = get_identity_feature_states(environment=environment, identity=identity)
 
     # Then
-    assert len(all_feature_states) == 3
-    for feature_state in all_feature_states:
-        environment_feature_state = get_environment_feature_state_for_feature(
-            environment, feature_state.feature
-        )
-
-        expected = (
-            True
-            if feature_state.feature == overridden_feature
-            else environment_feature_state.enabled
-        )
-        assert feature_state.enabled is expected
+    assert result == [
+        FeatureStateModel.model_construct(
+            feature=feature_1,
+            enabled=True,
+            featurestate_uuid=mocker.ANY,
+        ),
+        FeatureStateModel.model_construct(
+            feature=feature_2,
+            enabled=False,
+            featurestate_uuid=mocker.ANY,
+        ),
+        FeatureStateModel.model_construct(
+            feature=overridden_feature,
+            enabled=True,
+            featurestate_uuid=mocker.ANY,
+        ),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -121,6 +125,7 @@ def test_identity_get_all_feature_states_segments_only(
     environment: EnvironmentModel,
     segment: SegmentModel,
     identity_in_segment: IdentityModel,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
     # Given
     # a feature which we can override
@@ -137,23 +142,28 @@ def test_identity_get_all_feature_states_segments_only(
     )
 
     # When
-    all_feature_states = get_identity_feature_states(
+    result = get_identity_feature_states(
         environment=environment, identity=identity_in_segment
     )
 
     # Then
-    assert len(all_feature_states) == 3
-    for feature_state in all_feature_states:
-        environment_feature_state = get_environment_feature_state_for_feature(
-            environment, feature_state.feature
-        )
-
-        expected = (
-            True
-            if feature_state.feature == overridden_feature
-            else environment_feature_state.enabled
-        )
-        assert feature_state.enabled is expected
+    assert result == [
+        FeatureStateModel.model_construct(
+            feature=feature_1,
+            enabled=True,
+            featurestate_uuid=mocker.ANY,
+        ),
+        FeatureStateModel.model_construct(
+            feature=feature_2,
+            enabled=False,
+            featurestate_uuid=mocker.ANY,
+        ),
+        FeatureStateModel.model_construct(
+            feature=overridden_feature,
+            enabled=True,
+            featurestate_uuid=mocker.ANY,
+        ),
+    ]
 
 
 def test_identity_get_all_feature_states_with_traits(

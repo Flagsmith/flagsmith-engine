@@ -5,7 +5,11 @@ from pytest_lazyfixture import lazy_fixture
 from pytest_mock import MockerFixture
 
 from flag_engine.context.mappers import map_environment_identity_to_context
-from flag_engine.context.types import EvaluationContext
+from flag_engine.context.types import (
+    EvaluationContext,
+    SegmentCondition,
+    SegmentContext,
+)
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.segments import constants
@@ -14,11 +18,6 @@ from flag_engine.segments.evaluator import (
     context_matches_condition,
     get_identity_segments,
     is_context_in_segment,
-)
-from flag_engine.segments.models import (
-    SegmentConditionModel,
-    SegmentModel,
-    SegmentRuleModel,
 )
 from flag_engine.segments.types import ConditionOperator
 from tests.unit.segments.fixtures import (
@@ -215,7 +214,7 @@ from tests.unit.segments.fixtures import (
     ),
 )
 def test_context_in_segment(
-    segment: SegmentModel,
+    segment: SegmentContext,
     context: EvaluationContext,
     expected_result: bool,
 ) -> None:
@@ -234,16 +233,28 @@ def test_context_in_segment_percentage_split(
     expected_result: bool,
 ) -> None:
     # Given
-    percentage_split_condition = SegmentConditionModel(
-        operator=constants.PERCENTAGE_SPLIT, value=str(segment_split_value)
-    )
-    rule = SegmentRuleModel(
-        type=constants.ALL_RULE, conditions=[percentage_split_condition]
-    )
-    segment = SegmentModel(
-        id=1,
+    segment_context = SegmentContext(
+        key="1",
         name="% split",
-        rules=[SegmentRuleModel(type=constants.ALL_RULE, conditions=[], rules=[rule])],
+        rules=[
+            {
+                "type": constants.ALL_RULE,
+                "conditions": [],
+                "rules": [
+                    {
+                        "type": constants.ALL_RULE,
+                        "conditions": [
+                            {
+                                "operator": constants.PERCENTAGE_SPLIT,
+                                "property": "",
+                                "value": str(segment_split_value),
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+            }
+        ],
     )
 
     mock_get_hashed_percentage = mocker.patch(
@@ -252,7 +263,7 @@ def test_context_in_segment_percentage_split(
     mock_get_hashed_percentage.return_value = identity_hashed_percentage
 
     # When
-    result = is_context_in_segment(context=context, segment=segment)
+    result = is_context_in_segment(context=context, segment_context=segment_context)
 
     # Then
     assert result == expected_result
@@ -273,9 +284,7 @@ def test_get_identity_segments_calls_get_context_segments(
     get_identity_segments(identity, environment)
 
     # Then
-    mock_get_context_segments.assert_called_once_with(
-        context, environment.project.segments
-    )
+    mock_get_context_segments.assert_called_once_with(context)
 
 
 def test_context_in_segment_percentage_split__trait_value__calls_expected(
@@ -285,18 +294,29 @@ def test_context_in_segment_percentage_split__trait_value__calls_expected(
     # Given
     assert context["identity"] is not None
     context["identity"]["traits"]["custom_trait"] = "custom_value"
-    percentage_split_condition = SegmentConditionModel(
-        operator=constants.PERCENTAGE_SPLIT,
-        value="10",
-        property_="custom_trait",
-    )
-    rule = SegmentRuleModel(
-        type=constants.ALL_RULE, conditions=[percentage_split_condition]
-    )
-    segment = SegmentModel(
-        id=1,
+
+    segment_context = SegmentContext(
+        key="1",
         name="% split",
-        rules=[SegmentRuleModel(type=constants.ALL_RULE, conditions=[], rules=[rule])],
+        rules=[
+            {
+                "type": constants.ALL_RULE,
+                "conditions": [],
+                "rules": [
+                    {
+                        "type": constants.ALL_RULE,
+                        "conditions": [
+                            {
+                                "operator": constants.PERCENTAGE_SPLIT,
+                                "property": "custom_trait",
+                                "value": "10",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+            }
+        ],
     )
 
     mock_get_hashed_percentage = mocker.patch(
@@ -305,10 +325,12 @@ def test_context_in_segment_percentage_split__trait_value__calls_expected(
     mock_get_hashed_percentage.return_value = 1
 
     # When
-    result = is_context_in_segment(context=context, segment=segment)
+    result = is_context_in_segment(context=context, segment_context=segment_context)
 
     # Then
-    mock_get_hashed_percentage.assert_called_once_with([segment.id, "custom_value"])
+    mock_get_hashed_percentage.assert_called_once_with(
+        [segment_context["key"], "custom_value"]
+    )
     assert result
 
 
@@ -328,18 +350,25 @@ def test_context_in_segment_is_set_and_is_not_set(
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition_model = SegmentConditionModel(
-        operator=operator,
-        property_=property_,
-    )
-    rule = SegmentRuleModel(
-        type=constants.ALL_RULE,
-        conditions=[segment_condition_model],
-    )
-    segment = SegmentModel(id=1, name="segment model", rules=[rule])
+    segment_context: SegmentContext = {
+        "key": "1",
+        "name": "test_segment",
+        "rules": [
+            {
+                "type": "ALL",
+                "conditions": [
+                    {
+                        "property": property_,
+                        "operator": operator,
+                        "value": "",
+                    }
+                ],
+            }
+        ],
+    }
 
     # When
-    result = is_context_in_segment(context=context_in_segment, segment=segment)
+    result = is_context_in_segment(context_in_segment, segment_context)
 
     # Then
     assert result is expected_result
@@ -426,15 +455,15 @@ def test_context_in_segment_is_set_and_is_not_set(
 def test_segment_condition_matches_context_value(
     operator: ConditionOperator,
     trait_value: typing.Union[None, int, str, float],
-    condition_value: object,
+    condition_value: str,
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition = SegmentConditionModel(
-        operator=operator,
-        property_="foo",
-        value=condition_value,
-    )
+    segment_condition: SegmentCondition = {
+        "operator": operator,
+        "property": "foo",
+        "value": condition_value,
+    }
 
     # When
     result = _matches_context_value(segment_condition, trait_value)
@@ -448,9 +477,9 @@ def test_segment_condition__unsupported_operator__return_false(
 ) -> None:
     # Given
     mocker.patch("flag_engine.segments.evaluator.MATCHERS_BY_OPERATOR", new={})
-    segment_condition = SegmentConditionModel(
+    segment_condition = SegmentCondition(
         operator=constants.EQUAL,
-        property_="x",
+        property="x",
         value="foo",
     )
     trait_value = "foo"
@@ -494,9 +523,9 @@ def test_segment_condition_matches_context_value_for_semver(
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition = SegmentConditionModel(
+    segment_condition = SegmentCondition(
         operator=operator,
-        property_="version",
+        property="version",
         value=condition_value,
     )
 
@@ -512,9 +541,9 @@ def test_segment_condition_matches_context_value_for_semver(
     (
         (
             {"identity": {"traits": {trait_key_1: False}}},
-            SegmentConditionModel(
+            SegmentCondition(
                 operator=constants.EQUAL,
-                property_=trait_key_1,
+                property=trait_key_1,
                 value="false",
             ),
             "segment_key",
@@ -522,9 +551,9 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
         (
             {"identity": {"traits": {trait_key_1: True}}},
-            SegmentConditionModel(
+            SegmentCondition(
                 operator=constants.EQUAL,
-                property_=trait_key_1,
+                property=trait_key_1,
                 value="true",
             ),
             "segment_key",
@@ -532,9 +561,9 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
         (
             {"identity": {"traits": {trait_key_1: 12}}},
-            SegmentConditionModel(
+            SegmentCondition(
                 operator=constants.EQUAL,
-                property_=trait_key_1,
+                property=trait_key_1,
                 value="12",
             ),
             "segment_key",
@@ -542,9 +571,9 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
         (
             {"identity": {"traits": {trait_key_1: None}}},
-            SegmentConditionModel(
+            SegmentCondition(
                 operator=constants.IS_SET,
-                property_=trait_key_1,
+                property=trait_key_1,
                 value="false",
             ),
             "segment_key",
@@ -554,7 +583,7 @@ def test_segment_condition_matches_context_value_for_semver(
 )
 def test_context_matches_condition(
     context: EvaluationContext,
-    condition: SegmentConditionModel,
+    condition: SegmentCondition,
     segment_key: str,
     expected_result: bool,
 ) -> None:
@@ -576,18 +605,18 @@ def test_context_matches_condition(
         ("1.0.0", "3|0", False),
         (False, "1|3", False),
         (1, "invalid|value", False),
-        (1, None, False),
+        (1, "", False),
     ],
 )
 def test_segment_condition_matches_context_value_for_modulo(
     trait_value: typing.Union[int, float, str, bool],
-    condition_value: typing.Optional[str],
+    condition_value: str,
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition = SegmentConditionModel(
+    segment_condition = SegmentCondition(
         operator=constants.MODULO,
-        property_="version",
+        property="version",
         value=condition_value,
     )
 

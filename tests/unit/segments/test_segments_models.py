@@ -5,6 +5,7 @@ import pytest
 from flag_engine.segments import constants
 from flag_engine.segments.models import SegmentRuleModel
 from flag_engine.segments.types import RuleType
+from flag_engine.segments.utils import _none
 
 
 @pytest.mark.parametrize(
@@ -29,7 +30,7 @@ def test_segment_rule_none(
     (
         (constants.ALL_RULE, all),
         (constants.ANY_RULE, any),
-        (constants.NONE_RULE, SegmentRuleModel.none),
+        (constants.NONE_RULE, _none),
     ),
 )
 def test_segment_rule_matching_function(

@@ -7,17 +7,23 @@ from functools import partial, wraps
 import semver
 
 from flag_engine.context.mappers import map_environment_identity_to_context
-from flag_engine.context.types import EvaluationContext
+from flag_engine.context.types import (
+    EvaluationContext,
+    FeatureContext,
+    SegmentCondition,
+    SegmentContext,
+    SegmentRule,
+)
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.types import ContextValue
+from flag_engine.result.types import EvaluationResult, FlagResult, SegmentResult
 from flag_engine.segments import constants
 from flag_engine.segments.models import (
-    SegmentConditionModel,
     SegmentModel,
-    SegmentRuleModel,
 )
 from flag_engine.segments.types import ConditionOperator
+from flag_engine.segments.utils import get_matching_function
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
@@ -39,40 +45,145 @@ def get_identity_segments(
         identity=identity,
         override_traits=None,
     )
-    return get_context_segments(context, environment.project.segments)
+    return [
+        SegmentModel(id=segment_context["key"], name=segment_context["name"])
+        for segment_context in get_context_segments(context)
+    ]
 
 
 def get_context_segments(
     context: EvaluationContext,
-    segments: typing.List[SegmentModel],
-) -> typing.List[SegmentModel]:
-    return [
-        segment
-        for segment in segments
-        if is_context_in_segment(
-            context=context,
-            segment=segment,
-        )
+) -> typing.List[SegmentResult]:
+    """
+    Get a list of segments for a given evaluation context.
+
+    :param context: the evaluation context
+    :return: list of segments that match the context
+    """
+    return get_evaluation_result(context)["segments"]
+
+
+def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
+    """
+    Get the evaluation result for a given context.
+
+    :param context: the evaluation context
+    :return: EvaluationResult containing the context, flags, and segments
+    """
+    segments = [
+        segment_context
+        for segment_context in (context.get("segments") or {}).values()
+        if is_context_in_segment(context, segment_context)
     ]
+
+    segment_feature_contexts: typing.Dict[SupportsStr, FeatureContext] = {}
+    for segment_context in segments:
+        if overrides := segment_context.get("overrides"):
+            for override_feature_context in overrides:
+                feature_key = override_feature_context["feature_key"]
+                if (
+                    feature_key not in segment_feature_contexts
+                    or override_feature_context["priority"]
+                    < segment_feature_contexts[feature_key]["priority"]
+                ):
+                    segment_feature_contexts[feature_key] = override_feature_context
+
+    flags: list[FlagResult] = [
+        {
+            "enabled": segment_feature_context["enabled"],
+            "feature_key": segment_feature_context["feature_key"],
+            "name": segment_feature_context["name"],
+            "reason": f"TARGETING_MATCH; segment={segment_context['name']}",
+            "value": segment_feature_context.get("value"),
+        }
+        if (
+            segment_feature_context := segment_feature_contexts.get(
+                feature_context["feature_key"],
+            )
+        )
+        else get_flag_result_from_feature_context(
+            feature_context,
+            get_context_value(context, "$.identity.key"),
+        )
+        for feature_context in (context.get("features") or {}).values()
+    ]
+
+    return {
+        "context": context,
+        "flags": flags,
+        "segments": [
+            {
+                "key": segment_context["key"],
+                "name": segment_context["name"],
+            }
+            for segment_context in segments
+        ],
+    }
+
+
+def get_flag_result_from_feature_context(
+    feature_context: FeatureContext,
+    key: SupportsStr,
+) -> FlagResult:
+    """
+    Get a feature value from the feature context
+    for a given key.
+
+    :param feature_context: the feature context
+    :param key: the key to get the value for
+    :return: the value for the key in the feature context
+    """
+    if variants := feature_context.get("variants"):
+        percentage_value = get_hashed_percentage_for_object_ids(
+            [feature_context["key"], key]
+        )
+
+        # We expect `variants` to be pre-sorted in order of persistence. This gives us a
+        # way to ensure that the same value is returned every time we use the same
+        # percentage value.
+        start_percentage = 0.0
+
+        for variant in variants:
+            limit = variant["weight"] + start_percentage
+            if start_percentage <= percentage_value < limit:
+                return {
+                    "enabled": feature_context["enabled"],
+                    "feature_key": feature_context["feature_key"],
+                    "name": feature_context["name"],
+                    "reason": "SPLIT",
+                    "value": variant["value"],
+                }
+
+            start_percentage = limit
+
+    return {
+        "enabled": feature_context["enabled"],
+        "feature_key": feature_context["feature_key"],
+        "name": feature_context["name"],
+        "reason": "DEFAULT",
+        "value": feature_context["value"],
+    }
 
 
 def is_context_in_segment(
     context: EvaluationContext,
-    segment: SegmentModel,
+    segment_context: SegmentContext,
 ) -> bool:
-    return bool(rules := segment.rules) and all(
-        context_matches_rule(context=context, rule=rule, segment_key=segment.id)
+    return bool(rules := segment_context["rules"]) and all(
+        context_matches_rule(
+            context=context, rule=rule, segment_key=segment_context["key"]
+        )
         for rule in rules
     )
 
 
 def context_matches_rule(
     context: EvaluationContext,
-    rule: SegmentRuleModel,
+    rule: SegmentRule,
     segment_key: SupportsStr,
 ) -> bool:
     matches_conditions = (
-        rule.matching_function(
+        get_matching_function(rule["type"])(
             [
                 context_matches_condition(
                     context=context,
@@ -82,7 +193,7 @@ def context_matches_rule(
                 for condition in conditions
             ]
         )
-        if (conditions := rule.conditions)
+        if (conditions := rule.get("conditions"))
         else True
     )
 
@@ -92,34 +203,34 @@ def context_matches_rule(
             rule=rule,
             segment_key=segment_key,
         )
-        for rule in rule.rules
+        for rule in rule.get("rules") or []
     )
 
 
 def context_matches_condition(
     context: EvaluationContext,
-    condition: SegmentConditionModel,
+    condition: SegmentCondition,
     segment_key: SupportsStr,
 ) -> bool:
     context_value = (
-        get_context_value(context, condition.property_) if condition.property_ else None
+        get_context_value(context, condition_property)
+        if (condition_property := condition.get("property"))
+        else None
     )
 
-    if condition.operator == constants.PERCENTAGE_SPLIT:
-        assert condition.value
-
+    if condition["operator"] == constants.PERCENTAGE_SPLIT:
         if context_value is not None:
             object_ids = [segment_key, context_value]
         else:
             object_ids = [segment_key, get_context_value(context, "$.identity.key")]
 
-        float_value = float(condition.value)
+        float_value = float(condition["value"])
         return get_hashed_percentage_for_object_ids(object_ids) <= float_value
 
-    if condition.operator == constants.IS_NOT_SET:
+    if condition["operator"] == constants.IS_NOT_SET:
         return context_value is None
 
-    if condition.operator == constants.IS_SET:
+    if condition["operator"] == constants.IS_SET:
         return context_value is not None
 
     return (
@@ -152,11 +263,11 @@ def get_context_value(
 
 
 def _matches_context_value(
-    condition: SegmentConditionModel,
+    condition: SegmentCondition,
     context_value: ContextValue,
 ) -> bool:
-    if matcher := MATCHERS_BY_OPERATOR.get(condition.operator):
-        return matcher(condition.value, context_value)
+    if matcher := MATCHERS_BY_OPERATOR.get(condition["operator"]):
+        return matcher(condition["value"], context_value)
 
     return False
 

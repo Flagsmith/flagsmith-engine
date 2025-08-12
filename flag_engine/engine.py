@@ -1,12 +1,14 @@
 import typing
 
-from flag_engine.context.mappers import map_environment_identity_to_context
-from flag_engine.context.types import EvaluationContext
+from flag_engine.context.mappers import (
+    map_environment_identity_to_context,
+    map_flag_results_to_feature_states,
+)
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
-from flag_engine.segments.evaluator import get_context_segments
+from flag_engine.segments.evaluator import get_evaluation_result
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
 
@@ -61,13 +63,10 @@ def get_identity_feature_states(
         override_traits=override_traits,
     )
 
-    feature_states = list(
-        _get_identity_feature_states_dict(
-            environment=environment,
-            identity=identity,
-            context=context,
-        ).values()
-    )
+    result = get_evaluation_result(context)
+
+    feature_states = map_flag_results_to_feature_states(result["flags"])
+
     if environment.get_hide_disabled_flags():
         return [fs for fs in feature_states if fs.enabled]
     return feature_states
@@ -95,52 +94,19 @@ def get_identity_feature_state(
         override_traits=override_traits,
     )
 
-    feature_states = _get_identity_feature_states_dict(
-        environment=environment,
-        identity=identity,
-        context=context,
-    )
-    matching_feature = next(
-        filter(lambda feature: feature.name == feature_name, feature_states.keys()),
+    result = get_evaluation_result(context)
+
+    feature_states = map_flag_results_to_feature_states(result["flags"])
+
+    matching_feature_state = next(
+        filter(
+            lambda feature_state: feature_state.feature.name == feature_name,
+            feature_states,
+        ),
         None,
     )
 
-    if not matching_feature:
+    if not matching_feature_state:
         raise FeatureStateNotFound()
 
-    return feature_states[matching_feature]
-
-
-def _get_identity_feature_states_dict(
-    environment: EnvironmentModel,
-    identity: IdentityModel,
-    context: EvaluationContext,
-) -> typing.Dict[FeatureModel, FeatureStateModel]:
-    # Get feature states from the environment
-    feature_states_by_feature = {fs.feature: fs for fs in environment.feature_states}
-
-    # Override with any feature states defined by matching segments
-    for context_segment in get_context_segments(
-        context=context,
-        segments=environment.project.segments,
-    ):
-        for segment_feature_state in context_segment.feature_states:
-            if (
-                feature_state := feature_states_by_feature.get(
-                    segment_feature := segment_feature_state.feature
-                )
-            ) and feature_state.is_higher_segment_priority(segment_feature_state):
-                continue
-            feature_states_by_feature[segment_feature] = segment_feature_state
-
-    # Override with any feature states defined directly the identity
-    feature_states_by_feature.update(
-        {
-            identity_feature: identity_feature_state
-            for identity_feature_state in identity.identity_features
-            if (identity_feature := identity_feature_state.feature)
-            in feature_states_by_feature
-        }
-    )
-
-    return feature_states_by_feature
+    return matching_feature_state

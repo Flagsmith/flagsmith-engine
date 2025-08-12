@@ -4,8 +4,8 @@ from pydantic import BaseModel, BeforeValidator, Field
 from typing_extensions import Annotated
 
 from flag_engine.features.models import FeatureStateModel
-from flag_engine.segments import constants
 from flag_engine.segments.types import ConditionOperator, RuleType
+from flag_engine.segments.utils import get_matching_function
 
 LaxStr = Annotated[str, BeforeValidator(lambda x: str(x))]
 
@@ -27,11 +27,7 @@ class SegmentRuleModel(BaseModel):
 
     @property
     def matching_function(self) -> typing.Callable[[typing.Iterable[object]], bool]:
-        return {
-            constants.ANY_RULE: any,
-            constants.ALL_RULE: all,
-            constants.NONE_RULE: SegmentRuleModel.none,
-        }[self.type]
+        return get_matching_function(self.type)
 
 
 class SegmentModel(BaseModel):
