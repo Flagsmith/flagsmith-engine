@@ -11,6 +11,14 @@ from flag_engine.identities.traits.models import TraitModel
 from flag_engine.segments.evaluator import get_evaluation_result
 from flag_engine.utils.exceptions import FeatureStateNotFound
 
+__all__ = (
+    "get_environment_feature_states",
+    "get_environment_feature_state",
+    "get_identity_feature_states",
+    "get_identity_feature_state",
+    "get_evaluation_result",
+)
+
 
 def get_environment_feature_states(
     environment: EnvironmentModel,
