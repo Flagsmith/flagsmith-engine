@@ -1,4 +1,5 @@
 import typing
+import warnings
 
 from flag_engine.context.mappers import (
     map_environment_identity_to_context,
@@ -28,6 +29,10 @@ def get_environment_feature_states(
 
     :param environment: the environment model object
     """
+    warnings.warn(
+        "`get_environment_feature_states` is deprecated, use `get_evaluation_result` instead.",
+        DeprecationWarning,
+    )
     if environment.get_hide_disabled_flags():
         return [fs for fs in environment.feature_states if fs.enabled]
     return environment.feature_states
@@ -42,6 +47,10 @@ def get_environment_feature_state(
     :param environment: the environment model object
     :param feature_name: the name of the feature to get the feature state for
     """
+    warnings.warn(
+        "`get_environment_feature_state` is deprecated, use `get_evaluation_result` instead.",
+        DeprecationWarning,
+    )
     try:
         return next(
             filter(lambda f: f.feature.name == feature_name, environment.feature_states)
@@ -65,6 +74,10 @@ def get_identity_feature_states(
     :return: list of feature state models based on the environment, any matching
         segments and any specific identity overrides
     """
+    warnings.warn(
+        "`get_identity_feature_states` is deprecated, use `get_evaluation_result` instead.",
+        DeprecationWarning,
+    )
     context = map_environment_identity_to_context(
         environment=environment,
         identity=identity,
@@ -96,6 +109,10 @@ def get_identity_feature_state(
     :return: feature state model based on the environment, any matching
         segments and any specific identity overrides
     """
+    warnings.warn(
+        "`get_identity_feature_state` is deprecated, use `get_evaluation_result` instead.",
+        DeprecationWarning,
+    )
     context = map_environment_identity_to_context(
         environment=environment,
         identity=identity,

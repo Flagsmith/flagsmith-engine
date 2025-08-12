@@ -1,6 +1,7 @@
 import operator
 import re
 import typing
+import warnings
 from contextlib import suppress
 from functools import partial, wraps
 
@@ -32,12 +33,16 @@ def get_identity_segments(
     environment: EnvironmentModel,
 ) -> typing.List[SegmentModel]:
     """
-    Get a list of segments for a given identity in a given environment.
+    DEPRECATED: Get a list of segments for a given identity in a given environment.
 
     :param identity: the identity model object to get the segments for
     :param environment: the environment model object the identity belongs to
     :return: list of segments that the identity belongs to in the environment
     """
+    warnings.warn(
+        "`get_identity_feature_states` is deprecated, use `get_evaluation_result` instead.",
+        DeprecationWarning,
+    )
     context = map_environment_identity_to_context(
         environment=environment,
         identity=identity,
@@ -53,11 +58,15 @@ def get_context_segments(
     context: EvaluationContext,
 ) -> typing.List[SegmentResult]:
     """
-    Get a list of segments for a given evaluation context.
+    DEPRECATED: Get a list of segments for a given evaluation context.
 
     :param context: the evaluation context
     :return: list of segments that match the context
     """
+    warnings.warn(
+        "`get_context_segments` is deprecated, use `get_evaluation_result` instead.",
+        DeprecationWarning,
+    )
     return get_evaluation_result(context)["segments"]
 
 
