@@ -86,7 +86,7 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                 ):
                     segment_feature_contexts[feature_key] = override_feature_context
 
-    flags: list[FlagResult] = [
+    flags: typing.List[FlagResult] = [
         (
             {
                 "enabled": segment_feature_context["enabled"],
