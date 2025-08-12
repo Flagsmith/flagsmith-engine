@@ -125,8 +125,6 @@ def map_environment_identity_to_context(
 
 def map_feature_states_to_feature_contexts(
     feature_states: typing.List[FeatureStateModel],
-    *,
-    priority: int | float | None = None,
 ) -> typing.Dict[str, FeatureContext]:
     features: typing.Dict[str, FeatureContext] = {}
     for feature_state in feature_states:
@@ -141,7 +139,8 @@ def map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
@@ -154,9 +153,7 @@ def map_feature_states_to_feature_contexts(
                 )
             ]
         if feature_segment := feature_state.feature_segment:
-            priority = feature_segment.priority
-        if priority is not None:
-            feature_ctx_data["priority"] = priority
+            feature_ctx_data["priority"] = feature_segment.priority
         features[feature_state.feature.name] = feature_ctx_data
     return features
 
