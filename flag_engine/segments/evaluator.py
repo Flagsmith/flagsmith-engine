@@ -125,13 +125,7 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
     return {
         "context": context,
         "flags": flags,
-        "segments": [
-            {
-                "key": segment_context["key"],
-                "name": segment_context["name"],
-            }
-            for segment_context in segments
-        ],
+        "segments": segments,
     }
 
 
