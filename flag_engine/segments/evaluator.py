@@ -77,14 +77,19 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
     :param context: the evaluation context
     :return: EvaluationResult containing the context, flags, and segments
     """
-    segments = [
-        segment_context
-        for segment_context in (context.get("segments") or {}).values()
-        if is_context_in_segment(context, segment_context)
-    ]
-
+    segments: typing.List[SegmentResult] = []
     segment_feature_contexts: typing.Dict[SupportsStr, FeatureContext] = {}
-    for segment_context in segments:
+    for segment_context in (context.get("segments") or {}).values():
+        if not is_context_in_segment(context, segment_context):
+            continue
+
+        segments.append(
+            {
+                "key": segment_context["key"],
+                "name": segment_context["name"],
+            }
+        )
+
         if overrides := segment_context.get("overrides"):
             for override_feature_context in overrides:
                 feature_key = override_feature_context["feature_key"]
