@@ -9,9 +9,9 @@ def get_matching_function(
     return {
         "ANY": any,
         "ALL": all,
-        "NONE": _none,
+        "NONE": none,
     }[segment_type]
 
 
-def _none(iterable: typing.Iterable[object]) -> bool:
+def none(iterable: typing.Iterable[object]) -> bool:
     return not any(iterable)

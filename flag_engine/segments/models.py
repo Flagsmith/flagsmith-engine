@@ -21,10 +21,6 @@ class SegmentRuleModel(BaseModel):
     rules: typing.List["SegmentRuleModel"] = Field(default_factory=list)
     conditions: typing.List[SegmentConditionModel] = Field(default_factory=list)
 
-    @staticmethod
-    def none(iterable: typing.Iterable[object]) -> bool:
-        return not any(iterable)
-
     @property
     def matching_function(self) -> typing.Callable[[typing.Iterable[object]], bool]:
         return get_matching_function(self.type)
