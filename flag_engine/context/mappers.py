@@ -47,7 +47,8 @@ def map_environment_identity_to_context(
     # Concatenate feature states overriden for identities
     # to segment contexts
     features_to_identifiers: typing.Dict[
-        tuple[tuple[str, str, bool, typing.Any], ...], list[str]
+        typing.Tuple[typing.Tuple[str, str, bool, typing.Any], ...],
+        typing.List[str],
     ] = {}
     for identity_override in (*environment.identity_overrides, identity):
         identity_features: typing.List[FeatureStateModel] = (
@@ -139,7 +140,8 @@ def map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
