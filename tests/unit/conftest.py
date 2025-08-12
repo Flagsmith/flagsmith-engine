@@ -6,10 +6,7 @@ from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import EvaluationContext
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
-from flag_engine.features.models import (
-    FeatureModel,
-    FeatureStateModel,
-)
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.organisations.models import OrganisationModel
