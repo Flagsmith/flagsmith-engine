@@ -19,6 +19,7 @@ from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
+    get_evaluation_result,
     get_flag_result_from_feature_context,
     get_identity_segments,
     is_context_in_segment,
@@ -635,6 +636,35 @@ def test_segment_condition_matches_context_value_for_modulo(
 
     # Then
     assert result == expected_result
+
+
+def test_get_evaluation_result__returns_expected(
+    context_in_segment: EvaluationContext,
+) -> None:
+    # When
+    result = get_evaluation_result(context_in_segment)
+
+    # Then
+    assert result == {
+        "context": context_in_segment,
+        "flags": [
+            {
+                "enabled": False,
+                "feature_key": "1",
+                "name": "feature_1",
+                "reason": "TARGETING_MATCH; segment=my_segment",
+                "value": "segment_override",
+            },
+            {
+                "enabled": False,
+                "feature_key": "2",
+                "name": "feature_2",
+                "reason": "DEFAULT",
+                "value": None,
+            },
+        ],
+        "segments": [{"key": "1", "name": "my_segment"}],
+    }
 
 
 @pytest.mark.parametrize(
