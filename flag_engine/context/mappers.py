@@ -1,4 +1,5 @@
 import typing
+from collections import defaultdict
 
 from flag_engine.context.types import (
     EvaluationContext,
@@ -16,6 +17,14 @@ from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.result.types import FlagResult
 from flag_engine.segments.models import SegmentRuleModel
+
+OverrideKey = typing.Tuple[
+    str,
+    str,
+    bool,
+    typing.Any,
+]
+OverridesKey = typing.Tuple[OverrideKey, ...]
 
 
 def map_environment_identity_to_context(
@@ -47,9 +56,9 @@ def map_environment_identity_to_context(
     # Concatenate feature states overriden for identities
     # to segment contexts
     features_to_identifiers: typing.Dict[
-        typing.Tuple[typing.Tuple[str, str, bool, typing.Any], ...],
+        OverridesKey,
         typing.List[str],
-    ] = {}
+    ] = defaultdict(list)
     for identity_override in (*environment.identity_overrides, identity):
         identity_features: typing.List[FeatureStateModel] = (
             identity_override.identity_features
@@ -65,9 +74,7 @@ def map_environment_identity_to_context(
             )
             for feature_state in sorted(identity_features, key=_get_name)
         )
-        features_to_identifiers.setdefault(overrides_key, []).append(
-            identity_override.identifier
-        )
+        features_to_identifiers[overrides_key].append(identity_override.identifier)
     for overrides_key, identifiers in features_to_identifiers.items():
         segment_name = f"overrides_{abs(hash(overrides_key))}"
         segments[segment_name] = SegmentContext(
@@ -140,7 +147,8 @@ def map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
