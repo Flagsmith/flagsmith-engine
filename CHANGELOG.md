@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.3](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.2...v6.0.3) (2025-08-13)
+
+
+### Other
+
+* Drop Python 3.7 support ([#240](https://github.com/Flagsmith/flagsmith-engine/issues/240)) ([ffadc79](https://github.com/Flagsmith/flagsmith-engine/commit/ffadc79fffe0328e77360d609fea159fef7befaf))
+
 ## [6.0.2](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.1...v6.0.2) (2025-08-06)
 
 
