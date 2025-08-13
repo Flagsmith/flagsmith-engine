@@ -33,7 +33,7 @@ def map_environment_identity_to_context(
     override_traits: typing.Optional[typing.List[TraitModel]],
 ) -> EvaluationContext:
     """
-    Maps an EnvironmentModel and IdentityModel to an EvaluationContext.
+    Map an EnvironmentModel and IdentityModel to an EvaluationContext.
 
     :param environment: The environment model object.
     :param identity: The identity model object.
@@ -134,6 +134,12 @@ def map_environment_identity_to_context(
 def map_feature_states_to_feature_contexts(
     feature_states: typing.List[FeatureStateModel],
 ) -> typing.Dict[str, FeatureContext]:
+    """
+    Map feature states to feature contexts.
+
+    :param feature_states: A list of FeatureStateModel objects.
+    :return: A dictionary mapping feature names to their contexts.
+    """
     features: typing.Dict[str, FeatureContext] = {}
     for feature_state in feature_states:
         feature_ctx_data: FeatureContext = {
@@ -170,6 +176,12 @@ def map_feature_states_to_feature_contexts(
 def map_segment_rules_to_segment_context_rules(
     rules: typing.List[SegmentRuleModel],
 ) -> typing.List[SegmentRule]:
+    """
+    Map segment rules to segment rules for the evaluation context.
+
+    :param rules: A list of SegmentRuleModel objects.
+    :return: A list of SegmentRule objects.
+    """
     return [
         {
             "type": rule.type,
@@ -190,6 +202,12 @@ def map_segment_rules_to_segment_context_rules(
 def map_flag_results_to_feature_states(
     flag_results: typing.List[FlagResult],
 ) -> typing.List[FeatureStateModel]:
+    """
+    Map flag results to feature states.
+
+    :param flag_results: A list of FlagResult objects.
+    :return: A list of FeatureStateModel objects.
+    """
     return [
         FeatureStateModel(
             feature=FeatureModel(
