@@ -29,7 +29,7 @@ OverridesKey = typing.Tuple[OverrideKey, ...]
 
 def map_environment_identity_to_context(
     environment: EnvironmentModel,
-    identity: IdentityModel,
+    identity: typing.Optional[IdentityModel],
     override_traits: typing.Optional[typing.List[TraitModel]],
 ) -> EvaluationContext:
     """
@@ -125,7 +125,9 @@ def map_environment_identity_to_context(
                     else identity.identity_traits
                 )
             },
-        },
+        }
+        if identity
+        else None,
         "features": features,
         "segments": segments,
     }
@@ -153,7 +155,8 @@ def map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
