@@ -40,7 +40,7 @@ def get_identity_segments(
     :return: list of segments that the identity belongs to in the environment
     """
     warnings.warn(
-        "`get_identity_feature_states` is deprecated, use `get_evaluation_result` instead.",
+        "`get_identity_segments` is deprecated, use `get_evaluation_result` instead.",
         DeprecationWarning,
     )
     context = map_environment_identity_to_context(
