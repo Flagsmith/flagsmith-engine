@@ -40,17 +40,17 @@ def map_environment_identity_to_context(
     :param override_traits: A list of TraitModel objects, to be used in place of `identity.identity_traits` if provided.
     :return: An EvaluationContext containing the environment and identity.
     """
-    features = map_feature_states_to_feature_contexts(environment.feature_states)
+    features = _map_feature_states_to_feature_contexts(environment.feature_states)
     segments: typing.Dict[str, SegmentContext] = {}
     for segment in environment.project.segments:
         segment_ctx_data: SegmentContext = {
             "key": str(segment.id),
             "name": segment.name,
-            "rules": map_segment_rules_to_segment_context_rules(segment.rules),
+            "rules": _map_segment_rules_to_segment_context_rules(segment.rules),
         }
         if segment_feature_states := segment.feature_states:
             segment_ctx_data["overrides"] = list(
-                map_feature_states_to_feature_contexts(segment_feature_states).values()
+                _map_feature_states_to_feature_contexts(segment_feature_states).values()
             )
         segments[segment.name] = segment_ctx_data
     # Concatenate feature states overriden for identities
@@ -59,7 +59,8 @@ def map_environment_identity_to_context(
         OverridesKey,
         typing.List[str],
     ] = defaultdict(list)
-    for identity_override in (*environment.identity_overrides, identity):
+    identity_overrides = environment.identity_overrides + [identity] if identity else []
+    for identity_override in identity_overrides:
         identity_features: typing.List[FeatureStateModel] = (
             identity_override.identity_features
         )
@@ -133,7 +134,7 @@ def map_environment_identity_to_context(
     }
 
 
-def map_feature_states_to_feature_contexts(
+def _map_feature_states_to_feature_contexts(
     feature_states: typing.List[FeatureStateModel],
 ) -> typing.Dict[str, FeatureContext]:
     """
@@ -175,7 +176,7 @@ def map_feature_states_to_feature_contexts(
     return features
 
 
-def map_segment_rules_to_segment_context_rules(
+def _map_segment_rules_to_segment_context_rules(
     rules: typing.List[SegmentRuleModel],
 ) -> typing.List[SegmentRule]:
     """
@@ -195,13 +196,13 @@ def map_segment_rules_to_segment_context_rules(
                 }
                 for condition in rule.conditions
             ],
-            "rules": map_segment_rules_to_segment_context_rules(rule.rules),
+            "rules": _map_segment_rules_to_segment_context_rules(rule.rules),
         }
         for rule in rules
     ]
 
 
-def map_flag_results_to_feature_states(
+def _map_flag_results_to_feature_states(
     flag_results: typing.List[FlagResult],
 ) -> typing.List[FeatureStateModel]:
     """
