@@ -119,16 +119,11 @@ def _map_identity_overrides_to_segment_contexts(
             rules=[
                 {
                     "type": "ALL",
-                    "rules": [
+                    "conditions": [
                         {
-                            "type": "ALL",
-                            "conditions": [
-                                {
-                                    "property": "$.identity.identifier",
-                                    "operator": "IN",
-                                    "value": ",".join(identifiers),
-                                }
-                            ],
+                            "property": "$.identity.identifier",
+                            "operator": "IN",
+                            "value": ",".join(identifiers),
                         }
                     ],
                 }
@@ -170,7 +165,8 @@ def _map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
