@@ -6,12 +6,7 @@ from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import EvaluationContext
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.constants import STANDARD
-from flag_engine.features.models import (
-    FeatureModel,
-    FeatureStateModel,
-    MultivariateFeatureOptionModel,
-    MultivariateFeatureStateValueModel,
-)
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
 from flag_engine.organisations.models import OrganisationModel
@@ -162,10 +157,10 @@ def identity_in_segment(
 @pytest.fixture
 def context_in_segment(
     identity_in_segment: IdentityModel,
-    environment: EnvironmentModel,
+    environment_with_segment_override: EnvironmentModel,
 ) -> EvaluationContext:
     return map_environment_identity_to_context(
-        environment=environment,
+        environment=environment_with_segment_override,
         identity=identity_in_segment,
         override_traits=None,
     )
@@ -183,17 +178,6 @@ def segment_override_fs(
     )
     fs.set_value("segment_override")
     return fs
-
-
-@pytest.fixture()
-def mv_feature_state_value() -> MultivariateFeatureStateValueModel:
-    return MultivariateFeatureStateValueModel(
-        id=1,
-        multivariate_feature_option=MultivariateFeatureOptionModel(
-            id=1, value="test_value"
-        ),
-        percentage_allocation=100,
-    )
 
 
 @pytest.fixture()

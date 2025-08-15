@@ -1,14 +1,13 @@
-import math
 import typing
 import uuid
+import warnings
 
-from annotated_types import Ge, Le, SupportsLt
+from annotated_types import Ge, Le
 from pydantic import UUID4, BaseModel, Field, model_validator
 from pydantic_collections import BaseCollectionModel
 from typing_extensions import Annotated
 
 from flag_engine.utils.exceptions import InvalidPercentageAllocation
-from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 
 
 class FeatureModel(BaseModel):
@@ -18,9 +17,6 @@ class FeatureModel(BaseModel):
 
     def __eq__(self, other: object) -> bool:
         return isinstance(other, FeatureModel) and self.id == other.id
-
-    def __hash__(self) -> int:
-        return hash(self.id)
 
 
 class MultivariateFeatureOptionModel(BaseModel):
@@ -88,72 +84,15 @@ class FeatureStateModel(BaseModel, validate_assignment=True):
 
     def get_value(self, identity_id: typing.Union[None, int, str] = None) -> typing.Any:
         """
-        Get the value of the feature state.
+        DEPRECATED: Get the value of the feature state.
+        Use the `feature_state_value` field directly instead.
 
         :param identity_id: a unique identifier for the identity, can be either a
             numeric id or a string but must be unique for the identity.
         :return: the value of the feature state.
         """
-        if identity_id and len(self.multivariate_feature_state_values) > 0:
-            return self._get_multivariate_value(identity_id)
-        return self.feature_state_value
-
-    def is_higher_segment_priority(self, other: "FeatureStateModel") -> bool:
-        """
-        Returns `True` if `self` is higher segment priority than `other`
-        (i.e. has lower value for feature_segment.priority)
-
-        NOTE:
-            A segment will be considered higher priority only if:
-            1. `other` does not have a feature segment(i.e: it is an environment feature state or it's a
-            feature state with feature segment but from an old document that does not have `feature_segment.priority`)
-            but `self` does.
-
-            2. `other` have a feature segment with high priority
-
-        """
-
-        if other_feature_segment := other.feature_segment:
-            if (
-                other_feature_segment_priority := other_feature_segment.priority
-            ) is not None:
-                return (
-                    getattr(
-                        self.feature_segment,
-                        "priority",
-                        math.inf,
-                    )
-                    < other_feature_segment_priority
-                )
-        return False
-
-    def _get_multivariate_value(
-        self, identity_id: typing.Union[int, str]
-    ) -> typing.Any:
-        percentage_value = get_hashed_percentage_for_object_ids(
-            [self.django_id or self.featurestate_uuid, identity_id]
+        warnings.warn(
+            "get_value is deprecated, use feature_state_value directly.",
+            DeprecationWarning,
         )
-
-        # Iterate over the mv options in order of id (so we get the same value each
-        # time) to determine the correct value to return to the identity based on
-        # the percentage allocations of the multivariate options. This gives us a
-        # way to ensure that the same value is returned every time we use the same
-        # percentage value.
-        start_percentage = 0.0
-
-        def _mv_fs_sort_key(mv_value: MultivariateFeatureStateValueModel) -> SupportsLt:
-            return mv_value.id or mv_value.mv_fs_value_uuid
-
-        for mv_value in sorted(
-            self.multivariate_feature_state_values,
-            key=_mv_fs_sort_key,
-        ):
-            limit = mv_value.percentage_allocation + start_percentage
-            if start_percentage <= percentage_value < limit:
-                return mv_value.multivariate_feature_option.value
-
-            start_percentage = limit
-
-        # default to return the control value if no MV values found, although this
-        # should never happen
         return self.feature_state_value
