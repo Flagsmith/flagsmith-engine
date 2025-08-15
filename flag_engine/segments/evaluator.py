@@ -1,3 +1,4 @@
+import json
 import operator
 import re
 import typing
@@ -322,12 +323,22 @@ def _evaluate_in(
     segment_value: typing.Optional[str], context_value: ContextValue
 ) -> bool:
     if segment_value:
-        if isinstance(context_value, str):
-            return context_value in segment_value.split(",")
+        try:
+            in_values = json.loads(segment_value)
+            # Only accept JSON lists.
+            # Ideally, we should use something like pydantic.TypeAdapter[list[str]],
+            # but we aim to ditch the pydantic dependency in the future.
+            if not isinstance(in_values, list):
+                raise ValueError
+            in_values = [str(value) for value in in_values]
+        except ValueError:
+            in_values = segment_value.split(",")
+        # Guard against comparing boolean values to numeric strings.
         if isinstance(context_value, int) and not any(
             context_value is x for x in (False, True)
         ):
-            return str(context_value) in segment_value.split(",")
+            context_value = str(context_value)
+        return context_value in in_values
     return False
 
 

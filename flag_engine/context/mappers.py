@@ -1,3 +1,4 @@
+import json
 import typing
 from collections import defaultdict
 
@@ -122,7 +123,7 @@ def _map_identity_overrides_to_segment_contexts(
                         {
                             "property": "$.identity.identifier",
                             "operator": "IN",
-                            "value": ",".join(identifiers),
+                            "value": json.dumps(identifiers),
                         }
                     ],
                 }
