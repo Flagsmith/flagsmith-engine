@@ -165,8 +165,7 @@ def _map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values
-            := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
@@ -225,9 +224,11 @@ def map_flag_results_to_feature_states(
             feature=FeatureModel(
                 id=flag_result["feature_key"],
                 name=flag_result["name"],
-                type="MULTIVARIATE"
-                if flag_result["reason"].startswith("SPLIT")
-                else "STANDARD",
+                type=(
+                    "MULTIVARIATE"
+                    if flag_result["reason"].startswith("SPLIT")
+                    else "STANDARD"
+                ),
             ),
             enabled=flag_result["enabled"],
             feature_state_value=flag_result["value"],
