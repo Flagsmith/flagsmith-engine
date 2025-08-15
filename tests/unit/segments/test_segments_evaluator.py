@@ -667,6 +667,112 @@ def test_get_evaluation_result__returns_expected(
     }
 
 
+def test_get_evaluation_result__two_segments_override_same_feature__returns_expected() -> (
+    None
+):
+    # Given
+    context_in_segments: EvaluationContext = {
+        "environment": {"key": "api-key", "name": ""},
+        "identity": {
+            "identifier": "identity_2",
+            "key": "api-key_identity_2",
+            "traits": {"foo": "bar"},
+        },
+        "features": {
+            "feature_1": {
+                "key": "1",
+                "feature_key": "1",
+                "name": "feature_1",
+                "enabled": False,
+                "value": None,
+            },
+            "feature_2": {
+                "key": "2",
+                "feature_key": "2",
+                "name": "feature_2",
+                "enabled": False,
+                "value": None,
+            },
+        },
+        "segments": {
+            "1": {
+                "key": "1",
+                "name": "my_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "key": "4",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "enabled": False,
+                        "value": "segment_override",
+                        "priority": 2,
+                    }
+                ],
+            },
+            "3": {
+                "key": "3",
+                "name": "higher_priority_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "enabled": True,
+                        "key": "2",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "value": "segment_override_other",
+                        "priority": 1,
+                    }
+                ],
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(context_in_segments)
+
+    # Then
+    assert result == {
+        "context": context_in_segments,
+        "flags": [
+            {
+                "enabled": True,
+                "feature_key": "1",
+                "name": "feature_1",
+                "reason": "TARGETING_MATCH; segment=higher_priority_segment",
+                "value": "segment_override_other",
+            },
+            {
+                "enabled": False,
+                "feature_key": "2",
+                "name": "feature_2",
+                "reason": "DEFAULT",
+                "value": None,
+            },
+        ],
+        "segments": [
+            {"key": "1", "name": "my_segment"},
+            {"key": "3", "name": "higher_priority_segment"},
+        ],
+    }
+
+
 @pytest.mark.parametrize(
     "percentage_value, expected_result",
     (
