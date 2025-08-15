@@ -153,13 +153,13 @@ def get_flag_result_from_feature_context(
         start_percentage = 0.0
 
         for variant in variants:
-            limit = variant["weight"] + start_percentage
+            limit = (weight := variant["weight"]) + start_percentage
             if start_percentage <= percentage_value < limit:
                 return {
                     "enabled": feature_context["enabled"],
                     "feature_key": feature_context["feature_key"],
                     "name": feature_context["name"],
-                    "reason": "SPLIT",
+                    "reason": f"SPLIT; weight={weight}",
                     "value": variant["value"],
                 }
 
