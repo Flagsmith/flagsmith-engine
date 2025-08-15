@@ -154,7 +154,7 @@ def _map_feature_states_to_feature_contexts(
     """
     features: typing.Dict[str, FeatureContext] = {}
     for feature_state in feature_states:
-        feature_ctx_data: FeatureContext = {
+        feature_context: FeatureContext = {
             "key": str(feature_state.django_id or feature_state.featurestate_uuid),
             "feature_key": str(feature_state.feature.id),
             "name": feature_state.feature.name,
@@ -167,7 +167,7 @@ def _map_feature_states_to_feature_contexts(
         if (
             multivariate_feature_state_values := feature_state.multivariate_feature_state_values
         ):
-            feature_ctx_data["variants"] = [
+            feature_context["variants"] = [
                 {
                     "value": multivariate_feature_state_value.multivariate_feature_option.value,
                     "weight": multivariate_feature_state_value.percentage_allocation,
@@ -179,8 +179,8 @@ def _map_feature_states_to_feature_contexts(
             ]
         if feature_segment := feature_state.feature_segment:
             if (priority := feature_segment.priority) is not None:
-                feature_ctx_data["priority"] = priority
-        features[feature_state.feature.name] = feature_ctx_data
+                feature_context["priority"] = priority
+        features[feature_state.feature.name] = feature_context
     return features
 
 
