@@ -51,13 +51,12 @@ def get_environment_feature_state(
         "`get_environment_feature_state` is deprecated, use `get_evaluation_result` instead.",
         DeprecationWarning,
     )
-    try:
-        return next(
-            filter(lambda f: f.feature.name == feature_name, environment.feature_states)
-        )
 
-    except StopIteration:
-        raise FeatureStateNotFound()
+    for feature_state in environment.feature_states:
+        if feature_state.feature.name == feature_name:
+            return feature_state
+
+    raise FeatureStateNotFound()
 
 
 def get_identity_feature_states(
@@ -121,17 +120,8 @@ def get_identity_feature_state(
 
     result = get_evaluation_result(context)
 
-    feature_states = map_flag_results_to_feature_states(result["flags"])
+    for feature_state in map_flag_results_to_feature_states(result["flags"]):
+        if feature_state.feature.name == feature_name:
+            return feature_state
 
-    matching_feature_state = next(
-        filter(
-            lambda feature_state: feature_state.feature.name == feature_name,
-            feature_states,
-        ),
-        None,
-    )
-
-    if not matching_feature_state:
-        raise FeatureStateNotFound()
-
-    return matching_feature_state
+    raise FeatureStateNotFound()
