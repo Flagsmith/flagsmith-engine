@@ -49,7 +49,7 @@ def get_identity_segments(
         override_traits=None,
     )
     return [
-        SegmentModel(id=segment_context["key"], name=segment_context["name"])
+        SegmentModel(id=segment_context["key"] or 0, name=segment_context["name"])
         for segment_context in get_evaluation_result(context)["segments"]
     ]
 

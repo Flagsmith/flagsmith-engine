@@ -13,6 +13,7 @@ from flag_engine.context.types import (
     SegmentContext,
 )
 from flag_engine.environments.models import EnvironmentModel
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.result.types import FlagResult
 from flag_engine.segments import constants
@@ -788,6 +789,51 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
             {"key": "1", "name": "my_segment"},
             {"key": "3", "name": "higher_priority_segment"},
         ],
+    }
+
+
+def test_get_evaluation_result__identity_override__returns_expected(
+    environment: EnvironmentModel,
+    feature_1: FeatureModel,
+    identity: IdentityModel,
+) -> None:
+    # Given
+    identity.identity_features.append(
+        FeatureStateModel(
+            feature=feature_1,
+            enabled=True,
+            value="overridden_for_identity",
+        )
+    )
+    context = map_environment_identity_to_context(
+        environment=environment,
+        identity=identity,
+        override_traits=None,
+    )
+
+    # When
+    result = get_evaluation_result(context)
+
+    # Then
+    assert result == {
+        "context": context,
+        "flags": [
+            {
+                "enabled": True,
+                "feature_key": "1",
+                "name": "feature_1",
+                "reason": "TARGETING_MATCH; segment=identity_overrides",
+                "value": None,
+            },
+            {
+                "enabled": False,
+                "feature_key": "2",
+                "name": "feature_2",
+                "reason": "DEFAULT",
+                "value": None,
+            },
+        ],
+        "segments": [{"key": "", "name": "identity_overrides"}],
     }
 
 

@@ -112,10 +112,9 @@ def _map_identity_overrides_to_segment_contexts(
         features_to_identifiers[overrides_key].append(identity_override.identifier)
     segment_contexts: typing.Dict[str, SegmentContext] = {}
     for overrides_key, identifiers in features_to_identifiers.items():
-        segment_name = f"overrides_{abs(hash(overrides_key))}"
-        segment_contexts[segment_name] = SegmentContext(
+        segment_contexts[str(hash(overrides_key))] = SegmentContext(
             key="",  # Identity override segments never use % Split operator
-            name=segment_name,
+            name="identity_overrides",
             rules=[
                 {
                     "type": "ALL",
