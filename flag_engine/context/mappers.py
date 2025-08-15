@@ -158,7 +158,8 @@ def _map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
@@ -203,7 +204,7 @@ def _map_segment_rules_to_segment_context_rules(
     ]
 
 
-def _map_flag_results_to_feature_states(
+def map_flag_results_to_feature_states(
     flag_results: typing.List[FlagResult],
 ) -> typing.List[FeatureStateModel]:
     """
