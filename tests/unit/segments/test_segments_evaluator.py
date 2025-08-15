@@ -19,6 +19,7 @@ from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
+    get_context_segments,
     get_evaluation_result,
     get_flag_result_from_feature_context,
     get_identity_segments,
@@ -296,6 +297,23 @@ def test_get_identity_segments__calls__returns_expected(
     # Then
     get_evaluation_result_spy.assert_called_once_with(expected_context)
     assert result == [SegmentModel(id=1, name="my_segment")]
+
+
+def test_get_context_segments__calls__returns_expected(
+    mocker: MockerFixture,
+    context_in_segment: EvaluationContext,
+) -> None:
+    # Given
+    get_evaluation_result_spy = mocker.spy(
+        flag_engine.segments.evaluator, "get_evaluation_result"
+    )
+
+    # When
+    result = get_context_segments(context_in_segment)
+
+    # Then
+    get_evaluation_result_spy.assert_called_once_with(context_in_segment)
+    assert result == [{"key": "1", "name": "my_segment"}]
 
 
 def test_context_in_segment_percentage_split__trait_value__calls_expected(
