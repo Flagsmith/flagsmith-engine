@@ -52,14 +52,48 @@ def map_environment_identity_to_context(
             segment_ctx_data["overrides"] = list(
                 _map_feature_states_to_feature_contexts(segment_feature_states).values()
             )
-        segments[segment.name] = segment_ctx_data
-    # Concatenate feature states overriden for identities
-    # to segment contexts
+        segments[str(segment.id)] = segment_ctx_data
+    identity_overrides = environment.identity_overrides + [identity] if identity else []
+    segments.update(_map_identity_overrides_to_segment_contexts(identity_overrides))
+    return {
+        "environment": {
+            "key": environment.api_key,
+            "name": environment.name or "",
+        },
+        "identity": (
+            {
+                "identifier": identity.identifier,
+                "key": str(identity.django_id or identity.composite_key),
+                "traits": {
+                    trait.trait_key: trait.trait_value
+                    for trait in (
+                        override_traits
+                        if override_traits is not None
+                        else identity.identity_traits
+                    )
+                },
+            }
+            if identity
+            else None
+        ),
+        "features": features,
+        "segments": segments,
+    }
+
+
+def _map_identity_overrides_to_segment_contexts(
+    identity_overrides: typing.List[IdentityModel],
+) -> typing.Dict[str, SegmentContext]:
+    """
+    Map identity overrides to segment contexts.
+
+    :param identity_overrides: A list of IdentityModel objects.
+    :return: A dictionary mapping segment ids to SegmentContext objects.
+    """
     features_to_identifiers: typing.Dict[
         OverridesKey,
         typing.List[str],
     ] = defaultdict(list)
-    identity_overrides = environment.identity_overrides + [identity] if identity else []
     for identity_override in identity_overrides:
         identity_features: typing.List[FeatureStateModel] = (
             identity_override.identity_features
@@ -76,9 +110,10 @@ def map_environment_identity_to_context(
             for feature_state in sorted(identity_features, key=_get_name)
         )
         features_to_identifiers[overrides_key].append(identity_override.identifier)
+    segment_contexts: typing.Dict[str, SegmentContext] = {}
     for overrides_key, identifiers in features_to_identifiers.items():
         segment_name = f"overrides_{abs(hash(overrides_key))}"
-        segments[segment_name] = SegmentContext(
+        segment_contexts[segment_name] = SegmentContext(
             key="",  # Identity override segments never use % Split operator
             name=segment_name,
             rules=[
@@ -110,30 +145,7 @@ def map_environment_identity_to_context(
                 for feature_key, feature_name, feature_enabled, feature_value in overrides_key
             ],
         )
-    return {
-        "environment": {
-            "key": environment.api_key,
-            "name": environment.name or "",
-        },
-        "identity": (
-            {
-                "identifier": identity.identifier,
-                "key": str(identity.django_id or identity.composite_key),
-                "traits": {
-                    trait.trait_key: trait.trait_value
-                    for trait in (
-                        override_traits
-                        if override_traits is not None
-                        else identity.identity_traits
-                    )
-                },
-            }
-            if identity
-            else None
-        ),
-        "features": features,
-        "segments": segments,
-    }
+    return segment_contexts
 
 
 def _map_feature_states_to_feature_contexts(
@@ -158,8 +170,7 @@ def _map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values
-            := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
         ):
             feature_ctx_data["variants"] = [
                 {
