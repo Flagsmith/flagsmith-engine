@@ -281,8 +281,8 @@ def test_get_identity_segments__calls__returns_expected(
     identity_in_segment: IdentityModel,
 ) -> None:
     # Given
-    get_context_segments_spy = mocker.spy(
-        flag_engine.segments.evaluator, "get_context_segments"
+    get_evaluation_result_spy = mocker.spy(
+        flag_engine.segments.evaluator, "get_evaluation_result"
     )
     expected_context = map_environment_identity_to_context(
         environment=environment,
@@ -294,7 +294,7 @@ def test_get_identity_segments__calls__returns_expected(
     result = get_identity_segments(identity_in_segment, environment)
 
     # Then
-    get_context_segments_spy.assert_called_once_with(expected_context)
+    get_evaluation_result_spy.assert_called_once_with(expected_context)
     assert result == [SegmentModel(id=1, name="my_segment")]
 
 
