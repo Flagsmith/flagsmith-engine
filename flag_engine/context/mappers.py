@@ -113,7 +113,10 @@ def _map_identity_overrides_to_segment_contexts(
         features_to_identifiers[overrides_key].append(identity_override.identifier)
     segment_contexts: typing.Dict[str, SegmentContext] = {}
     for overrides_key, identifiers in features_to_identifiers.items():
-        segment_contexts[str(hash(overrides_key))] = SegmentContext(
+        # Create a segment context for each unique set of overrides
+        # Generate a unique key to avoid collisions
+        segment_key = str(hash(overrides_key))
+        segment_contexts[segment_key] = SegmentContext(
             key="",  # Identity override segments never use % Split operator
             name="identity_overrides",
             rules=[
@@ -165,7 +168,8 @@ def _map_feature_states_to_feature_contexts(
             MultivariateFeatureStateValueModel
         ]
         if (
-            multivariate_feature_state_values := feature_state.multivariate_feature_state_values
+            multivariate_feature_state_values
+            := feature_state.multivariate_feature_state_values
         ):
             feature_context["variants"] = [
                 {
