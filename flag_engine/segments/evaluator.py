@@ -6,7 +6,7 @@ import warnings
 from contextlib import suppress
 from functools import lru_cache, wraps
 
-import jsonpath_rfc9535
+import jsonpath_rfc9535  # type: ignore[import-untyped]
 import semver
 
 from flag_engine.context.mappers import map_environment_identity_to_context
