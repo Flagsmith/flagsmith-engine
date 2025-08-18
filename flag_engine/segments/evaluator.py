@@ -96,8 +96,14 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                 feature_key = override_feature_context["feature_key"]
                 if (
                     feature_key not in segment_feature_contexts
-                    or override_feature_context.get("priority", 0)
-                    < segment_feature_contexts[feature_key].get("priority", 0)
+                    or override_feature_context.get(
+                        "priority",
+                        constants.DEFAULT_PRIORITY,
+                    )
+                    < segment_feature_contexts[feature_key].get(
+                        "priority",
+                        constants.DEFAULT_PRIORITY,
+                    )
                 ):
                     segment_feature_contexts[feature_key] = override_feature_context
 

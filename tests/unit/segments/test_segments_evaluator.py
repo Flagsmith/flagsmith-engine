@@ -812,6 +812,97 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
     }
 
 
+def test_get_evaluation_result__segment_override__no_priority__returns_expected() -> (
+    None
+):
+    # Given
+    context: EvaluationContext = {
+        "environment": {"key": "api-key", "name": ""},
+        "identity": {
+            "identifier": "identity_2",
+            "key": "api-key_identity_2",
+            "traits": {"foo": "bar"},
+        },
+        "features": {
+            "feature_1": {
+                "key": "1",
+                "feature_key": "1",
+                "name": "feature_1",
+                "enabled": False,
+                "value": None,
+            },
+        },
+        "segments": {
+            "1": {
+                "key": "1",
+                "name": "segment_without_override_priority",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "key": "3",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "enabled": True,
+                        "value": "overridden_without_priority",
+                    }
+                ],
+            },
+            "2": {
+                "key": "2",
+                "name": "segment_with_override_priority",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "key": "4",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "enabled": True,
+                        "value": "overridden_with_priority",
+                        "priority": 1,
+                    }
+                ],
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(context)
+
+    # Then
+    assert result == {
+        "context": context,
+        "flags": [
+            {
+                "enabled": True,
+                "feature_key": "1",
+                "name": "feature_1",
+                "reason": "TARGETING_MATCH; segment=segment_with_override_priority",
+                "value": "overridden_with_priority",
+            },
+        ],
+        "segments": [
+            {"key": "1", "name": "segment_without_override_priority"},
+            {"key": "2", "name": "segment_with_override_priority"},
+        ],
+    }
+
+
 def test_get_evaluation_result__identity_override__returns_expected(
     environment: EnvironmentModel,
     feature_1: FeatureModel,
