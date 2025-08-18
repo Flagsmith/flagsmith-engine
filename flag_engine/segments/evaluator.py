@@ -6,7 +6,7 @@ import warnings
 from contextlib import suppress
 from functools import lru_cache, wraps
 
-import jsonpath_rfc9535  # type: ignore[import-untyped]
+import jsonpath_rfc9535  # type: ignore[import]
 import semver
 
 from flag_engine.context.mappers import map_environment_identity_to_context
@@ -19,7 +19,7 @@ from flag_engine.context.types import (
 )
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.traits.types import ContextValue
+from flag_engine.identities.traits.types import ContextValue, is_trait_value
 from flag_engine.result.types import EvaluationResult, FlagResult, SegmentResult
 from flag_engine.segments import constants
 from flag_engine.segments.models import SegmentModel
@@ -392,7 +392,8 @@ def _get_context_value_getter(
     def getter(context: EvaluationContext) -> ContextValue:
         try:
             if result := compiled_query.find_one(context):
-                return result.value
+                if is_trait_value(value := result.value):
+                    return value
             return None
         except jsonpath_rfc9535.JSONPathError:  # pragma: no cover
             # This is supposed to be unreachable, but if it happens,
