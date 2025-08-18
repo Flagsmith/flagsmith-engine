@@ -229,7 +229,7 @@ def map_flag_results_to_feature_states(
                 name=flag_result["name"],
                 type=(
                     "MULTIVARIATE"
-                    if flag_result["reason"].startswith("SPLIT")
+                    if flag_result.get("reason", "").startswith("SPLIT")
                     else "STANDARD"
                 ),
             ),
