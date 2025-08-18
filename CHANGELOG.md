@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.2...v6.1.0) (2025-08-18)
+
+
+### Features
+
+* **v7:** `get_evaluation_result` ([#239](https://github.com/Flagsmith/flagsmith-engine/issues/239)) ([b1e4447](https://github.com/Flagsmith/flagsmith-engine/commit/b1e444733c14e74a61cac9b1173518366e34b31a))
+
+
+### Other
+
+* Drop Python 3.7 support ([#240](https://github.com/Flagsmith/flagsmith-engine/issues/240)) ([ffadc79](https://github.com/Flagsmith/flagsmith-engine/commit/ffadc79fffe0328e77360d609fea159fef7befaf))
+
 ## [6.0.2](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.1...v6.0.2) (2025-08-06)
 
 
