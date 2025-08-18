@@ -4,8 +4,9 @@ import re
 import typing
 import warnings
 from contextlib import suppress
-from functools import partial, wraps
+from functools import lru_cache, wraps
 
+import jsonpath_rfc9535
 import semver
 
 from flag_engine.context.mappers import map_environment_identity_to_context
@@ -23,7 +24,7 @@ from flag_engine.result.types import EvaluationResult, FlagResult, SegmentResult
 from flag_engine.segments import constants
 from flag_engine.segments.models import SegmentModel
 from flag_engine.segments.types import ConditionOperator
-from flag_engine.segments.utils import get_matching_function
+from flag_engine.segments.utils import escape_double_quotes, get_matching_function
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
@@ -256,26 +257,11 @@ def context_matches_condition(
     )
 
 
-def _get_trait(context: EvaluationContext, trait_key: str) -> ContextValue:
-    return (
-        identity_context["traits"][trait_key]
-        if (identity_context := context["identity"])
-        else None
-    )
-
-
 def get_context_value(
     context: EvaluationContext,
     property: str,
 ) -> ContextValue:
-    getter = CONTEXT_VALUE_GETTERS_BY_PROPERTY.get(property) or partial(
-        _get_trait,
-        trait_key=property,
-    )
-    try:
-        return getter(context)
-    except KeyError:
-        return None
+    return _get_context_value_getter(property)(context)
 
 
 def _matches_context_value(
@@ -385,8 +371,36 @@ MATCHERS_BY_OPERATOR: typing.Dict[
 }
 
 
-CONTEXT_VALUE_GETTERS_BY_PROPERTY = {
-    "$.identity.identifier": lambda context: context["identity"]["identifier"],
-    "$.identity.key": lambda context: context["identity"]["key"],
-    "$.environment.name": lambda context: context["environment"]["name"],
-}
+@lru_cache
+def _get_context_value_getter(
+    property: str,
+) -> typing.Callable[[EvaluationContext], ContextValue]:
+    """
+    Get a function to retrieve a context value based on property value,
+    assumed to be either a JSONPath string or a trait key.
+
+    :param property: The property to retrieve the value for.
+    :return: A function that takes an EvaluationContext and returns the value.
+    """
+    try:
+        compiled_query = jsonpath_rfc9535.compile(property)
+    except jsonpath_rfc9535.JSONPathSyntaxError:
+        compiled_query = jsonpath_rfc9535.compile(
+            f'$.identity.traits["{escape_double_quotes(property)}"]',
+        )
+
+    def getter(context: EvaluationContext) -> ContextValue:
+        try:
+            if result := compiled_query.find_one(context):
+                return result.value
+            return None
+        except jsonpath_rfc9535.JSONPathError:  # pragma: no cover
+            # This is supposed to be unreachable, but if it happens,
+            # we log a warning and return None.
+            warnings.warn(
+                f"Failed to evaluate JSONPath query '{property}' in context: {context}",
+                RuntimeWarning,
+            )
+            return None
+
+    return getter

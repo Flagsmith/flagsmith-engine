@@ -1,5 +1,6 @@
 annotated-types
-semver
+jsonpath-rfc9535
 pydantic
 pydantic-collections
+semver
 typing_extensions
