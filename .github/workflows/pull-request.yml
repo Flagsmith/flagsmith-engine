@@ -56,3 +56,4 @@ jobs:
         with:
           minimum_coverage: 100
           fail_below_threshold: true
+          show_missing: true
