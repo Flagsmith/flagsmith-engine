@@ -1,7 +1,7 @@
 import typing
 
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 from pytest_mock import MockerFixture
 
 import flag_engine.segments.evaluator
@@ -367,8 +367,8 @@ def test_context_in_segment_percentage_split__trait_value__calls_expected(
 @pytest.mark.parametrize(
     "operator,  property_, expected_result",
     (
-        (constants.IS_SET, lazy_fixture("segment_condition_property"), True),
-        (constants.IS_NOT_SET, lazy_fixture("segment_condition_property"), False),
+        (constants.IS_SET, lf("segment_condition_property"), True),
+        (constants.IS_NOT_SET, lf("segment_condition_property"), False),
         (constants.IS_SET, "random_property", False),
         (constants.IS_NOT_SET, "random_property", True),
     ),
