@@ -3,7 +3,9 @@ from pathlib import Path
 
 import pytest
 from pydantic import BaseModel
-from pytest_codspeed import BenchmarkFixture  # type: ignore[import-untyped]
+from pytest_codspeed import (  # type: ignore[import-untyped,unused-ignore]
+    BenchmarkFixture,
+)
 
 from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.engine import get_identity_feature_states
@@ -88,7 +90,7 @@ def test_engine(
 
 
 @pytest.mark.benchmark
-def test_engine_benchmark(benchmark: BenchmarkFixture) -> None:  # type: ignore[no-any-unimported]
+def test_engine_benchmark(benchmark: BenchmarkFixture) -> None:  # type: ignore[no-any-unimported,unused-ignore]
     contexts = []
     for environment_model, identity_model, _ in TEST_CASES:
         contexts.append(
@@ -99,7 +101,7 @@ def test_engine_benchmark(benchmark: BenchmarkFixture) -> None:  # type: ignore[
             )
         )
 
-    @benchmark  # type: ignore[misc]
+    @benchmark  # type: ignore[misc,unused-ignore]
     def __() -> None:
         for context in contexts:
             get_evaluation_result(context)
