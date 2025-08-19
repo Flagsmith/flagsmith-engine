@@ -99,7 +99,7 @@ def test_engine_benchmark(benchmark: BenchmarkFixture) -> None:  # type: ignore[
             )
         )
 
-    @benchmark
+    @benchmark  # type: ignore[misc]
     def __() -> None:
         for context in contexts:
             get_evaluation_result(context)
