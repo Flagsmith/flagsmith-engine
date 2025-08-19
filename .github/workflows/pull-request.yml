@@ -62,7 +62,7 @@ jobs:
         uses: CodSpeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: pytest --codspeed
+          run: pytest -c /dev/null --codspeed
 
       - name: Check Coverage
         uses: 5monkeys/cobertura-action@v14
