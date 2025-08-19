@@ -58,6 +58,12 @@ jobs:
       - name: Run Tests
         run: pytest -p no:warnings
 
+      - name: Run Benchmarks
+        uses: CodSpeedHQ/action@v3
+        with:
+          token: ${{ secrets.CODSPEED_TOKEN }}
+          run: pytest --codspeed
+
       - name: Check Coverage
         uses: 5monkeys/cobertura-action@v14
         with:
