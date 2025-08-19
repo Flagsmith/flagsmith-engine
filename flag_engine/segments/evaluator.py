@@ -390,8 +390,13 @@ def _get_context_value_getter(
         )
 
     def getter(context: EvaluationContext) -> ContextValue:
+        if typing.TYPE_CHECKING:  # pragma: no cover
+            # Ugly hack to satisfy mypy :(
+            data = dict(context)
+        else:
+            data = context
         try:
-            if result := compiled_query.find_one(context):
+            if result := compiled_query.find_one(data):
                 if is_trait_value(value := result.value):
                     return value
             return None
