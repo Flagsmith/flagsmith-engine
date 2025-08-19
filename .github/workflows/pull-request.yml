@@ -59,6 +59,7 @@ jobs:
         run: pytest -p no:warnings
 
       - name: Run Benchmarks
+        if: ${{ matrix.python-version == '3.9' }}
         uses: CodSpeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
