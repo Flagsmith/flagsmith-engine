@@ -3,10 +3,13 @@ from pathlib import Path
 
 import pytest
 from pydantic import BaseModel
+from pytest_codspeed import BenchmarkFixture  # type: ignore[import-untyped]
 
+from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.engine import get_identity_feature_states
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.models import IdentityModel
+from flag_engine.segments.evaluator import get_evaluation_result
 
 MODULE_PATH = Path(__file__).parent.resolve()
 
@@ -51,11 +54,14 @@ def _extract_test_cases(
         ]
 
 
+TEST_CASES = _extract_test_cases(
+    MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
+)
+
+
 @pytest.mark.parametrize(
     "environment_model, identity_model, api_response",
-    _extract_test_cases(
-        MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
-    ),
+    TEST_CASES,
 )
 def test_engine(
     environment_model: EnvironmentModel,
@@ -79,3 +85,21 @@ def test_engine(
         fs.feature.name: fs.get_value(identity_model.django_id)
         for fs in engine_response
     } == {flag["feature"]["name"]: flag["feature_state_value"] for flag in api_flags}
+
+
+@pytest.mark.benchmark
+def test_engine_benchmark(benchmark: BenchmarkFixture) -> None:  # type: ignore[no-any-unimported]
+    contexts = []
+    for environment_model, identity_model, _ in TEST_CASES:
+        contexts.append(
+            map_environment_identity_to_context(
+                environment=environment_model,
+                identity=identity_model,
+                override_traits=None,
+            )
+        )
+
+    @benchmark
+    def __() -> None:
+        for context in contexts:
+            get_evaluation_result(context)

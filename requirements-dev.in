@@ -2,11 +2,11 @@ pytest
 black
 flake8
 isort
+pytest-codspeed
 pytest-mock
-pytest-lazy-fixture
+pytest-lazy-fixtures
 pytest-cov
 pip-tools
-types-pytest-lazy-fixture
 types-setuptools
 mypy
 absolufy-imports
