@@ -58,16 +58,16 @@ jobs:
       - name: Run Tests
         run: pytest -p no:warnings
 
-      - name: Run Benchmarks
-        if: ${{ matrix.python-version == '3.9' }}
-        uses: CodSpeedHQ/action@v3
-        with:
-          token: ${{ secrets.CODSPEED_TOKEN }}
-          run: pytest -c /dev/null --codspeed
-
       - name: Check Coverage
         uses: 5monkeys/cobertura-action@v14
         with:
           minimum_coverage: 100
           fail_below_threshold: true
           show_missing: true
+
+      - name: Run Benchmarks
+        if: ${{ matrix.python-version == '3.9' }}
+        uses: CodSpeedHQ/action@v3
+        with:
+          token: ${{ secrets.CODSPEED_TOKEN }}
+          run: pytest --codspeed
