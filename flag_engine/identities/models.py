@@ -47,7 +47,7 @@ class IdentityModel(BaseModel):
 
     dashboard_alias: typing.Optional[str] = None
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def composite_key(self) -> str:
         return self.generate_composite_key(self.environment_api_key, self.identifier)
