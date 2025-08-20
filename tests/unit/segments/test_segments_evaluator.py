@@ -21,6 +21,7 @@ from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
     get_context_segments,
+    get_context_value,
     get_evaluation_result,
     get_flag_result_from_feature_context,
     get_identity_segments,
@@ -1028,3 +1029,38 @@ def test_get_flag_result_from_feature_context__call_return_expected(
             expected_key,
         ]
     )
+
+
+@pytest.mark.parametrize(
+    "property",
+    [
+        pytest.param("$.identity", id="jsonpath returns an object"),
+        'trait key "with quotes"',
+        "$.leads.to.nowhere",
+    ],
+)
+def test_get_context_value__invalid_jsonpath__returns_expected(
+    context: EvaluationContext,
+    property: str,
+) -> None:
+    # Given & When
+    result = get_context_value(context, property)
+
+    # Then
+    assert result is None
+
+
+def test_get_context_value__jsonpath_like_trait__returns_expected(
+    context: EvaluationContext,
+) -> None:
+    # Given
+    jsonpath_like_trait = '$.  i am not" a valid jsonpath'
+    expected_result = "some_value"
+    assert context["identity"]
+    context["identity"]["traits"][jsonpath_like_trait] = expected_result
+
+    # When
+    result = get_context_value(context, jsonpath_like_trait)
+
+    # Then
+    assert result == expected_result

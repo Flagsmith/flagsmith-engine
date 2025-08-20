@@ -2,7 +2,7 @@
 #    uv pip compile requirements-dev.in --constraints requirements.txt -o requirements-dev.txt --python-version 3.9
 absolufy-imports==0.3.1
     # via -r requirements-dev.in
-annotated-types==0.5.0
+annotated-types==0.7.0
     # via
     #   -c requirements.txt
     #   pydantic
@@ -85,11 +85,11 @@ pycodestyle==2.14.0
     # via flake8
 pycparser==2.22
     # via cffi
-pydantic==2.4.0
+pydantic==2.10.6
     # via
     #   -c requirements.txt
     #   datamodel-code-generator
-pydantic-core==2.10.0
+pydantic-core==2.27.2
     # via
     #   -c requirements.txt
     #   pydantic
@@ -133,11 +133,11 @@ tomli==2.2.1
     #   mypy
     #   pip-tools
     #   pytest
-typeguard==4.2.0
+typeguard==4.4.2
     # via inflect
 types-setuptools==80.9.0.20250809
     # via -r requirements-dev.in
-typing-extensions==4.8.0
+typing-extensions==4.13.2
     # via
     #   -c requirements.txt
     #   black

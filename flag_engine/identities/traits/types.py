@@ -11,6 +11,14 @@ from flag_engine.identities.traits.constants import TRAIT_STRING_VALUE_MAX_LENGT
 _UnconstrainedContextValue = Union[None, int, float, bool, str]
 
 
+def is_trait_value(value: Any) -> TypeGuard[_UnconstrainedContextValue]:
+    """
+    Check if the value is a valid trait value type.
+    This function is used to determine if a value can be treated as a trait value.
+    """
+    return isinstance(value, get_args(_UnconstrainedContextValue))
+
+
 def map_any_value_to_trait_value(value: Any) -> _UnconstrainedContextValue:
     """
     Try to coerce a value of arbitrary type to a trait value type.
