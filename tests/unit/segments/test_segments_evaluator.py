@@ -1048,3 +1048,19 @@ def test_get_context_value__invalid_jsonpath__returns_expected(
 
     # Then
     assert result is None
+
+
+def test_get_context_value__jsonpath_like_trait__returns_expected(
+    context: EvaluationContext,
+) -> None:
+    # Given
+    jsonpath_like_trait = '$.  i am not" a valid jsonpath'
+    expected_result = "some_value"
+    assert context["identity"]
+    context["identity"]["traits"][jsonpath_like_trait] = expected_result
+
+    # When
+    result = get_context_value(context, jsonpath_like_trait)
+
+    # Then
+    assert result == expected_result

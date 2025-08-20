@@ -261,7 +261,12 @@ def get_context_value(
     context: EvaluationContext,
     property: str,
 ) -> ContextValue:
-    return _get_context_value_getter(property)(context)
+    if property.startswith("$."):
+        return _get_context_value_getter(property)(context)
+    if identity_context := context.get("identity"):
+        if traits := identity_context.get("traits"):
+            return traits.get(property)
+    return None
 
 
 def _matches_context_value(
@@ -385,6 +390,8 @@ def _get_context_value_getter(
     try:
         compiled_query = jsonpath_rfc9535.compile(property)
     except jsonpath_rfc9535.JSONPathSyntaxError:
+        # This covers a rare case when a trait starting with "$.",
+        # but not a valid JSONPath, is used.
         compiled_query = jsonpath_rfc9535.compile(
             f'$.identity.traits["{escape_double_quotes(property)}"]',
         )
