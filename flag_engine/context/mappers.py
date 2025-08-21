@@ -4,13 +4,13 @@ from decimal import Decimal
 
 from flag_engine.segments.types import ContextValue, is_context_value
 
-OverrideKey = typing.Tuple[
+OverrideKey = tuple[
     str,
     str,
     bool,
     typing.Any,
 ]
-OverridesKey = typing.Tuple[OverrideKey, ...]
+OverridesKey = tuple[OverrideKey, ...]
 
 
 def map_any_value_to_context_value(value: typing.Any) -> ContextValue:
