@@ -9,6 +9,7 @@ from functools import lru_cache, wraps
 import jsonpath_rfc9535
 import semver
 
+from flag_engine.context.mappers import map_any_value_to_context_value
 from flag_engine.context.types import (
     EvaluationContext,
     FeatureContext,
@@ -238,12 +239,13 @@ def get_context_value(
     context: EvaluationContext,
     property: str,
 ) -> ContextValue:
+    value = None
     if property.startswith("$."):
-        return _get_context_value_getter(property)(context)
-    if identity_context := context.get("identity"):
+        value = _get_context_value_getter(property)(context)
+    elif identity_context := context.get("identity"):
         if traits := identity_context.get("traits"):
-            return traits.get(property)
-    return None
+            value = traits.get(property)
+    return map_any_value_to_context_value(value)
 
 
 def _matches_context_value(
