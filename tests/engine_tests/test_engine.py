@@ -142,8 +142,10 @@ def _extract_test_cases(
         yield context, response
 
 
-TEST_CASES = _extract_test_cases(
-    MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
+TEST_CASES = list(
+    _extract_test_cases(
+        MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
+    )
 )
 
 
