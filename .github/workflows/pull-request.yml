@@ -71,4 +71,4 @@ jobs:
         uses: CodSpeedHQ/action@v3
         with:
           token: ${{ secrets.CODSPEED_TOKEN }}
-          run: pytest --codspeed
+          run: pytest --codspeed --no-cov
