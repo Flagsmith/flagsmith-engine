@@ -4,18 +4,10 @@ from decimal import Decimal
 
 from flag_engine.segments.types import ContextValue, is_context_value
 
-OverrideKey = tuple[
-    str,
-    str,
-    bool,
-    typing.Any,
-]
-OverridesKey = tuple[OverrideKey, ...]
-
 
 def map_any_value_to_context_value(value: typing.Any) -> ContextValue:
     """
-    Try to coerce a value of arbitrary type to a trait value type.
+    Try to coerce a value of arbitrary type to a context value type.
     Union member-specific constraints, such as max string value length, are ignored here.
     Replicate behaviour from marshmallow/pydantic V1 for number-like strings.
     For decimals return an int in case of unset exponent.
