@@ -3,9 +3,7 @@
 absolufy-imports==0.3.1
     # via -r requirements-dev.in
 annotated-types==0.7.0
-    # via
-    #   -c requirements.txt
-    #   pydantic
+    # via pydantic
 argcomplete==3.6.2
     # via datamodel-code-generator
 black==25.1.0
@@ -85,14 +83,10 @@ pycodestyle==2.14.0
     # via flake8
 pycparser==2.22
     # via cffi
-pydantic==2.10.6
-    # via
-    #   -c requirements.txt
-    #   datamodel-code-generator
-pydantic-core==2.27.2
-    # via
-    #   -c requirements.txt
-    #   pydantic
+pydantic==2.11.7
+    # via datamodel-code-generator
+pydantic-core==2.33.2
+    # via pydantic
 pyflakes==3.4.0
     # via flake8
 pygments==2.19.2
@@ -133,11 +127,11 @@ tomli==2.2.1
     #   mypy
     #   pip-tools
     #   pytest
-typeguard==4.4.2
+typeguard==4.4.4
     # via inflect
 types-setuptools==80.9.0.20250809
     # via -r requirements-dev.in
-typing-extensions==4.13.2
+typing-extensions==4.14.1
     # via
     #   -c requirements.txt
     #   black
@@ -146,6 +140,9 @@ typing-extensions==4.13.2
     #   pydantic
     #   pydantic-core
     #   typeguard
+    #   typing-inspection
+typing-inspection==0.4.1
+    # via pydantic
 wheel==0.45.1
     # via pip-tools
 zipp==3.23.0

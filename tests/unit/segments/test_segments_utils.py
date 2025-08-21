@@ -1,5 +1,3 @@
-import typing
-
 import pytest
 
 from flag_engine.segments.utils import none
@@ -16,7 +14,7 @@ from flag_engine.segments.utils import none
     ),
 )
 def test_segment_rule_none(
-    iterable: typing.List[bool],
+    iterable: list[bool],
     expected_result: bool,
 ) -> None:
     assert none(iterable) is expected_result

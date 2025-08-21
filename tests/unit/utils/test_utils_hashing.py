@@ -1,5 +1,4 @@
 import itertools
-import typing
 import uuid
 from unittest import mock
 
@@ -18,7 +17,7 @@ from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
     ),
 )
 def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_exc(
-    object_ids: typing.List[typing.Union[uuid.UUID, int, str]],
+    object_ids: list[uuid.UUID | int | str],
 ) -> None:
     assert 100 > get_hashed_percentage_for_object_ids(object_ids) >= 0
 
@@ -33,7 +32,7 @@ def test_get_hashed_percentage_for_object_ids_is_number_between_0_inc_and_100_ex
     ),
 )
 def test_get_hashed_percentage_for_object_ids_is_the_same_each_time(
-    object_ids: typing.List[typing.Union[uuid.UUID, int, str]],
+    object_ids: list[uuid.UUID | int | str],
 ) -> None:
     # When
     result_1 = get_hashed_percentage_for_object_ids(object_ids)

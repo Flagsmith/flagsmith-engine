@@ -16,8 +16,8 @@ from flag_engine.engine import get_evaluation_result
 
 MODULE_PATH = Path(__file__).parent.resolve()
 
-EnvironmentDocument = typing.Dict[str, typing.Any]
-APIResponse = typing.Dict[str, typing.Any]
+EnvironmentDocument = dict[str, typing.Any]
+APIResponse = dict[str, typing.Any]
 
 
 @dataclass
@@ -28,7 +28,7 @@ class EngineTestCase:
 
 def _extract_test_cases(
     file_path: Path,
-) -> typing.Iterable[typing.Tuple[EvaluationContext, APIResponse]]:
+) -> typing.Iterable[tuple[EvaluationContext, APIResponse]]:
     """
     Extract the test cases from the json data file which should be in the following
     format.
