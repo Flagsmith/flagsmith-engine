@@ -1,36 +1,34 @@
+import json
 import typing
+from dataclasses import dataclass
+from operator import itemgetter
 from pathlib import Path
 
 import pytest
-from pydantic import BaseModel
-from pytest_codspeed import (  # type: ignore[import-untyped,unused-ignore]
-    BenchmarkFixture,
-)
+from pytest_mock import MockerFixture
 
-from flag_engine.context.mappers import map_environment_identity_to_context
-from flag_engine.engine import get_identity_feature_states
-from flag_engine.environments.models import EnvironmentModel
-from flag_engine.identities.models import IdentityModel
-from flag_engine.segments.evaluator import get_evaluation_result
+from flag_engine.context.types import (
+    EvaluationContext,
+    FeatureContext,
+    SegmentRule,
+)
+from flag_engine.engine import get_evaluation_result
 
 MODULE_PATH = Path(__file__).parent.resolve()
 
+EnvironmentDocument = typing.Dict[str, typing.Any]
 APIResponse = typing.Dict[str, typing.Any]
 
 
-class EngineTestCase(BaseModel):
-    identity: IdentityModel
+@dataclass
+class EngineTestCase:
+    context: EvaluationContext
     response: APIResponse
-
-
-class EngineTestData(BaseModel):
-    environment: EnvironmentModel
-    identities_and_responses: typing.List[EngineTestCase]
 
 
 def _extract_test_cases(
     file_path: Path,
-) -> typing.Iterable[typing.Tuple[EnvironmentModel, IdentityModel, APIResponse]]:
+) -> typing.Iterable[typing.Tuple[EvaluationContext, APIResponse]]:
     """
     Extract the test cases from the json data file which should be in the following
     format.
@@ -48,12 +46,100 @@ def _extract_test_cases(
     :param file_path: the path to the json data file
     :return: a list of tuples containing the environment, identity and api response
     """
-    with open(file_path, "r") as f:
-        test_data = EngineTestData.model_validate_json(f.read())
+    test_data = json.load(file_path.open("rb"))
+
+    environment_document = test_data["environment"]
+
+    def _extract_segment_rules(rules: list[dict[str, typing.Any]]) -> list[SegmentRule]:
         return [
-            (test_data.environment, test_case.identity, test_case.response)
-            for test_case in test_data.identities_and_responses
+            {
+                "type": rule["type"],
+                "conditions": [
+                    {
+                        "property": condition.get("property_"),
+                        "operator": condition["operator"],
+                        "value": condition["value"],
+                    }
+                    for condition in rule.get("conditions", [])
+                ],
+                "rules": _extract_segment_rules(rule.get("rules", [])),
+            }
+            for rule in rules
         ]
+
+    def _extract_feature_contexts(
+        feature_states: list[dict[str, typing.Any]],
+    ) -> typing.Iterable[FeatureContext]:
+        for feature_state in feature_states:
+            feature_context = FeatureContext(
+                key=str(feature_state["django_id"]),
+                feature_key=str(feature_state["feature"]["id"]),
+                name=feature_state["feature"]["name"],
+                enabled=feature_state["enabled"],
+                value=feature_state["feature_state_value"],
+            )
+            if multivariate_feature_state_values := feature_state.get(
+                "multivariate_feature_state_values"
+            ):
+                feature_context["variants"] = [
+                    {
+                        "value": multivariate_feature_state_value[
+                            "multivariate_feature_option"
+                        ]["value"],
+                        "weight": multivariate_feature_state_value[
+                            "percentage_allocation"
+                        ],
+                    }
+                    for multivariate_feature_state_value in sorted(
+                        multivariate_feature_state_values,
+                        key=itemgetter("id"),
+                    )
+                ]
+            if (
+                priority := (feature_state.get("feature_segment") or {}).get("priority")
+                is not None
+            ):
+                feature_context["priority"] = priority
+
+            yield feature_context
+
+    for case in test_data["identities_and_responses"]:
+        identity_data = case["identity"]
+        response = case["response"]
+
+        context: EvaluationContext = {
+            "environment": {
+                "key": environment_document["api_key"],
+                "name": "Test Environment",
+            },
+            "features": {
+                feature["name"]: feature
+                for feature in _extract_feature_contexts(
+                    environment_document["feature_states"]
+                )
+            },
+            "segments": {
+                str(segment["id"]): {
+                    "key": str(segment["id"]),
+                    "name": segment["name"],
+                    "rules": _extract_segment_rules(segment["rules"]),
+                    "overrides": [
+                        *_extract_feature_contexts(segment.get("feature_states", []))
+                    ],
+                }
+                for segment in environment_document["project"]["segments"]
+            },
+            "identity": {
+                "identifier": identity_data["identifier"],
+                "key": identity_data.get("django_id") or identity_data["composite_key"],
+                "traits": {
+                    trait["trait_key"]: trait["trait_value"]
+                    for trait in identity_data["identity_traits"]
+                },
+            },
+        }
+
+        yield context, response
 
 
 TEST_CASES = _extract_test_cases(
@@ -62,46 +148,31 @@ TEST_CASES = _extract_test_cases(
 
 
 @pytest.mark.parametrize(
-    "environment_model, identity_model, api_response",
+    "context, response",
     TEST_CASES,
 )
 def test_engine(
-    environment_model: EnvironmentModel,
-    identity_model: IdentityModel,
-    api_response: typing.Dict[str, typing.Any],
+    context: EvaluationContext,
+    response: APIResponse,
+    mocker: MockerFixture,
 ) -> None:
     # When
-    # we get the feature states from the engine
-    engine_response = get_identity_feature_states(environment_model, identity_model)
-
-    # and we sort the feature states so we can iterate over them and compare
-    api_flags = api_response["flags"]
+    engine_response = get_evaluation_result(context)
 
     # Then
-    # there are an equal number of flags and feature states
-    assert len(engine_response) == len(api_flags)
-
-    # and the values and enabled status of each of the feature states returned by the
-    # engine are identical to those returned by the Django API (i.e. the test data).
-    assert {
-        fs.feature.name: fs.get_value(identity_model.django_id)
-        for fs in engine_response
-    } == {flag["feature"]["name"]: flag["feature_state_value"] for flag in api_flags}
+    assert {flag["feature_key"]: flag for flag in engine_response["flags"]} == {
+        (feature_key := str(flag["feature"]["id"])): {
+            "name": flag["feature"]["name"],
+            "feature_key": feature_key,
+            "enabled": flag["enabled"],
+            "value": flag["feature_state_value"],
+            "reason": mocker.ANY,
+        }
+        for flag in response["flags"]
+    }
 
 
 @pytest.mark.benchmark
-def test_engine_benchmark(benchmark: BenchmarkFixture) -> None:  # type: ignore[no-any-unimported,unused-ignore]
-    contexts = []
-    for environment_model, identity_model, _ in TEST_CASES:
-        contexts.append(
-            map_environment_identity_to_context(
-                environment=environment_model,
-                identity=identity_model,
-                override_traits=None,
-            )
-        )
-
-    @benchmark  # type: ignore[misc,unused-ignore]
-    def __() -> None:
-        for context in contexts:
-            get_evaluation_result(context)
+def test_engine_benchmark() -> None:
+    for context, _ in TEST_CASES:
+        get_evaluation_result(context)

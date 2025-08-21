@@ -9,7 +9,6 @@ from functools import lru_cache, wraps
 import jsonpath_rfc9535
 import semver
 
-from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import (
     EvaluationContext,
     FeatureContext,
@@ -18,59 +17,13 @@ from flag_engine.context.types import (
     SegmentRule,
     StrValueSegmentCondition,
 )
-from flag_engine.environments.models import EnvironmentModel
-from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.traits.types import ContextValue, is_trait_value
 from flag_engine.result.types import EvaluationResult, FlagResult, SegmentResult
 from flag_engine.segments import constants
-from flag_engine.segments.models import SegmentModel
-from flag_engine.segments.types import ConditionOperator
+from flag_engine.segments.types import ConditionOperator, ContextValue, is_context_value
 from flag_engine.segments.utils import escape_double_quotes, get_matching_function
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
-
-
-def get_identity_segments(
-    identity: IdentityModel,
-    environment: EnvironmentModel,
-) -> typing.List[SegmentModel]:
-    """
-    DEPRECATED: Get a list of segments for a given identity in a given environment.
-
-    :param identity: the identity model object to get the segments for
-    :param environment: the environment model object the identity belongs to
-    :return: list of segments that the identity belongs to in the environment
-    """
-    warnings.warn(
-        "`get_identity_segments` is deprecated, use `get_evaluation_result` instead.",
-        DeprecationWarning,
-    )
-    context = map_environment_identity_to_context(
-        environment=environment,
-        identity=identity,
-        override_traits=None,
-    )
-    return [
-        SegmentModel(id=segment_context["key"] or 0, name=segment_context["name"])
-        for segment_context in get_evaluation_result(context)["segments"]
-    ]
-
-
-def get_context_segments(
-    context: EvaluationContext,
-) -> typing.List[SegmentResult]:
-    """
-    DEPRECATED: Get a list of segments for a given evaluation context.
-
-    :param context: the evaluation context
-    :return: list of segments that match the context
-    """
-    warnings.warn(
-        "`get_context_segments` is deprecated, use `get_evaluation_result` instead.",
-        DeprecationWarning,
-    )
-    return get_evaluation_result(context)["segments"]
 
 
 def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
@@ -404,7 +357,7 @@ def _get_context_value_getter(
             data = context
         try:
             if result := compiled_query.find_one(data):
-                if is_trait_value(value := result.value):
+                if is_context_value(value := result.value):
                     return value
             return None
         except jsonpath_rfc9535.JSONPathError:  # pragma: no cover
