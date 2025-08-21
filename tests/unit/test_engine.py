@@ -1,9 +1,7 @@
 import json
 
 from flag_engine.context.types import EvaluationContext, IdentityContext, SegmentContext
-from flag_engine.engine import (
-    get_evaluation_result,
-)
+from flag_engine.engine import get_evaluation_result
 
 
 def test_get_evaluation_result__no_overrides__returns_expected(
