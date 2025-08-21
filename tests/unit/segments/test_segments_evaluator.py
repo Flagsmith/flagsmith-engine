@@ -1,3 +1,5 @@
+import typing
+
 import pytest
 from pytest_lazy_fixtures import lf
 from pytest_mock import MockerFixture
@@ -426,7 +428,7 @@ def test_context_in_segment_is_set_and_is_not_set(
 )
 def test_segment_condition_matches_context_value(
     operator: ConditionOperator,
-    trait_value: None | int | str | float,
+    trait_value: typing.Union[None, int, str, float],
     condition_value: str,
     expected_result: bool,
 ) -> None:
@@ -727,7 +729,7 @@ def test_context_matches_condition(
     ],
 )
 def test_segment_condition_matches_context_value_for_modulo(
-    trait_value: int | float | str | bool,
+    trait_value: typing.Union[int, float, str, bool],
     condition_value: str,
     expected_result: bool,
 ) -> None:

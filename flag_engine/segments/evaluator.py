@@ -259,14 +259,14 @@ def _matches_context_value(
 
 
 def _evaluate_not_contains(
-    segment_value: str | None,
+    segment_value: typing.Optional[str],
     context_value: ContextValue,
 ) -> bool:
     return isinstance(context_value, str) and str(segment_value) not in context_value
 
 
 def _evaluate_regex(
-    segment_value: str | None,
+    segment_value: typing.Optional[str],
     context_value: ContextValue,
 ) -> bool:
     return (
@@ -276,7 +276,7 @@ def _evaluate_regex(
 
 
 def _evaluate_modulo(
-    segment_value: str | None,
+    segment_value: typing.Optional[str],
     context_value: ContextValue,
 ) -> bool:
     if not isinstance(context_value, (int, float)):
@@ -297,11 +297,11 @@ def _evaluate_modulo(
 
 def _context_value_typed(
     func: typing.Callable[..., bool],
-) -> typing.Callable[[str | None, ContextValue], bool]:
+) -> typing.Callable[[typing.Optional[str], ContextValue], bool]:
     @wraps(func)
     def inner(
-        segment_value: str | None,
-        context_value: ContextValue | semver.Version,
+        segment_value: typing.Optional[str],
+        context_value: typing.Union[ContextValue, semver.Version],
     ) -> bool:
         with suppress(TypeError, ValueError):
             if isinstance(context_value, str) and is_semver(segment_value):
@@ -316,7 +316,7 @@ def _context_value_typed(
 
 
 MATCHERS_BY_OPERATOR: dict[
-    ConditionOperator, typing.Callable[[str | None, ContextValue], bool]
+    ConditionOperator, typing.Callable[[typing.Optional[str], ContextValue], bool]
 ] = {
     constants.NOT_CONTAINS: _evaluate_not_contains,
     constants.REGEX: _evaluate_regex,
