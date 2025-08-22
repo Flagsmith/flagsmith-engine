@@ -1036,15 +1036,13 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
 ) -> None:
     # Given
     expected_feature_context_key = "2"
+    # a None key is provided (no identity context present)
     expected_key = None
 
-    # we mock the function which gets the percentage value for an identity to
-    # return a deterministic value so we know which value to expect
     get_hashed_percentage_for_object_ids_mock = mocker.patch(
         "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids",
     )
 
-    # and have a feature context with some multivariate feature options and associated values
     feature_context: FeatureContext = {
         "key": expected_feature_context_key,
         "feature_key": "1",
@@ -1064,7 +1062,7 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
     )
 
     # Then
-    # the value of the feature state is correct based on the percentage value returned
+    # the value of the feature state is the default one
     assert result == {
         "enabled": False,
         "feature_key": "1",
