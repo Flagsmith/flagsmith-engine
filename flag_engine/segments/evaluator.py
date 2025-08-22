@@ -109,7 +109,7 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                     segment_feature_contexts[feature_key] = override_feature_context
 
     identity_key = get_context_value(context, "$.identity.key")
-    flags: typing.List[FlagResult] = [
+    flags: list[FlagResult] = [
         (
             {
                 "enabled": segment_feature_context["enabled"],
@@ -140,7 +140,7 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
 
 def get_flag_result_from_feature_context(
     feature_context: FeatureContext,
-    key: SupportsStr,
+    key: typing.Optional[SupportsStr],
 ) -> FlagResult:
     """
     Get a feature value from the feature context
@@ -150,7 +150,7 @@ def get_flag_result_from_feature_context(
     :param key: the key to get the value for
     :return: the value for the key in the feature context
     """
-    if variants := feature_context.get("variants"):
+    if key is not None and (variants := feature_context.get("variants")):
         percentage_value = get_hashed_percentage_for_object_ids(
             [feature_context["key"], key]
         )

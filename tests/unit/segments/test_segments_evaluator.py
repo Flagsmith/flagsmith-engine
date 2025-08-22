@@ -984,7 +984,7 @@ def test_get_evaluation_result__identity_override__returns_expected(
         ),
     ),
 )
-def test_get_flag_result_from_feature_context__call_return_expected(
+def test_get_flag_result_from_feature_context__calls_returns_expected(
     percentage_value: int,
     expected_result: FlagResult,
     mocker: MockerFixture,
@@ -1029,6 +1029,52 @@ def test_get_flag_result_from_feature_context__call_return_expected(
             expected_key,
         ]
     )
+
+
+def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
+    mocker: MockerFixture,
+) -> None:
+    # Given
+    expected_feature_context_key = "2"
+    expected_key = None
+
+    # we mock the function which gets the percentage value for an identity to
+    # return a deterministic value so we know which value to expect
+    get_hashed_percentage_for_object_ids_mock = mocker.patch(
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids",
+    )
+
+    # and have a feature context with some multivariate feature options and associated values
+    feature_context: FeatureContext = {
+        "key": expected_feature_context_key,
+        "feature_key": "1",
+        "enabled": False,
+        "name": "my_feature",
+        "value": "control",
+        "variants": [
+            {"value": "foo", "weight": 30},
+            {"value": "bar", "weight": 30},
+        ],
+    }
+
+    # When
+    result = get_flag_result_from_feature_context(
+        feature_context=feature_context,
+        key=expected_key,
+    )
+
+    # Then
+    # the value of the feature state is correct based on the percentage value returned
+    assert result == {
+        "enabled": False,
+        "feature_key": "1",
+        "name": "my_feature",
+        "reason": "DEFAULT",
+        "value": "control",
+    }
+
+    # the function is not called as there is no key to hash against
+    get_hashed_percentage_for_object_ids_mock.assert_not_called()
 
 
 @pytest.mark.parametrize(
