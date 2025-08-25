@@ -251,8 +251,8 @@ def context_matches_condition(
                 in_values = segment_value.split(",")
         in_values = [str(value) for value in in_values]
         # Guard against comparing boolean values to numeric strings.
-        if isinstance(context_value, int) and not any(
-            context_value is x for x in (False, True)
+        if isinstance(context_value, int) and not (
+            context_value is True or context_value is False
         ):
             context_value = str(context_value)
         return context_value in in_values
