@@ -3,7 +3,7 @@ from functools import singledispatch
 
 import semver
 
-from flag_engine.identities.traits.types import ContextValue
+from flag_engine.segments.types import ContextValue
 from flag_engine.utils.semver import remove_semver_suffix
 
 
