@@ -1,4 +1,4 @@
-from flag_engine.context.types import SegmentCondition, SegmentContext, SegmentRule
+from flag_engine.context.types import SegmentContext, SegmentRule
 from flag_engine.segments import constants
 
 trait_key_1 = "email"
@@ -19,7 +19,7 @@ segment_single_condition = SegmentContext(
         SegmentRule(
             type=constants.ALL_RULE,
             conditions=[
-                SegmentCondition(
+                dict(
                     operator=constants.EQUAL,
                     property=trait_key_1,
                     value=trait_value_1,
@@ -36,12 +36,12 @@ segment_multiple_conditions_all = SegmentContext(
         SegmentRule(
             type=constants.ALL_RULE,
             conditions=[
-                SegmentCondition(
+                dict(
                     operator=constants.EQUAL,
                     property=trait_key_1,
                     value=trait_value_1,
                 ),
-                SegmentCondition(
+                dict(
                     operator=constants.EQUAL,
                     property=trait_key_2,
                     value=trait_value_2,
@@ -58,12 +58,12 @@ segment_multiple_conditions_any = SegmentContext(
         SegmentRule(
             type=constants.ANY_RULE,
             conditions=[
-                SegmentCondition(
+                dict(
                     operator=constants.EQUAL,
                     property=trait_key_1,
                     value=trait_value_1,
                 ),
-                SegmentCondition(
+                dict(
                     operator=constants.EQUAL,
                     property=trait_key_2,
                     value=trait_value_2,
@@ -83,12 +83,12 @@ segment_nested_rules = SegmentContext(
                 SegmentRule(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        dict(
                             operator=constants.EQUAL,
                             property=trait_key_1,
                             value=trait_value_1,
                         ),
-                        SegmentCondition(
+                        dict(
                             operator=constants.EQUAL,
                             property=trait_key_2,
                             value=trait_value_2,
@@ -98,7 +98,7 @@ segment_nested_rules = SegmentContext(
                 SegmentRule(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        dict(
                             operator=constants.EQUAL,
                             property=trait_key_3,
                             value=trait_value_3,
@@ -117,7 +117,7 @@ segment_conditions_and_nested_rules = SegmentContext(
         SegmentRule(
             type=constants.ALL_RULE,
             conditions=[
-                SegmentCondition(
+                dict(
                     operator=constants.EQUAL,
                     property=trait_key_1,
                     value=trait_value_1,
@@ -127,7 +127,7 @@ segment_conditions_and_nested_rules = SegmentContext(
                 SegmentRule(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        dict(
                             operator=constants.EQUAL,
                             property=trait_key_2,
                             value=trait_value_2,
@@ -137,7 +137,7 @@ segment_conditions_and_nested_rules = SegmentContext(
                 SegmentRule(
                     type=constants.ALL_RULE,
                     conditions=[
-                        SegmentCondition(
+                        dict(
                             operator=constants.EQUAL,
                             property=trait_key_3,
                             value=trait_value_3,

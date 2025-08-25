@@ -17,6 +17,7 @@ from flag_engine.context.types import (
     SegmentContext,
     SegmentRule,
 )
+from flag_engine.context.types import SegmentCondition1 as StrValueSegmentCondition
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.types import ContextValue, is_trait_value
@@ -235,6 +236,29 @@ def context_matches_condition(
         else None
     )
 
+    if condition["operator"] == constants.IN:
+        if isinstance(segment_value := condition["value"], list):
+            in_values = segment_value
+        else:
+            try:
+                in_values = json.loads(segment_value)
+                # Only accept JSON lists.
+                # Ideally, we should use something like pydantic.TypeAdapter[list[str]],
+                # but we aim to ditch the pydantic dependency in the future.
+                if not isinstance(in_values, list):
+                    raise ValueError
+            except ValueError:
+                in_values = segment_value.split(",")
+        in_values = [str(value) for value in in_values]
+        # Guard against comparing boolean values to numeric strings.
+        if isinstance(context_value, int) and not any(
+            context_value is x for x in (False, True)
+        ):
+            context_value = str(context_value)
+        return context_value in in_values
+
+    condition = typing.cast(StrValueSegmentCondition, condition)
+
     if condition["operator"] == constants.PERCENTAGE_SPLIT:
         if context_value is not None:
             object_ids = [segment_key, context_value]
@@ -270,7 +294,7 @@ def get_context_value(
 
 
 def _matches_context_value(
-    condition: SegmentCondition,
+    condition: StrValueSegmentCondition,
     context_value: ContextValue,
 ) -> bool:
     if matcher := MATCHERS_BY_OPERATOR.get(condition["operator"]):
@@ -316,29 +340,6 @@ def _evaluate_modulo(
     return context_value % divisor == remainder
 
 
-def _evaluate_in(
-    segment_value: typing.Optional[str], context_value: ContextValue
-) -> bool:
-    if segment_value:
-        try:
-            in_values = json.loads(segment_value)
-            # Only accept JSON lists.
-            # Ideally, we should use something like pydantic.TypeAdapter[list[str]],
-            # but we aim to ditch the pydantic dependency in the future.
-            if not isinstance(in_values, list):
-                raise ValueError
-            in_values = [str(value) for value in in_values]
-        except ValueError:
-            in_values = segment_value.split(",")
-        # Guard against comparing boolean values to numeric strings.
-        if isinstance(context_value, int) and not any(
-            context_value is x for x in (False, True)
-        ):
-            context_value = str(context_value)
-        return context_value in in_values
-    return False
-
-
 def _context_value_typed(
     func: typing.Callable[..., bool],
 ) -> typing.Callable[[typing.Optional[str], ContextValue], bool]:
@@ -365,7 +366,6 @@ MATCHERS_BY_OPERATOR: typing.Dict[
     constants.NOT_CONTAINS: _evaluate_not_contains,
     constants.REGEX: _evaluate_regex,
     constants.MODULO: _evaluate_modulo,
-    constants.IN: _evaluate_in,
     constants.EQUAL: _context_value_typed(operator.eq),
     constants.GREATER_THAN: _context_value_typed(operator.gt),
     constants.GREATER_THAN_INCLUSIVE: _context_value_typed(operator.ge),

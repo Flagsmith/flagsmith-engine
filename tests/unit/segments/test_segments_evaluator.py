@@ -5,15 +5,19 @@ from pytest_lazy_fixtures import lf
 from pytest_mock import MockerFixture
 
 import flag_engine.segments.evaluator
-from flag_engine.context.mappers import map_environment_identity_to_context
+from flag_engine.context.mappers import (
+    FeatureModel,
+    map_environment_identity_to_context,
+)
 from flag_engine.context.types import (
     EvaluationContext,
     FeatureContext,
     SegmentCondition,
     SegmentContext,
 )
+from flag_engine.context.types import SegmentCondition1 as StrValueSegmentCondition
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FeatureModel, FeatureStateModel
+from flag_engine.features.models import FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.result.types import FlagResult
 from flag_engine.segments import constants
@@ -472,35 +476,6 @@ def test_context_in_segment_is_set_and_is_not_set(
         (constants.REGEX, None, r"[a-z]", False),
         (constants.REGEX, "foo", 12, False),
         (constants.REGEX, 1, "1", True),
-        (constants.IN, "foo", "", False),
-        (constants.IN, "foo", "foo,bar", True),
-        (constants.IN, "bar", "foo,bar", True),
-        (constants.IN, "foo", "foo", True),
-        (constants.IN, 1, "1,2,3,4", True),
-        (constants.IN, 1, "", False),
-        (constants.IN, 1, "1", True),
-        (constants.IN, 1, None, False),
-        (constants.IN, 1, None, False),
-        (constants.IN, "foo", "", False),
-        (constants.IN, "foo", "foo,bar", True),
-        (constants.IN, "bar", "foo,bar", True),
-        (constants.IN, "foo", "foo", True),
-        (constants.IN, 1, "1,2,3,4", True),
-        (constants.IN, 1, "", False),
-        (constants.IN, 1, "1", True),
-        (constants.IN, 1, None, False),
-        (constants.IN, 1, None, False),
-        (constants.IN, "foo", "[]", False),
-        (constants.IN, "foo", '["foo","bar"]', True),
-        (constants.IN, "bar", '["foo","bar"]', True),
-        (constants.IN, "foo", '["foo"]', True),
-        (constants.IN, 1, "[1,2,3,4]", True),
-        (constants.IN, 1, '["1","2","3","4"]', True),
-        (constants.IN, 1, "[]", False),
-        (constants.IN, 1, "[1]", True),
-        (constants.IN, 1, '["1"]', True),
-        (constants.IN, 1, None, False),
-        (constants.IN, 1, None, False),
     ),
 )
 def test_segment_condition_matches_context_value(
@@ -510,7 +485,7 @@ def test_segment_condition_matches_context_value(
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition: SegmentCondition = {
+    segment_condition: StrValueSegmentCondition = {
         "operator": operator,
         "property": "foo",
         "value": condition_value,
@@ -528,7 +503,7 @@ def test_segment_condition__unsupported_operator__return_false(
 ) -> None:
     # Given
     mocker.patch("flag_engine.segments.evaluator.MATCHERS_BY_OPERATOR", new={})
-    segment_condition = SegmentCondition(
+    segment_condition: StrValueSegmentCondition = dict(
         operator=constants.EQUAL,
         property="x",
         value="foo",
@@ -574,7 +549,7 @@ def test_segment_condition_matches_context_value_for_semver(
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition = SegmentCondition(
+    segment_condition: StrValueSegmentCondition = dict(
         operator=operator,
         property="version",
         value=condition_value,
@@ -589,10 +564,10 @@ def test_segment_condition_matches_context_value_for_semver(
 
 @pytest.mark.parametrize(
     "context,condition,segment_key,expected_result",
-    (
+    [
         (
             {"identity": {"traits": {trait_key_1: False}}},
-            SegmentCondition(
+            dict(
                 operator=constants.EQUAL,
                 property=trait_key_1,
                 value="false",
@@ -602,7 +577,7 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
         (
             {"identity": {"traits": {trait_key_1: True}}},
-            SegmentCondition(
+            dict(
                 operator=constants.EQUAL,
                 property=trait_key_1,
                 value="true",
@@ -612,7 +587,7 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
         (
             {"identity": {"traits": {trait_key_1: 12}}},
-            SegmentCondition(
+            dict(
                 operator=constants.EQUAL,
                 property=trait_key_1,
                 value="12",
@@ -622,7 +597,7 @@ def test_segment_condition_matches_context_value_for_semver(
         ),
         (
             {"identity": {"traits": {trait_key_1: None}}},
-            SegmentCondition(
+            dict(
                 operator=constants.IS_SET,
                 property=trait_key_1,
                 value="false",
@@ -630,7 +605,153 @@ def test_segment_condition_matches_context_value_for_semver(
             "segment_key",
             False,
         ),
-    ),
+        (
+            {"identity": {"traits": {trait_key_1: "foo"}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="foo,bar",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: "bar"}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="foo,bar",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: "baz"}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="foo,bar",
+            ),
+            "segment_key",
+            False,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 1}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="1,2,3,4",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 5}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="1,2,3,4",
+            ),
+            "segment_key",
+            False,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: "foo"}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value='["foo","bar"]',
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: "baz"}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value='["foo","bar"]',
+            ),
+            "segment_key",
+            False,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 1}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="[1,2,3,4]",
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 5}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="[1,2,3,4]",
+            ),
+            "segment_key",
+            False,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 1}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value='["1","2","3","4"]',
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 5}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value='["1","2","3","4"]',
+            ),
+            "segment_key",
+            False,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: None}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value="foo,bar",
+            ),
+            "segment_key",
+            False,
+        ),
+        (
+            {"identity": {"traits": {trait_key_1: 1}}},
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value=[1, 2, 3, 4],
+            ),
+            "segment_key",
+            True,
+        ),
+        (
+            {
+                "identity": {
+                    "traits": {
+                        trait_key_1: '"I am a valid JSON literal but not a list"'
+                    }
+                }
+            },
+            dict(
+                operator=constants.IN,
+                property=trait_key_1,
+                value='"I am a valid JSON literal but not a list"',
+            ),
+            "segment_key",
+            True,
+        ),
+    ],
 )
 def test_context_matches_condition(
     context: EvaluationContext,
@@ -665,7 +786,7 @@ def test_segment_condition_matches_context_value_for_modulo(
     expected_result: bool,
 ) -> None:
     # Given
-    segment_condition = SegmentCondition(
+    segment_condition: StrValueSegmentCondition = dict(
         operator=constants.MODULO,
         property="version",
         value=condition_value,
