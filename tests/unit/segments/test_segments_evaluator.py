@@ -6,18 +6,17 @@ from pytest_mock import MockerFixture
 
 import flag_engine.segments.evaluator
 from flag_engine.context.mappers import (
-    FeatureModel,
     map_environment_identity_to_context,
 )
 from flag_engine.context.types import (
     EvaluationContext,
     FeatureContext,
     SegmentCondition,
+    SegmentContext,
 )
 from flag_engine.context.types import SegmentCondition1 as StrValueSegmentCondition
-from flag_engine.context.types import SegmentContext
 from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FeatureStateModel
+from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.result.types import FlagResult
 from flag_engine.segments import constants
