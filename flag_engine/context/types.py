@@ -27,19 +27,19 @@ class IdentityContext(TypedDict):
     traits: NotRequired[Dict[str, Optional[Union[str, float, bool]]]]
 
 
-class SegmentCondition1(TypedDict):
+class StrValueSegmentCondition(TypedDict):
     property: str
     operator: ConditionOperator
     value: str
 
 
-class SegmentCondition2(TypedDict):
+class InOperatorSegmentCondition(TypedDict):
     property: str
     operator: Literal["IN"]
     value: List[str]
 
 
-SegmentCondition = Union[SegmentCondition1, SegmentCondition2]
+SegmentCondition = Union[StrValueSegmentCondition, InOperatorSegmentCondition]
 
 
 class SegmentRule(TypedDict):

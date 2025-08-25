@@ -10,9 +10,9 @@ from flag_engine.context.types import (
     EvaluationContext,
     FeatureContext,
     SegmentCondition,
+    SegmentContext,
+    StrValueSegmentCondition,
 )
-from flag_engine.context.types import SegmentCondition1 as StrValueSegmentCondition
-from flag_engine.context.types import SegmentContext
 from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
