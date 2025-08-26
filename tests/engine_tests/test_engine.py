@@ -7,11 +7,7 @@ from pathlib import Path
 import pytest
 from pytest_mock import MockerFixture
 
-from flag_engine.context.types import (
-    EvaluationContext,
-    FeatureContext,
-    SegmentRule,
-)
+from flag_engine.context.types import EvaluationContext, FeatureContext, SegmentRule
 from flag_engine.engine import get_evaluation_result
 
 MODULE_PATH = Path(__file__).parent.resolve()
