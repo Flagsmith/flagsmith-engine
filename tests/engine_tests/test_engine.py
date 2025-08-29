@@ -42,7 +42,7 @@ def _extract_test_cases(
     :param file_path: the path to the json data file
     :return: a list of tuples containing the environment, identity and api response
     """
-    test_data = json.load(file_path.open("rb"))
+    test_data = json.loads(file_path.read_text())
 
     environment_document = test_data["environment"]
 
