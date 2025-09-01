@@ -4,8 +4,6 @@ import pytest
 from pytest_lazy_fixtures import lf
 from pytest_mock import MockerFixture
 
-import flag_engine.segments.evaluator
-from flag_engine.context.mappers import map_environment_identity_to_context
 from flag_engine.context.types import (
     EvaluationContext,
     FeatureContext,
@@ -13,22 +11,15 @@ from flag_engine.context.types import (
     SegmentContext,
     StrValueSegmentCondition,
 )
-from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.models import FeatureModel, FeatureStateModel
-from flag_engine.identities.models import IdentityModel
 from flag_engine.result.types import FlagResult
 from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
-    get_context_segments,
     get_context_value,
-    get_evaluation_result,
     get_flag_result_from_feature_context,
-    get_identity_segments,
     is_context_in_segment,
 )
-from flag_engine.segments.models import SegmentModel
 from flag_engine.segments.types import ConditionOperator
 from tests.unit.segments.fixtures import (
     empty_segment,
@@ -279,53 +270,13 @@ def test_context_in_segment_percentage_split(
     assert result == expected_result
 
 
-def test_get_identity_segments__calls__returns_expected(
-    mocker: MockerFixture,
-    environment: EnvironmentModel,
-    identity_in_segment: IdentityModel,
-) -> None:
-    # Given
-    get_evaluation_result_spy = mocker.spy(
-        flag_engine.segments.evaluator, "get_evaluation_result"
-    )
-    expected_context = map_environment_identity_to_context(
-        environment=environment,
-        identity=identity_in_segment,
-        override_traits=None,
-    )
-
-    # When
-    result = get_identity_segments(identity_in_segment, environment)
-
-    # Then
-    get_evaluation_result_spy.assert_called_once_with(expected_context)
-    assert result == [SegmentModel(id=1, name="my_segment")]
-
-
-def test_get_context_segments__calls__returns_expected(
-    mocker: MockerFixture,
-    context_in_segment: EvaluationContext,
-) -> None:
-    # Given
-    get_evaluation_result_spy = mocker.spy(
-        flag_engine.segments.evaluator, "get_evaluation_result"
-    )
-
-    # When
-    result = get_context_segments(context_in_segment)
-
-    # Then
-    get_evaluation_result_spy.assert_called_once_with(context_in_segment)
-    assert result == [{"key": "1", "name": "my_segment"}]
-
-
 def test_context_in_segment_percentage_split__trait_value__calls_expected(
     mocker: MockerFixture,
     context: EvaluationContext,
 ) -> None:
     # Given
     assert context["identity"] is not None
-    context["identity"]["traits"]["custom_trait"] = "custom_value"
+    context["identity"]["traits"] = {"custom_trait": "custom_value"}
 
     segment_context: SegmentContext = {
         "key": "1",
@@ -796,277 +747,6 @@ def test_segment_condition_matches_context_value_for_modulo(
     assert result == expected_result
 
 
-def test_get_evaluation_result__returns_expected(
-    context_in_segment: EvaluationContext,
-) -> None:
-    # When
-    result = get_evaluation_result(context_in_segment)
-
-    # Then
-    assert result == {
-        "context": context_in_segment,
-        "flags": [
-            {
-                "enabled": False,
-                "feature_key": "1",
-                "name": "feature_1",
-                "reason": "TARGETING_MATCH; segment=my_segment",
-                "value": "segment_override",
-            },
-            {
-                "enabled": False,
-                "feature_key": "2",
-                "name": "feature_2",
-                "reason": "DEFAULT",
-                "value": None,
-            },
-        ],
-        "segments": [{"key": "1", "name": "my_segment"}],
-    }
-
-
-def test_get_evaluation_result__two_segments_override_same_feature__returns_expected() -> (
-    None
-):
-    # Given
-    context_in_segments: EvaluationContext = {
-        "environment": {"key": "api-key", "name": ""},
-        "identity": {
-            "identifier": "identity_2",
-            "key": "api-key_identity_2",
-            "traits": {"foo": "bar"},
-        },
-        "features": {
-            "feature_1": {
-                "key": "1",
-                "feature_key": "1",
-                "name": "feature_1",
-                "enabled": False,
-                "value": None,
-            },
-            "feature_2": {
-                "key": "2",
-                "feature_key": "2",
-                "name": "feature_2",
-                "enabled": False,
-                "value": None,
-            },
-        },
-        "segments": {
-            "1": {
-                "key": "1",
-                "name": "my_segment",
-                "rules": [
-                    {
-                        "type": "ALL",
-                        "conditions": [
-                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
-                        ],
-                        "rules": [],
-                    }
-                ],
-                "overrides": [
-                    {
-                        "key": "4",
-                        "feature_key": "1",
-                        "name": "feature_1",
-                        "enabled": False,
-                        "value": "segment_override",
-                        "priority": 2,
-                    }
-                ],
-            },
-            "3": {
-                "key": "3",
-                "name": "higher_priority_segment",
-                "rules": [
-                    {
-                        "type": "ALL",
-                        "conditions": [
-                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
-                        ],
-                        "rules": [],
-                    }
-                ],
-                "overrides": [
-                    {
-                        "enabled": True,
-                        "key": "2",
-                        "feature_key": "1",
-                        "name": "feature_1",
-                        "value": "segment_override_other",
-                        "priority": 1,
-                    }
-                ],
-            },
-        },
-    }
-
-    # When
-    result = get_evaluation_result(context_in_segments)
-
-    # Then
-    assert result == {
-        "context": context_in_segments,
-        "flags": [
-            {
-                "enabled": True,
-                "feature_key": "1",
-                "name": "feature_1",
-                "reason": "TARGETING_MATCH; segment=higher_priority_segment",
-                "value": "segment_override_other",
-            },
-            {
-                "enabled": False,
-                "feature_key": "2",
-                "name": "feature_2",
-                "reason": "DEFAULT",
-                "value": None,
-            },
-        ],
-        "segments": [
-            {"key": "1", "name": "my_segment"},
-            {"key": "3", "name": "higher_priority_segment"},
-        ],
-    }
-
-
-def test_get_evaluation_result__segment_override__no_priority__returns_expected() -> (
-    None
-):
-    # Given
-    context: EvaluationContext = {
-        "environment": {"key": "api-key", "name": ""},
-        "identity": {
-            "identifier": "identity_2",
-            "key": "api-key_identity_2",
-            "traits": {"foo": "bar"},
-        },
-        "features": {
-            "feature_1": {
-                "key": "1",
-                "feature_key": "1",
-                "name": "feature_1",
-                "enabled": False,
-                "value": None,
-            },
-        },
-        "segments": {
-            "1": {
-                "key": "1",
-                "name": "segment_without_override_priority",
-                "rules": [
-                    {
-                        "type": "ALL",
-                        "conditions": [
-                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
-                        ],
-                        "rules": [],
-                    }
-                ],
-                "overrides": [
-                    {
-                        "key": "3",
-                        "feature_key": "1",
-                        "name": "feature_1",
-                        "enabled": True,
-                        "value": "overridden_without_priority",
-                    }
-                ],
-            },
-            "2": {
-                "key": "2",
-                "name": "segment_with_override_priority",
-                "rules": [
-                    {
-                        "type": "ALL",
-                        "conditions": [
-                            {"property": "foo", "operator": "EQUAL", "value": "bar"}
-                        ],
-                        "rules": [],
-                    }
-                ],
-                "overrides": [
-                    {
-                        "key": "4",
-                        "feature_key": "1",
-                        "name": "feature_1",
-                        "enabled": True,
-                        "value": "overridden_with_priority",
-                        "priority": 1,
-                    }
-                ],
-            },
-        },
-    }
-
-    # When
-    result = get_evaluation_result(context)
-
-    # Then
-    assert result == {
-        "context": context,
-        "flags": [
-            {
-                "enabled": True,
-                "feature_key": "1",
-                "name": "feature_1",
-                "reason": "TARGETING_MATCH; segment=segment_with_override_priority",
-                "value": "overridden_with_priority",
-            },
-        ],
-        "segments": [
-            {"key": "1", "name": "segment_without_override_priority"},
-            {"key": "2", "name": "segment_with_override_priority"},
-        ],
-    }
-
-
-def test_get_evaluation_result__identity_override__returns_expected(
-    environment: EnvironmentModel,
-    feature_1: FeatureModel,
-    identity: IdentityModel,
-) -> None:
-    # Given
-    identity.identity_features.append(
-        FeatureStateModel(
-            feature=feature_1,
-            enabled=True,
-            value="overridden_for_identity",
-        )
-    )
-    context = map_environment_identity_to_context(
-        environment=environment,
-        identity=identity,
-        override_traits=None,
-    )
-
-    # When
-    result = get_evaluation_result(context)
-
-    # Then
-    assert result == {
-        "context": context,
-        "flags": [
-            {
-                "enabled": True,
-                "feature_key": "1",
-                "name": "feature_1",
-                "reason": "TARGETING_MATCH; segment=identity_overrides",
-                "value": None,
-            },
-            {
-                "enabled": False,
-                "feature_key": "2",
-                "name": "feature_2",
-                "reason": "DEFAULT",
-                "value": None,
-            },
-        ],
-        "segments": [{"key": "", "name": "identity_overrides"}],
-    }
-
-
 @pytest.mark.parametrize(
     "percentage_value, expected_result",
     (
@@ -1219,7 +899,7 @@ def test_get_context_value__jsonpath_like_trait__returns_expected(
     jsonpath_like_trait = '$.  i am not" a valid jsonpath'
     expected_result = "some_value"
     assert context["identity"]
-    context["identity"]["traits"][jsonpath_like_trait] = expected_result
+    context["identity"]["traits"] = {jsonpath_like_trait: expected_result}
 
     # When
     result = get_context_value(context, jsonpath_like_trait)

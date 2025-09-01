@@ -14,9 +14,8 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         "jsonpath-rfc9535>=0.1.5,<1",
-        "pydantic>=2.3.0,<3",
-        "pydantic-collections>=0.5.1,<1",
-        "semver>=3.0.1",
+        "semver>=3.0.4,<4",
+        "typing-extensions>=4.14.1,<5",
     ],
     classifiers=[
         "License :: OSI Approved :: BSD License",

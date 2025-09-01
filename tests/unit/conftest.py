@@ -1,22 +1,15 @@
-from datetime import datetime
-
 import pytest
 
-from flag_engine.context.mappers import map_environment_identity_to_context
-from flag_engine.context.types import EvaluationContext
-from flag_engine.environments.models import EnvironmentModel
-from flag_engine.features.constants import STANDARD
-from flag_engine.features.models import FeatureModel, FeatureStateModel
-from flag_engine.identities.models import IdentityModel
-from flag_engine.identities.traits.models import TraitModel
-from flag_engine.organisations.models import OrganisationModel
-from flag_engine.projects.models import ProjectModel
-from flag_engine.segments import constants
-from flag_engine.segments.models import (
-    SegmentConditionModel,
-    SegmentModel,
-    SegmentRuleModel,
+from flag_engine.context.types import (
+    EnvironmentContext,
+    EvaluationContext,
+    FeatureContext,
+    IdentityContext,
+    SegmentCondition,
+    SegmentContext,
+    SegmentRule,
 )
+from flag_engine.segments import constants
 
 
 @pytest.fixture()
@@ -33,159 +26,112 @@ def segment_condition_string_value() -> str:
 def segment_condition(
     segment_condition_property: str,
     segment_condition_string_value: str,
-) -> SegmentConditionModel:
-    return SegmentConditionModel(
-        operator=constants.EQUAL,
-        property_=segment_condition_property,
-        value=segment_condition_string_value,
+) -> SegmentCondition:
+    return {
+        "operator": constants.EQUAL,
+        "property": segment_condition_property,
+        "value": segment_condition_string_value,
+    }
+
+
+@pytest.fixture()
+def segment_rule(segment_condition: SegmentCondition) -> SegmentRule:
+    return {
+        "type": constants.ALL_RULE,
+        "conditions": [segment_condition],
+    }
+
+
+@pytest.fixture()
+def segment(segment_rule: SegmentRule) -> SegmentContext:
+    return {
+        "key": "1",
+        "name": "my_segment",
+        "rules": [segment_rule],
+    }
+
+
+@pytest.fixture()
+def feature_state_1() -> FeatureContext:
+    return FeatureContext(
+        feature_key="1", key="1", name="feature_1", value=None, enabled=True
     )
 
 
 @pytest.fixture()
-def segment_rule(segment_condition: SegmentConditionModel) -> SegmentRuleModel:
-    return SegmentRuleModel(type=constants.ALL_RULE, conditions=[segment_condition])
-
-
-@pytest.fixture()
-def segment(segment_rule: SegmentRuleModel) -> SegmentModel:
-    return SegmentModel(id=1, name="my_segment", rules=[segment_rule])
-
-
-@pytest.fixture()
-def organisation() -> OrganisationModel:
-    return OrganisationModel(
-        id=1,
-        name="test Org",
-        stop_serving_flags=False,
-        persist_trait_data=True,
-        feature_analytics=True,
+def feature_state_2() -> FeatureContext:
+    return FeatureContext(
+        feature_key="2", key="2", name="feature_2", value=None, enabled=False
     )
 
 
 @pytest.fixture()
-def project(
-    organisation: OrganisationModel,
-    segment: SegmentModel,
-) -> ProjectModel:
-    return ProjectModel(
-        id=1,
-        name="Test Project",
-        organisation=organisation,
-        hide_disabled_flags=False,
-        segments=[segment],
+def environment() -> EnvironmentContext:
+    return EnvironmentContext(
+        key="api-key",
+        name="Test Environment",
     )
 
 
 @pytest.fixture()
-def feature_1() -> FeatureModel:
-    return FeatureModel(id=1, name="feature_1", type=STANDARD)
-
-
-@pytest.fixture()
-def feature_2() -> FeatureModel:
-    return FeatureModel(id=2, name="feature_2", type=STANDARD)
-
-
-@pytest.fixture()
-def feature_state_1(feature_1: FeatureModel) -> FeatureStateModel:
-    return FeatureStateModel(feature=feature_1, enabled=True)
-
-
-@pytest.fixture()
-def feature_state_2(feature_2: FeatureModel) -> FeatureStateModel:
-    return FeatureStateModel(feature=feature_2, enabled=True)
-
-
-@pytest.fixture()
-def environment(
-    feature_1: FeatureModel,
-    feature_2: FeatureModel,
-    project: ProjectModel,
-) -> EnvironmentModel:
-    return EnvironmentModel(
-        id=1,
-        api_key="api-key",
-        project=project,
-        feature_states=[
-            FeatureStateModel(django_id=1, feature=feature_1, enabled=True),
-            FeatureStateModel(django_id=2, feature=feature_2, enabled=False),
-        ],
-    )
-
-
-@pytest.fixture()
-def identity(environment: EnvironmentModel) -> IdentityModel:
-    return IdentityModel(
-        identifier="identity_1",
-        environment_api_key=environment.api_key,
-        created_date=datetime.now(),
-    )
+def identity() -> IdentityContext:
+    return IdentityContext(identifier="identity_1", key="api-key_identity_1")
 
 
 @pytest.fixture
 def context(
-    environment: EnvironmentModel,
-    identity: IdentityModel,
+    environment: EnvironmentContext,
+    identity: IdentityContext,
+    feature_state_1: FeatureContext,
+    feature_state_2: FeatureContext,
+    segment: SegmentContext,
 ) -> EvaluationContext:
-    return map_environment_identity_to_context(
-        environment=environment,
-        identity=identity,
-        override_traits=None,
-    )
-
-
-@pytest.fixture()
-def trait_matching_segment(segment_condition: SegmentConditionModel) -> TraitModel:
-    return TraitModel(
-        trait_key=segment_condition.property_,
-        trait_value=segment_condition.value,
-    )
+    return {
+        "environment": environment,
+        "features": {
+            feature_state_1["feature_key"]: feature_state_1,
+            feature_state_2["feature_key"]: feature_state_2,
+        },
+        "segments": {segment["key"]: segment},
+        "identity": identity,
+    }
 
 
 @pytest.fixture()
 def identity_in_segment(
-    trait_matching_segment: TraitModel,
-    environment: EnvironmentModel,
-) -> IdentityModel:
-    return IdentityModel(
+    segment_condition_property: str,
+    segment_condition_string_value: str,
+) -> IdentityContext:
+    return IdentityContext(
         identifier="identity_2",
-        environment_api_key=environment.api_key,
-        identity_traits=[trait_matching_segment],
+        key="api-key_identity_2",
+        traits={
+            segment_condition_property: segment_condition_string_value,
+        },
     )
 
 
 @pytest.fixture
 def context_in_segment(
-    identity_in_segment: IdentityModel,
-    environment_with_segment_override: EnvironmentModel,
+    identity_in_segment: IdentityContext,
+    context: EvaluationContext,
+    segment: SegmentContext,
 ) -> EvaluationContext:
-    return map_environment_identity_to_context(
-        environment=environment_with_segment_override,
-        identity=identity_in_segment,
-        override_traits=None,
-    )
-
-
-@pytest.fixture()
-def segment_override_fs(
-    segment: SegmentModel,
-    feature_1: FeatureModel,
-) -> FeatureStateModel:
-    fs = FeatureStateModel(
-        django_id=4,
-        feature=feature_1,
-        enabled=False,
-    )
-    fs.set_value("segment_override")
-    return fs
-
-
-@pytest.fixture()
-def environment_with_segment_override(
-    environment: EnvironmentModel,
-    segment_override_fs: FeatureStateModel,
-    segment: SegmentModel,
-) -> EnvironmentModel:
-    segment.feature_states.append(segment_override_fs)
-    environment.project.segments.append(segment)
-    return environment
+    return {
+        **context,
+        "identity": identity_in_segment,
+        "segments": {
+            segment["key"]: {
+                **segment,
+                "overrides": [
+                    {
+                        "key": "4",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "enabled": False,
+                        "value": "segment_override",
+                    }
+                ],
+            },
+        },
+    }

@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
 
 from typing_extensions import NotRequired
 
-from flag_engine.segments.types import ConditionOperator, RuleType
+from flag_engine.segments.types import ConditionOperator, ContextValue, RuleType
 
 
 class EnvironmentContext(TypedDict):
@@ -24,7 +24,7 @@ class FeatureValue(TypedDict):
 class IdentityContext(TypedDict):
     identifier: str
     key: str
-    traits: NotRequired[Dict[str, Optional[Union[str, float, bool]]]]
+    traits: NotRequired[Dict[str, ContextValue]]
 
 
 class StrValueSegmentCondition(TypedDict):
