@@ -1,5 +1,33 @@
 # Changelog
 
+## [7.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v6.1.0...v7.0.0) (2025-09-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* **v7:** Remove deprecated APIs, Pydantic models ([#250](https://github.com/Flagsmith/flagsmith-engine/issues/250))
+* Drop Python 3.8 support ([#249](https://github.com/Flagsmith/flagsmith-engine/issues/249))
+
+### Features
+
+* Add Codspeed benchmark ([#244](https://github.com/Flagsmith/flagsmith-engine/issues/244)) ([622b372](https://github.com/Flagsmith/flagsmith-engine/commit/622b372f32cd0ba6bd875493b13969a1cf0dcf67))
+* Drop Python 3.8 support ([#249](https://github.com/Flagsmith/flagsmith-engine/issues/249)) ([63b546c](https://github.com/Flagsmith/flagsmith-engine/commit/63b546c0faa48c4dcae0156595183590445129dc))
+* Support returning default flags for `None` identities ([#254](https://github.com/Flagsmith/flagsmith-engine/issues/254)) ([a05befa](https://github.com/Flagsmith/flagsmith-engine/commit/a05befaea7b1db8178a37fbb10d3a0d581443609))
+* **v7:** JSONPath support ([#243](https://github.com/Flagsmith/flagsmith-engine/issues/243)) ([5b0136f](https://github.com/Flagsmith/flagsmith-engine/commit/5b0136fda496680ae80a74e627726de676db9a05))
+* **v7:** Remove deprecated APIs, Pydantic models ([#250](https://github.com/Flagsmith/flagsmith-engine/issues/250)) ([92de872](https://github.com/Flagsmith/flagsmith-engine/commit/92de8726af9f33d8f27b75b2743093234f773080))
+* **v7:** Support `string[]` as condition value for the `IN` operator ([#255](https://github.com/Flagsmith/flagsmith-engine/issues/255)) ([68d49d0](https://github.com/Flagsmith/flagsmith-engine/commit/68d49d0b0cf19a01e3659668b1dda5178987a491))
+
+
+### CI
+
+* Exclude coverage from benchmark ([#248](https://github.com/Flagsmith/flagsmith-engine/issues/248)) ([770680b](https://github.com/Flagsmith/flagsmith-engine/commit/770680b600fd1d3094d372b47ec22993e1a66597))
+* Run tests and benchmarks on main ([#247](https://github.com/Flagsmith/flagsmith-engine/issues/247)) ([5376cb9](https://github.com/Flagsmith/flagsmith-engine/commit/5376cb903fc4488bf31b4899df65549a3f48d75c))
+
+
+### Other
+
+* add root CODEOWNERS ([#253](https://github.com/Flagsmith/flagsmith-engine/issues/253)) ([f99fa99](https://github.com/Flagsmith/flagsmith-engine/commit/f99fa99c8a67dafff1b3373006c5eac835def226))
+
 ## [6.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v6.0.2...v6.1.0) (2025-08-18)
 
 
