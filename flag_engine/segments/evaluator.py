@@ -27,6 +27,11 @@ from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
 
 
+class FeatureContextWithSegmentName(typing.TypedDict):
+    feature_context: FeatureContext
+    segment_name: str
+
+
 def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
     """
     Get the evaluation result for a given context.
@@ -35,7 +40,10 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
     :return: EvaluationResult containing the context, flags, and segments
     """
     segments: list[SegmentResult] = []
-    segment_feature_contexts: dict[SupportsStr, FeatureContext] = {}
+    flags: list[FlagResult] = []
+
+    segment_feature_contexts: dict[SupportsStr, FeatureContextWithSegmentName] = {}
+
     for segment_context in (context.get("segments") or {}).values():
         if not is_context_in_segment(context, segment_context):
             continue
@@ -56,35 +64,44 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
                         "priority",
                         constants.DEFAULT_PRIORITY,
                     )
-                    < segment_feature_contexts[feature_key].get(
+                    < (segment_feature_contexts[feature_key]["feature_context"]).get(
                         "priority",
                         constants.DEFAULT_PRIORITY,
                     )
                 ):
-                    segment_feature_contexts[feature_key] = override_feature_context
+                    segment_feature_contexts[feature_key] = (
+                        FeatureContextWithSegmentName(
+                            feature_context=override_feature_context,
+                            segment_name=segment_context["name"],
+                        )
+                    )
 
-    identity_key = get_context_value(context, "$.identity.key")
-    flags: list[FlagResult] = [
-        (
-            {
-                "enabled": segment_feature_context["enabled"],
-                "feature_key": segment_feature_context["feature_key"],
-                "name": segment_feature_context["name"],
-                "reason": f"TARGETING_MATCH; segment={segment_context['name']}",
-                "value": segment_feature_context.get("value"),
-            }
-            if (
-                segment_feature_context := segment_feature_contexts.get(
-                    feature_context["feature_key"],
-                )
+    identity_key = (
+        identity_context["key"]
+        if (identity_context := context.get("identity"))
+        else None
+    )
+    for feature_context in (context.get("features") or {}).values():
+        if feature_context_with_segment_name := segment_feature_contexts.get(
+            feature_context["feature_key"],
+        ):
+            feature_context = feature_context_with_segment_name["feature_context"]
+            flags.append(
+                {
+                    "enabled": feature_context["enabled"],
+                    "feature_key": feature_context["feature_key"],
+                    "name": feature_context["name"],
+                    "reason": f"TARGETING_MATCH; segment={feature_context_with_segment_name['segment_name']}",
+                    "value": feature_context.get("value"),
+                }
             )
-            else get_flag_result_from_feature_context(
+            continue
+        flags.append(
+            get_flag_result_from_feature_context(
                 feature_context=feature_context,
                 key=identity_key,
             )
         )
-        for feature_context in (context.get("features") or {}).values()
-    ]
 
     return {
         "context": context,
