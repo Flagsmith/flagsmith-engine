@@ -1,7 +1,7 @@
 import typing
 
 import pytest
-from pytest_lazy_fixtures import lf
+from pytest_lazy_fixtures import lf  # type: ignore[import]
 from pytest_mock import MockerFixture
 
 from flag_engine.context.types import (
