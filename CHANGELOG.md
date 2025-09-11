@@ -2,11 +2,12 @@
 
 ## [7.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v7.0.0...v7.0.1) (2025-09-11)
 
-
 ### Bug Fixes
 
-* Incorrect `TARGETING_MATCH` reasons ([#258](https://github.com/Flagsmith/flagsmith-engine/issues/258)) ([3f12e5f](https://github.com/Flagsmith/flagsmith-engine/commit/3f12e5faa67636af7f7016eec673088959f8017b))
-* PERCENTAGE_SPLIT working for undefined keys ([#256](https://github.com/Flagsmith/flagsmith-engine/issues/256)) ([fa37c6c](https://github.com/Flagsmith/flagsmith-engine/commit/fa37c6ca52632030ea307347cf529c774ef6d198))
+- Incorrect `TARGETING_MATCH` reasons ([#258](https://github.com/Flagsmith/flagsmith-engine/issues/258))
+  ([3f12e5f](https://github.com/Flagsmith/flagsmith-engine/commit/3f12e5faa67636af7f7016eec673088959f8017b))
+- PERCENTAGE_SPLIT working for undefined keys ([#256](https://github.com/Flagsmith/flagsmith-engine/issues/256))
+  ([fa37c6c](https://github.com/Flagsmith/flagsmith-engine/commit/fa37c6ca52632030ea307347cf529c774ef6d198))
 
 ## [7.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v6.1.0...v7.0.0) (2025-09-01)
 
