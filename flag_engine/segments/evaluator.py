@@ -216,18 +216,15 @@ def context_matches_condition(
     if condition["operator"] == constants.PERCENTAGE_SPLIT:
         if context_value is not None:
             object_ids = [segment_key, context_value]
-        elif (
-            identity_key := (
-                (identity_context := context.get("identity"))
-                and identity_context["key"]
-            )
-            is not None
-        ):
-            object_ids = [segment_key, identity_key]
+        elif identity_context := context.get("identity"):
+            object_ids = [segment_key, identity_context["key"]]
         else:
             return False
 
-        float_value = float(condition["value"])
+        try:
+            float_value = float(condition["value"])
+        except ValueError:
+            return False
         return get_hashed_percentage_for_object_ids(object_ids) <= float_value
 
     if condition["operator"] == constants.IS_NOT_SET:
