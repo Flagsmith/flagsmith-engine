@@ -224,7 +224,13 @@ def test_context_in_segment(
 
 @pytest.mark.parametrize(
     "segment_split_value, identity_hashed_percentage, expected_result",
-    ((10, 1, True), (100, 50, True), (0, 1, False), (10, 20, False)),
+    (
+        (10, 1, True),
+        (100, 50, True),
+        (0, 1, False),
+        (10, 20, False),
+        ("invalid", 100, False),
+    ),
 )
 def test_context_in_segment_percentage_split(
     mocker: MockerFixture,
@@ -268,6 +274,49 @@ def test_context_in_segment_percentage_split(
 
     # Then
     assert result == expected_result
+
+
+def test_context_in_segment_percentage_split__no_identity__returns_expected(
+    mocker: MockerFixture,
+    context: EvaluationContext,
+) -> None:
+    # Given
+    del context["identity"]
+
+    segment_context: SegmentContext = {
+        "key": "1",
+        "name": "% split",
+        "rules": [
+            {
+                "type": constants.ALL_RULE,
+                "conditions": [],
+                "rules": [
+                    {
+                        "type": constants.ALL_RULE,
+                        "conditions": [
+                            {
+                                "operator": constants.PERCENTAGE_SPLIT,
+                                "property": "",
+                                "value": "10",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+            }
+        ],
+    }
+
+    mock_get_hashed_percentage = mocker.patch(
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
+    )
+
+    # When
+    result = is_context_in_segment(context=context, segment_context=segment_context)
+
+    # Then
+    mock_get_hashed_percentage.assert_not_called()
+    assert result is False
 
 
 def test_context_in_segment_percentage_split__trait_value__calls_expected(
