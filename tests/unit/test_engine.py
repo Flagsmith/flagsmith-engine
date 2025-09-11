@@ -250,6 +250,13 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
                 "enabled": False,
                 "value": None,
             },
+            "feature_2": {
+                "key": "2",
+                "feature_key": "2",
+                "name": "feature_2",
+                "enabled": False,
+                "value": None,
+            },
         },
         "segments": {
             "1": {
@@ -297,6 +304,32 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
                     }
                 ],
             },
+            "3": {
+                "key": "3",
+                "name": "another_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {
+                                "property": "$.identity.identifier",
+                                "operator": "EQUAL",
+                                "value": "identity_2",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "key": "5",
+                        "feature_key": "2",
+                        "name": "feature_2",
+                        "enabled": False,
+                        "value": "moose",
+                    }
+                ],
+            },
         },
     }
 
@@ -314,9 +347,17 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
                 "reason": "TARGETING_MATCH; segment=segment_with_override_priority",
                 "value": "overridden_with_priority",
             },
+            {
+                "enabled": False,
+                "feature_key": "2",
+                "name": "feature_2",
+                "reason": "TARGETING_MATCH; segment=another_segment",
+                "value": "moose",
+            },
         ],
         "segments": [
             {"key": "1", "name": "segment_without_override_priority"},
             {"key": "2", "name": "segment_with_override_priority"},
+            {"key": "3", "name": "another_segment"},
         ],
     }
