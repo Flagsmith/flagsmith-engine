@@ -216,8 +216,12 @@ def context_matches_condition(
     if condition["operator"] == constants.PERCENTAGE_SPLIT:
         if context_value is not None:
             object_ids = [segment_key, context_value]
-        elif identity_key := (
-            (identity_context := context.get("identity")) and identity_context["key"]
+        elif (
+            identity_key := (
+                (identity_context := context.get("identity"))
+                and identity_context["key"]
+            )
+            is not None
         ):
             object_ids = [segment_key, identity_key]
         else:
