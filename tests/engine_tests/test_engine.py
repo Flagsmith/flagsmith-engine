@@ -91,10 +91,9 @@ def _extract_test_cases(
                         key=itemgetter("id"),
                     )
                 ]
-            if (
-                priority := (feature_state.get("feature_segment") or {}).get("priority")
-                is not None
-            ):
+            if (feature_segment := feature_state.get("feature_segment")) and (
+                priority := feature_segment.get("priority")
+            ) is not None:
                 feature_context["priority"] = priority
 
             yield feature_context
