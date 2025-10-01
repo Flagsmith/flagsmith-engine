@@ -40,7 +40,7 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
     :return: EvaluationResult containing the context, flags, and segments
     """
     segments: list[SegmentResult] = []
-    flags: list[FlagResult] = []
+    flags: dict[str, FlagResult] = {}
 
     segment_feature_contexts: dict[SupportsStr, FeatureContextWithSegmentName] = {}
 
@@ -82,29 +82,25 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
         else None
     )
     for feature_context in (context.get("features") or {}).values():
+        feature_name = feature_context["name"]
         if feature_context_with_segment_name := segment_feature_contexts.get(
             feature_context["feature_key"],
         ):
             feature_context = feature_context_with_segment_name["feature_context"]
-            flags.append(
-                {
-                    "enabled": feature_context["enabled"],
-                    "feature_key": feature_context["feature_key"],
-                    "name": feature_context["name"],
-                    "reason": f"TARGETING_MATCH; segment={feature_context_with_segment_name['segment_name']}",
-                    "value": feature_context.get("value"),
-                }
-            )
+            flags[feature_name] = {
+                "enabled": feature_context["enabled"],
+                "feature_key": feature_context["feature_key"],
+                "name": feature_context["name"],
+                "reason": f"TARGETING_MATCH; segment={feature_context_with_segment_name['segment_name']}",
+                "value": feature_context.get("value"),
+            }
             continue
-        flags.append(
-            get_flag_result_from_feature_context(
-                feature_context=feature_context,
-                key=identity_key,
-            )
+        flags[feature_name] = get_flag_result_from_feature_context(
+            feature_context=feature_context,
+            key=identity_key,
         )
 
     return {
-        "context": context,
         "flags": flags,
         "segments": segments,
     }

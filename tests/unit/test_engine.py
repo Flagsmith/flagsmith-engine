@@ -2,6 +2,7 @@ import json
 
 from flag_engine.context.types import EvaluationContext, IdentityContext, SegmentContext
 from flag_engine.engine import get_evaluation_result
+from flag_engine.result.types import EvaluationResult
 
 
 def test_get_evaluation_result__no_overrides__returns_expected(
@@ -11,26 +12,25 @@ def test_get_evaluation_result__no_overrides__returns_expected(
     result = get_evaluation_result(context)
 
     # Then
-    assert result == {
-        "context": context,
-        "flags": [
-            {
+    assert result == EvaluationResult(
+        flags={
+            "feature_1": {
                 "enabled": True,
                 "feature_key": "1",
                 "name": "feature_1",
                 "reason": "DEFAULT",
                 "value": None,
             },
-            {
+            "feature_2": {
                 "enabled": False,
                 "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
-        ],
-        "segments": [],
-    }
+        },
+        segments=[],
+    )
 
 
 def test_get_evaluation_result__segment_override__returns_expected(
@@ -41,23 +41,22 @@ def test_get_evaluation_result__segment_override__returns_expected(
 
     # Then
     assert result == {
-        "context": context_in_segment,
-        "flags": [
-            {
+        "flags": {
+            "feature_1": {
                 "enabled": False,
                 "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=my_segment",
                 "value": "segment_override",
             },
-            {
+            "feature_2": {
                 "enabled": False,
                 "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
-        ],
+        },
         "segments": [{"key": "1", "name": "my_segment"}],
     }
 
@@ -99,23 +98,22 @@ def test_get_evaluation_result__identity_override__returns_expected(
 
     # Then
     assert result == {
-        "context": context,
-        "flags": [
-            {
+        "flags": {
+            "feature_1": {
                 "enabled": True,
                 "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=identity_overrides",
                 "value": "overridden_for_identity",
             },
-            {
+            "feature_2": {
                 "enabled": False,
                 "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
-        ],
+        },
         "segments": [
             {
                 "key": "",
@@ -207,23 +205,22 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
 
     # Then
     assert result == {
-        "context": context_in_segments,
-        "flags": [
-            {
+        "flags": {
+            "feature_1": {
                 "enabled": True,
                 "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=higher_priority_segment",
                 "value": "segment_override_other",
             },
-            {
+            "feature_2": {
                 "enabled": False,
                 "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
-        ],
+        },
         "segments": [
             {"key": "1", "name": "my_segment"},
             {"key": "3", "name": "higher_priority_segment"},
@@ -338,23 +335,22 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
 
     # Then
     assert result == {
-        "context": context,
-        "flags": [
-            {
+        "flags": {
+            "feature_1": {
                 "enabled": True,
                 "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=segment_with_override_priority",
                 "value": "overridden_with_priority",
             },
-            {
+            "feature_2": {
                 "enabled": False,
                 "feature_key": "2",
                 "name": "feature_2",
                 "reason": "TARGETING_MATCH; segment=another_segment",
                 "value": "moose",
             },
-        ],
+        },
         "segments": [
             {"key": "1", "name": "segment_without_override_priority"},
             {"key": "2", "name": "segment_with_override_priority"},

@@ -21,5 +21,5 @@ IS_SET: ConditionOperator = "IS_SET"
 IS_NOT_SET: ConditionOperator = "IS_NOT_SET"
 IN: ConditionOperator = "IN"
 
-# Lowest possible priority for segment overrides
+# Weakest possible priority for segment overrides
 DEFAULT_PRIORITY = float("inf")
