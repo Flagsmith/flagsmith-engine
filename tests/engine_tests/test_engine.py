@@ -1,34 +1,43 @@
-import json
 import typing
 from pathlib import Path
 
+import pyjson5
 import pytest
+from _pytest.mark import ParameterSet
 
 from flag_engine.context.types import EvaluationContext
 from flag_engine.engine import get_evaluation_result
 from flag_engine.result.types import EvaluationResult
 
-MODULE_PATH = Path(__file__).parent.resolve()
+TEST_CASES_PATH = Path(__file__).parent / "engine-test-data/test_cases"
 
 EnvironmentDocument = dict[str, typing.Any]
 
 
 def _extract_test_cases(
-    file_path: Path,
-) -> typing.Iterable[tuple[EvaluationContext, EvaluationResult]]:
-    test_data = json.loads(file_path.read_text())
+    test_cases_dir_path: Path,
+) -> typing.Iterable[ParameterSet]:
+    for file_path in test_cases_dir_path.glob("*.json"):
+        test_data = pyjson5.loads(file_path.read_text())
+        yield pytest.param(
+            test_data["context"],
+            test_data["result"],
+            id=file_path.stem,
+        )
 
-    for case in test_data["test_cases"]:
-        context: EvaluationContext = case["context"]
-        result: EvaluationResult = case["result"]
-        yield context, result
+
+def _extract_benchmark_contexts(
+    test_cases_dir_path: Path,
+) -> typing.Iterable[EvaluationContext]:
+    for file_path in [
+        "test_0cfd0d72-4de4-4ed7-9cfb-d80dc3dacead__default.json",
+        "test_1bde8445-ca19-4bda-a9d5-3543a800fc0f__context_values.json",
+    ]:
+        yield pyjson5.loads((test_cases_dir_path / file_path).read_text())["context"]
 
 
-TEST_CASES = list(
-    _extract_test_cases(
-        MODULE_PATH / "engine-test-data/data/environment_n9fbf9h3v4fFgH3U3ngWhb.json"
-    )
-)
+TEST_CASES = list(_extract_test_cases(TEST_CASES_PATH))
+BENCHMARK_CONTEXTS = list(_extract_benchmark_contexts(TEST_CASES_PATH))
 
 
 @pytest.mark.parametrize(
@@ -48,5 +57,5 @@ def test_engine(
 
 @pytest.mark.benchmark
 def test_engine_benchmark() -> None:
-    for context, _ in TEST_CASES:
+    for context in BENCHMARK_CONTEXTS:
         get_evaluation_result(context)

@@ -11,3 +11,4 @@ types-setuptools
 mypy
 absolufy-imports
 datamodel-code-generator
+pyjson5
