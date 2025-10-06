@@ -1,4 +1,5 @@
 import typing
+from itertools import chain
 from pathlib import Path
 
 import pyjson5
@@ -17,7 +18,10 @@ EnvironmentDocument = dict[str, typing.Any]
 def _extract_test_cases(
     test_cases_dir_path: Path,
 ) -> typing.Iterable[ParameterSet]:
-    for file_path in test_cases_dir_path.glob("*.json"):
+    for file_path in chain(
+        test_cases_dir_path.glob("*.json"),
+        test_cases_dir_path.glob("*.jsonc"),
+    ):
         test_data = pyjson5.loads(file_path.read_text())
         yield pytest.param(
             test_data["context"],
