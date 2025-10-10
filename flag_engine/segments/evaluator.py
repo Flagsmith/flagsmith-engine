@@ -48,12 +48,13 @@ def get_evaluation_result(context: EvaluationContext) -> EvaluationResult:
         if not is_context_in_segment(context, segment_context):
             continue
 
-        segments.append(
-            {
-                "key": segment_context["key"],
-                "name": segment_context["name"],
-            }
-        )
+        segment_result: SegmentResult = {
+            "key": segment_context["key"],
+            "name": segment_context["name"],
+        }
+        if metadata := segment_context.get("metadata"):
+            segment_result["metadata"] = metadata
+        segments.append(segment_result)
 
         if overrides := segment_context.get("overrides"):
             for override_feature_context in overrides:
