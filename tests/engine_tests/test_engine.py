@@ -40,7 +40,10 @@ def _extract_benchmark_contexts(
         yield pyjson5.loads((test_cases_dir_path / file_path).read_text())["context"]
 
 
-TEST_CASES = list(_extract_test_cases(TEST_CASES_PATH))
+TEST_CASES = sorted(
+    _extract_test_cases(TEST_CASES_PATH),
+    key=lambda param: str(param.id),
+)
 BENCHMARK_CONTEXTS = list(_extract_benchmark_contexts(TEST_CASES_PATH))
 
 
