@@ -2,15 +2,16 @@
 
 ## [8.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v7.0.1...v8.0.0) (2025-10-10)
 
-
 ### ⚠ BREAKING CHANGES
 
-* Use new `EvaluationResult`, updated test data ([#261](https://github.com/Flagsmith/flagsmith-engine/issues/261))
+- Use new `EvaluationResult`, updated test data ([#261](https://github.com/Flagsmith/flagsmith-engine/issues/261))
 
 ### Features
 
-* Support segment metadata ([#264](https://github.com/Flagsmith/flagsmith-engine/issues/264)) ([6a030da](https://github.com/Flagsmith/flagsmith-engine/commit/6a030da1088efb597c3fb9197d9f9cc01dd5df4c))
-* Use new `EvaluationResult`, updated test data ([#261](https://github.com/Flagsmith/flagsmith-engine/issues/261)) ([8eaa386](https://github.com/Flagsmith/flagsmith-engine/commit/8eaa386b43260b789765338bafeff219a4be33df))
+- Support segment metadata ([#264](https://github.com/Flagsmith/flagsmith-engine/issues/264))
+  ([6a030da](https://github.com/Flagsmith/flagsmith-engine/commit/6a030da1088efb597c3fb9197d9f9cc01dd5df4c))
+- Use new `EvaluationResult`, updated test data ([#261](https://github.com/Flagsmith/flagsmith-engine/issues/261))
+  ([8eaa386](https://github.com/Flagsmith/flagsmith-engine/commit/8eaa386b43260b789765338bafeff219a4be33df))
 
 ## [7.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v7.0.0...v7.0.1) (2025-09-11)
 
