@@ -15,10 +15,3 @@ def get_matching_function(
 
 def none(iterable: typing.Iterable[object]) -> bool:
     return not any(iterable)
-
-
-def escape_double_quotes(value: str) -> str:
-    """
-    Escape double quotes in a string for JSONPath compatibility.
-    """
-    return value.replace('"', '\\"')
