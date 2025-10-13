@@ -1,5 +1,10 @@
 import json
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
+
+if not TYPE_CHECKING:
+
+    def reveal_type(x: object) -> None: ...
+
 
 from flag_engine.context.types import EvaluationContext, IdentityContext, SegmentContext
 from flag_engine.engine import get_evaluation_result
@@ -397,6 +402,7 @@ def test_segment_metadata_generic_type__returns_expected() -> None:
 
     # Then
     assert result["segments"][0]["metadata"] is segment_metadata
+    reveal_type(result["segments"][0]["metadata"])  # CustomMetadata
 
 
 def test_segment_metadata_generic_type__default__returns_expected() -> None:
@@ -433,3 +439,4 @@ def test_segment_metadata_generic_type__default__returns_expected() -> None:
 
     # Then
     assert result["segments"][0]["metadata"] is segment_metadata
+    reveal_type(result["segments"][0]["metadata"])  # Dict[str, object]
