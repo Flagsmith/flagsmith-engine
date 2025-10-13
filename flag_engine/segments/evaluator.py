@@ -23,7 +23,7 @@ from flag_engine.segments import constants
 from flag_engine.segments.types import (
     ConditionOperator,
     ContextValue,
-    MetadataT,
+    SegmentMetadataT,
     is_context_value,
 )
 from flag_engine.segments.utils import escape_double_quotes, get_matching_function
@@ -38,15 +38,15 @@ class FeatureContextWithSegmentName(typing.TypedDict):
 
 
 def get_evaluation_result(
-    context: EvaluationContext[MetadataT],
-) -> EvaluationResult[MetadataT]:
+    context: EvaluationContext[SegmentMetadataT],
+) -> EvaluationResult[SegmentMetadataT]:
     """
     Get the evaluation result for a given context.
 
     :param context: the evaluation context
     :return: EvaluationResult containing the context, flags, and segments
     """
-    segments: list[SegmentResult[MetadataT]] = []
+    segments: list[SegmentResult[SegmentMetadataT]] = []
     flags: dict[str, FlagResult] = {}
 
     segment_feature_contexts: dict[SupportsStr, FeatureContextWithSegmentName] = {}
@@ -55,7 +55,7 @@ def get_evaluation_result(
         if not is_context_in_segment(context, segment_context):
             continue
 
-        segment_result: SegmentResult[MetadataT] = {
+        segment_result: SegmentResult[SegmentMetadataT] = {
             "key": segment_context["key"],
             "name": segment_context["name"],
         }
@@ -159,8 +159,8 @@ def get_flag_result_from_feature_context(
 
 
 def is_context_in_segment(
-    context: EvaluationContext[MetadataT],
-    segment_context: SegmentContext[MetadataT],
+    context: EvaluationContext[SegmentMetadataT],
+    segment_context: SegmentContext[SegmentMetadataT],
 ) -> bool:
     return bool(rules := segment_context["rules"]) and all(
         context_matches_rule(
@@ -171,7 +171,7 @@ def is_context_in_segment(
 
 
 def context_matches_rule(
-    context: EvaluationContext[MetadataT],
+    context: EvaluationContext[SegmentMetadataT],
     rule: SegmentRule,
     segment_key: SupportsStr,
 ) -> bool:
@@ -201,7 +201,7 @@ def context_matches_rule(
 
 
 def context_matches_condition(
-    context: EvaluationContext[MetadataT],
+    context: EvaluationContext[SegmentMetadataT],
     condition: SegmentCondition,
     segment_key: SupportsStr,
 ) -> bool:
@@ -262,7 +262,7 @@ def context_matches_condition(
 
 
 def get_context_value(
-    context: EvaluationContext[MetadataT],
+    context: EvaluationContext[SegmentMetadataT],
     property: str,
 ) -> ContextValue:
     value = None
@@ -360,7 +360,7 @@ MATCHERS_BY_OPERATOR: dict[
 @lru_cache
 def _get_context_value_getter(
     property: str,
-) -> typing.Callable[[EvaluationContext[MetadataT]], ContextValue]:
+) -> typing.Callable[[EvaluationContext[SegmentMetadataT]], ContextValue]:
     """
     Get a function to retrieve a context value based on property value,
     assumed to be either a JSONPath string or a trait key.
@@ -377,7 +377,7 @@ def _get_context_value_getter(
             f'$.identity.traits["{escape_double_quotes(property)}"]',
         )
 
-    def getter(context: EvaluationContext[MetadataT]) -> ContextValue:
+    def getter(context: EvaluationContext[SegmentMetadataT]) -> ContextValue:
         if typing.TYPE_CHECKING:  # pragma: no cover
             # Ugly hack to satisfy mypy :(
             data = dict(context)

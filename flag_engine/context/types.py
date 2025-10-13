@@ -11,8 +11,8 @@ from typing_extensions import NotRequired, TypedDict
 from flag_engine.segments.types import (
     ConditionOperator,
     ContextValue,
-    MetadataT,
     RuleType,
+    SegmentMetadataT,
 )
 
 
@@ -63,16 +63,16 @@ class FeatureContext(TypedDict):
     priority: NotRequired[float]
 
 
-class SegmentContext(TypedDict, Generic[MetadataT]):
+class SegmentContext(TypedDict, Generic[SegmentMetadataT]):
     key: str
     name: str
     rules: List[SegmentRule]
     overrides: NotRequired[List[FeatureContext]]
-    metadata: NotRequired[MetadataT]
+    metadata: NotRequired[SegmentMetadataT]
 
 
-class EvaluationContext(TypedDict, Generic[MetadataT]):
+class EvaluationContext(TypedDict, Generic[SegmentMetadataT]):
     environment: EnvironmentContext
     identity: NotRequired[Optional[IdentityContext]]
-    segments: NotRequired[Dict[str, SegmentContext[MetadataT]]]
+    segments: NotRequired[Dict[str, SegmentContext[SegmentMetadataT]]]
     features: NotRequired[Dict[str, FeatureContext]]
