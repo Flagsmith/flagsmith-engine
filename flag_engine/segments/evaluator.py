@@ -4,7 +4,7 @@ import re
 import typing
 import warnings
 from contextlib import suppress
-from functools import lru_cache, wraps
+from functools import lru_cache, partial, wraps
 
 import jsonpath_rfc9535
 import semver
@@ -26,7 +26,7 @@ from flag_engine.segments.types import (
     SegmentMetadataT,
     is_context_value,
 )
-from flag_engine.segments.utils import escape_double_quotes, get_matching_function
+from flag_engine.segments.utils import get_matching_function
 from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
@@ -357,6 +357,16 @@ MATCHERS_BY_OPERATOR: dict[
 }
 
 
+def _get_trait_value(
+    context: EvaluationContext,
+    trait_key: str,
+) -> ContextValue:
+    if identity_context := context.get("identity"):
+        if traits := identity_context.get("traits"):
+            return traits.get(trait_key)
+    return None
+
+
 @lru_cache
 def _get_context_value_getter(
     property: str,
@@ -373,9 +383,7 @@ def _get_context_value_getter(
     except jsonpath_rfc9535.JSONPathSyntaxError:
         # This covers a rare case when a trait starting with "$.",
         # but not a valid JSONPath, is used.
-        compiled_query = jsonpath_rfc9535.compile(
-            f'$.identity.traits["{escape_double_quotes(property)}"]',
-        )
+        return partial(_get_trait_value, trait_key=property)
 
     def getter(context: EvaluationContext[SegmentMetadataT]) -> ContextValue:
         if typing.TYPE_CHECKING:  # pragma: no cover
