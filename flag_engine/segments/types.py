@@ -1,6 +1,10 @@
-from typing import Any, Literal, Union, get_args
+from __future__ import annotations
 
-from typing_extensions import TypeGuard
+from typing import Any, Dict, Literal, Union, get_args
+
+from typing_extensions import TypeGuard, TypeVar
+
+MetadataT = TypeVar("MetadataT", default=Dict[str, Any])
 
 ConditionOperator = Literal[
     "EQUAL",
