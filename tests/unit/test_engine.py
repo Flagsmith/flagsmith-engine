@@ -2,7 +2,8 @@ import json
 from typing import TYPE_CHECKING, TypedDict
 
 if not TYPE_CHECKING:
-
+    # `reveal_type` is a pseudo-builtin only available when type checking.
+    # Define a no-op version here so that we can call it in the tests.
     def reveal_type(x: object) -> None: ...
 
 
