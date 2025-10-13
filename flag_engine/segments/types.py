@@ -4,7 +4,7 @@ from typing import Any, Dict, Literal, Union, get_args
 
 from typing_extensions import TypeGuard, TypeVar
 
-MetadataT = TypeVar("MetadataT", default=Dict[str, Any])
+MetadataT = TypeVar("MetadataT", default=Dict[str, object])
 
 ConditionOperator = Literal[
     "EQUAL",
