@@ -385,6 +385,9 @@ def _get_context_value_getter(
         return partial(_get_trait_value, trait_key=property)
 
     def getter(context: EvaluationContext[SegmentMetadataT]) -> ContextValue:
+        value: object
+        if (value := _get_trait_value(context, property)) is not None:
+            return value
         if typing.TYPE_CHECKING:  # pragma: no cover
             # Ugly hack to satisfy mypy :(
             data = dict(context)
@@ -394,8 +397,6 @@ def _get_context_value_getter(
             if result := compiled_query.find_one(data):
                 if is_context_value(value := result.value):
                     return value
-                else:
-                    return _get_trait_value(context, property)
             return None
         except jsonpath_rfc9535.JSONPathError:  # pragma: no cover
             # This is supposed to be unreachable, but if it happens,
