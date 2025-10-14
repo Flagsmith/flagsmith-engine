@@ -131,12 +131,12 @@ def get_flag_result_from_feature_context(
             [feature_context["key"], key]
         )
 
-        # We expect `variants` to be pre-sorted in order of persistence. This gives us a
-        # way to ensure that the same value is returned every time we use the same
-        # percentage value.
         start_percentage = 0.0
 
-        for variant in variants:
+        for variant in sorted(
+            variants,
+            key=operator.itemgetter("priority"),
+        ):
             limit = (weight := variant["weight"]) + start_percentage
             if start_percentage <= percentage_value < limit:
                 return {
