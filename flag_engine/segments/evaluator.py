@@ -268,9 +268,8 @@ def get_context_value(
     value = None
     if property.startswith("$."):
         value = _get_context_value_getter(property)(context)
-    elif identity_context := context.get("identity"):
-        if traits := identity_context.get("traits"):
-            value = traits.get(property)
+    else:
+        value = _get_trait_value(context, property)
     return map_any_value_to_context_value(value)
 
 
