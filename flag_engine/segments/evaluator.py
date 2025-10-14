@@ -357,7 +357,7 @@ MATCHERS_BY_OPERATOR: dict[
 
 
 def _get_trait_value(
-    context: EvaluationContext,
+    context: EvaluationContext[SegmentMetadataT],
     trait_key: str,
 ) -> ContextValue:
     if identity_context := context.get("identity"):
@@ -394,6 +394,8 @@ def _get_context_value_getter(
             if result := compiled_query.find_one(data):
                 if is_context_value(value := result.value):
                     return value
+                else:
+                    return _get_trait_value(context, property)
             return None
         except jsonpath_rfc9535.JSONPathError:  # pragma: no cover
             # This is supposed to be unreachable, but if it happens,
