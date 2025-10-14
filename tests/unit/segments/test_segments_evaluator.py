@@ -855,8 +855,8 @@ def test_get_flag_result_from_feature_context__calls_returns_expected(
         "name": "my_feature",
         "value": "control",
         "variants": [
-            {"value": "foo", "weight": 30},
-            {"value": "bar", "weight": 30},
+            {"value": "foo", "weight": 30, "priority": 1},
+            {"value": "bar", "weight": 30, "priority": 2},
         ],
     }
 
@@ -897,8 +897,8 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
         "name": "my_feature",
         "value": "control",
         "variants": [
-            {"value": "foo", "weight": 30},
-            {"value": "bar", "weight": 30},
+            {"value": "foo", "weight": 30, "priority": 1},
+            {"value": "bar", "weight": 30, "priority": 2},
         ],
     }
 
