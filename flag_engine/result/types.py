@@ -4,9 +4,11 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, TypedDict
+from typing import Any, Dict, Generic, List
 
-from typing_extensions import NotRequired
+from typing_extensions import NotRequired, TypedDict
+
+from flag_engine.segments.types import SegmentMetadataT
 
 
 class FlagResult(TypedDict):
@@ -17,12 +19,12 @@ class FlagResult(TypedDict):
     reason: str
 
 
-class SegmentResult(TypedDict):
+class SegmentResult(TypedDict, Generic[SegmentMetadataT]):
     key: str
     name: str
-    metadata: NotRequired[Dict[str, Any]]
+    metadata: NotRequired[SegmentMetadataT]
 
 
-class EvaluationResult(TypedDict):
+class EvaluationResult(TypedDict, Generic[SegmentMetadataT]):
     flags: Dict[str, FlagResult]
-    segments: List[SegmentResult]
+    segments: List[SegmentResult[SegmentMetadataT]]

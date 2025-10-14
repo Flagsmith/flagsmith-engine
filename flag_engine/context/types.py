@@ -4,11 +4,16 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional, TypedDict, Union
+from typing import Any, Dict, Generic, List, Literal, Optional, Union
 
-from typing_extensions import NotRequired
+from typing_extensions import NotRequired, TypedDict
 
-from flag_engine.segments.types import ConditionOperator, ContextValue, RuleType
+from flag_engine.segments.types import (
+    ConditionOperator,
+    ContextValue,
+    RuleType,
+    SegmentMetadataT,
+)
 
 
 class EnvironmentContext(TypedDict):
@@ -58,16 +63,16 @@ class FeatureContext(TypedDict):
     priority: NotRequired[float]
 
 
-class SegmentContext(TypedDict):
+class SegmentContext(TypedDict, Generic[SegmentMetadataT]):
     key: str
     name: str
     rules: List[SegmentRule]
     overrides: NotRequired[List[FeatureContext]]
-    metadata: NotRequired[Dict[str, Any]]
+    metadata: NotRequired[SegmentMetadataT]
 
 
-class EvaluationContext(TypedDict):
+class EvaluationContext(TypedDict, Generic[SegmentMetadataT]):
     environment: EnvironmentContext
     identity: NotRequired[Optional[IdentityContext]]
-    segments: NotRequired[Dict[str, SegmentContext]]
+    segments: NotRequired[Dict[str, SegmentContext[SegmentMetadataT]]]
     features: NotRequired[Dict[str, FeatureContext]]

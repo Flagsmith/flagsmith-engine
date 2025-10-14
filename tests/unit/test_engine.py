@@ -1,4 +1,11 @@
 import json
+from typing import TYPE_CHECKING, TypedDict
+
+if not TYPE_CHECKING:
+    # `reveal_type` is a pseudo-builtin only available when type checking.
+    # Define a no-op version here so that we can call it in the tests.
+    def reveal_type(x: object) -> None: ...
+
 
 from flag_engine.context.types import EvaluationContext, IdentityContext, SegmentContext
 from flag_engine.engine import get_evaluation_result
@@ -357,3 +364,80 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
             {"key": "3", "name": "another_segment"},
         ],
     }
+
+
+def test_segment_metadata_generic_type__returns_expected() -> None:
+    # Given
+    class CustomMetadata(TypedDict):
+        foo: str
+        bar: int
+
+    segment_metadata = CustomMetadata(foo="hello", bar=123)
+
+    evaluation_context: EvaluationContext[CustomMetadata] = {
+        "environment": {"key": "api-key", "name": ""},
+        "segments": {
+            "1": {
+                "key": "1",
+                "name": "my_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {
+                                "property": "$.environment.name",
+                                "operator": "EQUAL",
+                                "value": "",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "metadata": segment_metadata,
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(evaluation_context)
+
+    # Then
+    assert result["segments"][0]["metadata"] is segment_metadata
+    reveal_type(result["segments"][0]["metadata"])  # CustomMetadata
+
+
+def test_segment_metadata_generic_type__default__returns_expected() -> None:
+    # Given
+    segment_metadata = {"hello": object()}
+
+    # we don't specify generic type, but mypy is happy with this
+    evaluation_context: EvaluationContext = {
+        "environment": {"key": "api-key", "name": ""},
+        "segments": {
+            "1": {
+                "key": "1",
+                "name": "my_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {
+                                "property": "$.environment.name",
+                                "operator": "EQUAL",
+                                "value": "",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "metadata": segment_metadata,
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(evaluation_context)
+
+    # Then
+    assert result["segments"][0]["metadata"] is segment_metadata
+    reveal_type(result["segments"][0]["metadata"])  # Dict[str, object]
