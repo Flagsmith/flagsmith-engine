@@ -24,6 +24,7 @@ class EnvironmentContext(TypedDict):
 class FeatureValue(TypedDict):
     value: Any
     weight: float
+    priority: int
 
 
 class IdentityContext(TypedDict):
