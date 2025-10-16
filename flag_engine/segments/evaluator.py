@@ -23,6 +23,7 @@ from flag_engine.segments import constants
 from flag_engine.segments.types import (
     ConditionOperator,
     ContextValue,
+    FeatureMetadataT,
     SegmentMetadataT,
     is_context_value,
 )
@@ -32,14 +33,14 @@ from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
 
 
-class FeatureContextWithSegmentName(typing.TypedDict):
-    feature_context: FeatureContext
+class FeatureContextWithSegmentName(typing.TypedDict, typing.Generic[FeatureMetadataT]):
+    feature_context: FeatureContext[FeatureMetadataT]
     segment_name: str
 
 
 def get_evaluation_result(
-    context: EvaluationContext[SegmentMetadataT],
-) -> EvaluationResult[SegmentMetadataT]:
+    context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+) -> EvaluationResult[SegmentMetadataT, FeatureMetadataT]:
     """
     Get the evaluation result for a given context.
 
@@ -47,9 +48,12 @@ def get_evaluation_result(
     :return: EvaluationResult containing the context, flags, and segments
     """
     segments: list[SegmentResult[SegmentMetadataT]] = []
-    flags: dict[str, FlagResult] = {}
+    flags: dict[str, FlagResult[FeatureMetadataT]] = {}
 
-    segment_feature_contexts: dict[SupportsStr, FeatureContextWithSegmentName] = {}
+    segment_feature_contexts: dict[
+        SupportsStr,
+        FeatureContextWithSegmentName[FeatureMetadataT],
+    ] = {}
 
     for segment_context in (context.get("segments") or {}).values():
         if not is_context_in_segment(context, segment_context):
@@ -59,8 +63,8 @@ def get_evaluation_result(
             "key": segment_context["key"],
             "name": segment_context["name"],
         }
-        if metadata := segment_context.get("metadata"):
-            segment_result["metadata"] = metadata
+        if segment_metadata := segment_context.get("metadata"):
+            segment_result["metadata"] = segment_metadata
         segments.append(segment_result)
 
         if overrides := segment_context.get("overrides"):
@@ -95,13 +99,16 @@ def get_evaluation_result(
             feature_context["feature_key"],
         ):
             feature_context = feature_context_with_segment_name["feature_context"]
-            flags[feature_name] = {
+            flag_result: FlagResult[FeatureMetadataT]
+            flags[feature_name] = flag_result = {
                 "enabled": feature_context["enabled"],
                 "feature_key": feature_context["feature_key"],
                 "name": feature_context["name"],
                 "reason": f"TARGETING_MATCH; segment={feature_context_with_segment_name['segment_name']}",
                 "value": feature_context.get("value"),
             }
+            if feature_metadata := feature_context.get("metadata"):
+                flag_result["metadata"] = feature_metadata
             continue
         flags[feature_name] = get_flag_result_from_feature_context(
             feature_context=feature_context,
@@ -115,9 +122,9 @@ def get_evaluation_result(
 
 
 def get_flag_result_from_feature_context(
-    feature_context: FeatureContext,
+    feature_context: FeatureContext[FeatureMetadataT],
     key: typing.Optional[SupportsStr],
-) -> FlagResult:
+) -> FlagResult[FeatureMetadataT]:
     """
     Get a feature value from the feature context
     for a given key.
@@ -126,6 +133,8 @@ def get_flag_result_from_feature_context(
     :param key: the key to get the value for
     :return: the value for the key in the feature context
     """
+    flag_result: typing.Optional[FlagResult[FeatureMetadataT]] = None
+
     if key is not None and (variants := feature_context.get("variants")):
         percentage_value = get_hashed_percentage_for_object_ids(
             [feature_context["key"], key]
@@ -139,28 +148,35 @@ def get_flag_result_from_feature_context(
         ):
             limit = (weight := variant["weight"]) + start_percentage
             if start_percentage <= percentage_value < limit:
-                return {
+                flag_result = {
                     "enabled": feature_context["enabled"],
                     "feature_key": feature_context["feature_key"],
                     "name": feature_context["name"],
                     "reason": f"SPLIT; weight={weight}",
                     "value": variant["value"],
                 }
+                break
 
             start_percentage = limit
 
-    return {
-        "enabled": feature_context["enabled"],
-        "feature_key": feature_context["feature_key"],
-        "name": feature_context["name"],
-        "reason": "DEFAULT",
-        "value": feature_context["value"],
-    }
+    if flag_result is None:
+        flag_result = {
+            "enabled": feature_context["enabled"],
+            "feature_key": feature_context["feature_key"],
+            "name": feature_context["name"],
+            "reason": "DEFAULT",
+            "value": feature_context["value"],
+        }
+
+    if metadata := feature_context.get("metadata"):
+        flag_result["metadata"] = metadata
+
+    return flag_result
 
 
 def is_context_in_segment(
-    context: EvaluationContext[SegmentMetadataT],
-    segment_context: SegmentContext[SegmentMetadataT],
+    context: EvaluationContext[typing.Any, typing.Any],
+    segment_context: SegmentContext[typing.Any, typing.Any],
 ) -> bool:
     return bool(rules := segment_context["rules"]) and all(
         context_matches_rule(
@@ -171,7 +187,7 @@ def is_context_in_segment(
 
 
 def context_matches_rule(
-    context: EvaluationContext[SegmentMetadataT],
+    context: EvaluationContext[typing.Any, typing.Any],
     rule: SegmentRule,
     segment_key: SupportsStr,
 ) -> bool:
@@ -201,7 +217,7 @@ def context_matches_rule(
 
 
 def context_matches_condition(
-    context: EvaluationContext[SegmentMetadataT],
+    context: EvaluationContext[typing.Any, typing.Any],
     condition: SegmentCondition,
     segment_key: SupportsStr,
 ) -> bool:
@@ -262,7 +278,7 @@ def context_matches_condition(
 
 
 def get_context_value(
-    context: EvaluationContext[SegmentMetadataT],
+    context: EvaluationContext[typing.Any, typing.Any],
     property: str,
 ) -> ContextValue:
     value = None

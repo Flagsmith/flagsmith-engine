@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Literal, Union, get_args
+from typing import Any, Literal, Mapping, Union, get_args
 
 from typing_extensions import TypeGuard, TypeVar
 
-SegmentMetadataT = TypeVar("SegmentMetadataT", default=Dict[str, object])
+SegmentMetadataT = TypeVar("SegmentMetadataT", default=Mapping[str, object])
+FeatureMetadataT = TypeVar("FeatureMetadataT", default=Mapping[str, object])
 
 ConditionOperator = Literal[
     "EQUAL",

@@ -8,15 +8,16 @@ from typing import Any, Dict, Generic, List
 
 from typing_extensions import NotRequired, TypedDict
 
-from flag_engine.segments.types import SegmentMetadataT
+from flag_engine.segments.types import FeatureMetadataT, SegmentMetadataT
 
 
-class FlagResult(TypedDict):
+class FlagResult(TypedDict, Generic[FeatureMetadataT]):
     feature_key: str
     name: str
     enabled: bool
     value: Any
     reason: str
+    metadata: NotRequired[FeatureMetadataT]
 
 
 class SegmentResult(TypedDict, Generic[SegmentMetadataT]):
@@ -25,6 +26,6 @@ class SegmentResult(TypedDict, Generic[SegmentMetadataT]):
     metadata: NotRequired[SegmentMetadataT]
 
 
-class EvaluationResult(TypedDict, Generic[SegmentMetadataT]):
-    flags: Dict[str, FlagResult]
+class EvaluationResult(TypedDict, Generic[SegmentMetadataT, FeatureMetadataT]):
+    flags: Dict[str, FlagResult[FeatureMetadataT]]
     segments: List[SegmentResult[SegmentMetadataT]]
