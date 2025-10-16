@@ -368,13 +368,13 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
 
 def test_segment_metadata_generic_type__returns_expected() -> None:
     # Given
-    class CustomMetadata(TypedDict):
+    class CustomSegmentMetadata(TypedDict):
         foo: str
         bar: int
 
-    segment_metadata = CustomMetadata(foo="hello", bar=123)
+    segment_metadata = CustomSegmentMetadata(foo="hello", bar=123)
 
-    evaluation_context: EvaluationContext[CustomMetadata] = {
+    evaluation_context: EvaluationContext[CustomSegmentMetadata] = {
         "environment": {"key": "api-key", "name": ""},
         "segments": {
             "1": {
@@ -403,7 +403,7 @@ def test_segment_metadata_generic_type__returns_expected() -> None:
 
     # Then
     assert result["segments"][0]["metadata"] is segment_metadata
-    reveal_type(result["segments"][0]["metadata"])  # CustomMetadata
+    reveal_type(result["segments"][0]["metadata"])  # CustomSegmentMetadata
 
 
 def test_segment_metadata_generic_type__default__returns_expected() -> None:
@@ -440,4 +440,119 @@ def test_segment_metadata_generic_type__default__returns_expected() -> None:
 
     # Then
     assert result["segments"][0]["metadata"] is segment_metadata
-    reveal_type(result["segments"][0]["metadata"])  # Dict[str, object]
+    reveal_type(result["segments"][0]["metadata"])  # Mapping[str, object]
+
+
+def test_feature_metadata_generic_type__returns_expected() -> None:
+    # Given
+    class CustomFeatureMetadata(TypedDict):
+        foo: str
+        bar: int
+
+    feature_metadata = CustomFeatureMetadata(foo="hello", bar=123)
+
+    evaluation_context: EvaluationContext[None, CustomFeatureMetadata] = {
+        "environment": {"key": "api-key", "name": ""},
+        "features": {
+            "feature_1": {
+                "key": "1",
+                "feature_key": "1",
+                "name": "feature_1",
+                "enabled": False,
+                "value": None,
+                "metadata": feature_metadata,
+            },
+        },
+        "segments": {
+            "1": {
+                "key": "1",
+                "name": "my_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {
+                                "property": "$.environment.name",
+                                "operator": "EQUAL",
+                                "value": "",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "key": "5",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "enabled": True,
+                        "value": "overridden_for_identity",
+                        "metadata": feature_metadata,
+                    }
+                ],
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(evaluation_context)
+
+    # Then
+    assert result["flags"]["feature_1"]["metadata"] is feature_metadata
+    reveal_type(result["flags"]["feature_1"]["metadata"])  # CustomFeatureMetadata
+
+
+def test_feature_metadata_generic_type__default__returns_expected() -> None:
+    # Given
+    feature_metadata = {"hello": object()}
+
+    # we don't specify generic type, but mypy is happy with this
+    evaluation_context: EvaluationContext = {
+        "environment": {"key": "api-key", "name": ""},
+        "features": {
+            "feature_1": {
+                "key": "1",
+                "feature_key": "1",
+                "name": "feature_1",
+                "enabled": False,
+                "value": None,
+                "metadata": feature_metadata,
+            },
+        },
+        "segments": {
+            "1": {
+                "key": "1",
+                "name": "my_segment",
+                "rules": [
+                    {
+                        "type": "ALL",
+                        "conditions": [
+                            {
+                                "property": "$.environment.name",
+                                "operator": "EQUAL",
+                                "value": "",
+                            }
+                        ],
+                        "rules": [],
+                    }
+                ],
+                "overrides": [
+                    {
+                        "key": "5",
+                        "feature_key": "1",
+                        "name": "feature_1",
+                        "enabled": True,
+                        "value": "overridden_for_identity",
+                        "metadata": feature_metadata,
+                    }
+                ],
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(evaluation_context)
+
+    # Then
+    assert result["flags"]["feature_1"]["metadata"] is feature_metadata
+    reveal_type(result["flags"]["feature_1"]["metadata"])  # Mapping[str, object]
