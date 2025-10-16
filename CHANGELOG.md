@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v9.0.0...v9.1.0) (2025-10-16)
+
+
+### Features
+
+* Support generic feature metadata ([#269](https://github.com/Flagsmith/flagsmith-engine/issues/269)) ([bbb5be0](https://github.com/Flagsmith/flagsmith-engine/commit/bbb5be054177b429f6c9817992cc0b1cb4b8a08f))
+
 ## [9.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v8.0.0...v9.0.0) (2025-10-16)
 
 ### ⚠ BREAKING CHANGES
