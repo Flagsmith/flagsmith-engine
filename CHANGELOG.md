@@ -1,5 +1,26 @@
 # Changelog
 
+## [9.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v8.0.0...v9.0.0) (2025-10-16)
+
+### ⚠ BREAKING CHANGES
+
+- Use `FeatureValue.priority` for multivariate evaluations
+  ([#268](https://github.com/Flagsmith/flagsmith-engine/issues/268))
+
+### Features
+
+- Generic segment metadata ([#265](https://github.com/Flagsmith/flagsmith-engine/issues/265))
+  ([8ea7f68](https://github.com/Flagsmith/flagsmith-engine/commit/8ea7f6811e9cf2ce56b47fafb7d26673b5af0629))
+- Use `FeatureValue.priority` for multivariate evaluations
+  ([#268](https://github.com/Flagsmith/flagsmith-engine/issues/268))
+  ([8e790b2](https://github.com/Flagsmith/flagsmith-engine/commit/8e790b24cd31ee0513f52b9066565887d287b902))
+
+### Bug Fixes
+
+- `$.`-prefixed traits are not prioritised over valid JSONPaths
+  ([#266](https://github.com/Flagsmith/flagsmith-engine/issues/266))
+  ([789d737](https://github.com/Flagsmith/flagsmith-engine/commit/789d737de3c6ec9594632ccbada5c96e8622785b))
+
 ## [8.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v7.0.1...v8.0.0) (2025-10-10)
 
 ### ⚠ BREAKING CHANGES
