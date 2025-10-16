@@ -10,6 +10,7 @@ from functools import lru_cache, partial, wraps
 
 import jsonpath_rfc9535
 import semver
+from typing_extensions import TypedDict
 
 from flag_engine.context.mappers import map_any_value_to_context_value
 from flag_engine.context.types import (
@@ -35,7 +36,7 @@ from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
 
 
-class FeatureContextWithSegmentName(typing.TypedDict, typing.Generic[FeatureMetadataT]):
+class FeatureContextWithSegmentName(TypedDict, typing.Generic[FeatureMetadataT]):
     feature_context: FeatureContext[FeatureMetadataT]
     segment_name: str
 
