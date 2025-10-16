@@ -558,6 +558,31 @@ def test_feature_metadata_generic_type__default__returns_expected() -> None:
     reveal_type(result["flags"]["feature_1"]["metadata"])  # Mapping[str, object]
 
 
+def test_feature_metadata__no_override__returns_expected() -> None:
+    # Given
+    feature_metadata = {"hello": object()}
+
+    evaluation_context: EvaluationContext = {
+        "environment": {"key": "api-key", "name": ""},
+        "features": {
+            "feature_1": {
+                "key": "1",
+                "feature_key": "1",
+                "name": "feature_1",
+                "enabled": False,
+                "value": None,
+                "metadata": feature_metadata,
+            },
+        },
+    }
+
+    # When
+    result = get_evaluation_result(evaluation_context)
+
+    # Then
+    assert result["flags"]["feature_1"]["metadata"] is feature_metadata
+
+
 def test_feature_metadata__override_has_metadata__returns_expected() -> None:
     # Given
     default_feature_metadata = {"hello": object()}
