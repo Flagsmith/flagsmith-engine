@@ -1,4 +1,4 @@
 [submodule "tests/engine_tests/engine-test-data"]
 	path = tests/engine_tests/engine-test-data
 	url = https://github.com/flagsmith/engine-test-data.git
-	branch = feat/implicit-identity-key
+	tag = v3.1.0
