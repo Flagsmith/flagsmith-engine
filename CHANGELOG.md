@@ -1,5 +1,17 @@
 # Changelog
 
+## [10.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v9.1.0...v10.0.0) (2025-10-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* Remove `FeatureContext.feature_key`, `SegmentResult.key` ([#272](https://github.com/Flagsmith/flagsmith-engine/issues/272))
+
+### Features
+
+* Remove `FeatureContext.feature_key`, `SegmentResult.key` ([#272](https://github.com/Flagsmith/flagsmith-engine/issues/272)) ([4004b6b](https://github.com/Flagsmith/flagsmith-engine/commit/4004b6bcb8f7c4d11cd2c14dad26d419da8c7425))
+* Support implicit `IdentityContext.key` ([#274](https://github.com/Flagsmith/flagsmith-engine/issues/274)) ([a4826f8](https://github.com/Flagsmith/flagsmith-engine/commit/a4826f8e3333ad26bcbd53e267127fe370ca917b))
+
 ## [9.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v9.0.0...v9.1.0) (2025-10-16)
 
 ### Features
