@@ -803,7 +803,6 @@ def test_segment_condition_matches_context_value_for_modulo(
             10,
             {
                 "enabled": False,
-                "feature_key": "1",
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "foo",
@@ -813,7 +812,6 @@ def test_segment_condition_matches_context_value_for_modulo(
             40,
             {
                 "enabled": False,
-                "feature_key": "1",
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "bar",
@@ -823,7 +821,6 @@ def test_segment_condition_matches_context_value_for_modulo(
             70,
             {
                 "enabled": False,
-                "feature_key": "1",
                 "name": "my_feature",
                 "reason": "DEFAULT",
                 "value": "control",
@@ -850,7 +847,6 @@ def test_get_flag_result_from_feature_context__calls_returns_expected(
     # and have a feature context with some multivariate feature options and associated values
     feature_context: FeatureContext = {
         "key": expected_feature_context_key,
-        "feature_key": "1",
         "enabled": False,
         "name": "my_feature",
         "value": "control",
@@ -892,7 +888,6 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
 
     feature_context: FeatureContext = {
         "key": expected_feature_context_key,
-        "feature_key": "1",
         "enabled": False,
         "name": "my_feature",
         "value": "control",
@@ -912,7 +907,6 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
     # the value of the feature state is the default one
     assert result == {
         "enabled": False,
-        "feature_key": "1",
         "name": "my_feature",
         "reason": "DEFAULT",
         "value": "control",

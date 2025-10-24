@@ -57,7 +57,6 @@ class SegmentRule(TypedDict):
 
 class FeatureContext(TypedDict, Generic[FeatureMetadataT]):
     key: str
-    feature_key: str
     name: str
     enabled: bool
     value: Any
