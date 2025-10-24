@@ -53,16 +53,12 @@ def segment(segment_rule: SegmentRule) -> SegmentContext:
 
 @pytest.fixture()
 def feature_state_1() -> FeatureContext:
-    return FeatureContext(
-        feature_key="1", key="1", name="feature_1", value=None, enabled=True
-    )
+    return FeatureContext(key="1", name="feature_1", value=None, enabled=True)
 
 
 @pytest.fixture()
 def feature_state_2() -> FeatureContext:
-    return FeatureContext(
-        feature_key="2", key="2", name="feature_2", value=None, enabled=False
-    )
+    return FeatureContext(key="2", name="feature_2", value=None, enabled=False)
 
 
 @pytest.fixture()
@@ -89,8 +85,8 @@ def context(
     return {
         "environment": environment,
         "features": {
-            feature_state_1["feature_key"]: feature_state_1,
-            feature_state_2["feature_key"]: feature_state_2,
+            feature_state_1["name"]: feature_state_1,
+            feature_state_2["name"]: feature_state_2,
         },
         "segments": {segment["key"]: segment},
         "identity": identity,
@@ -126,7 +122,6 @@ def context_in_segment(
                 "overrides": [
                     {
                         "key": "4",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "enabled": False,
                         "value": "segment_override",

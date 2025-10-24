@@ -63,7 +63,6 @@ def get_evaluation_result(
             continue
 
         segment_result: SegmentResult[SegmentMetadataT] = {
-            "key": segment_context["key"],
             "name": segment_context["name"],
         }
         if segment_metadata := segment_context.get("metadata"):
@@ -72,19 +71,19 @@ def get_evaluation_result(
 
         if overrides := segment_context.get("overrides"):
             for override_feature_context in overrides:
-                feature_key = override_feature_context["feature_key"]
+                feature_name = override_feature_context["name"]
                 if (
-                    feature_key not in segment_feature_contexts
+                    feature_name not in segment_feature_contexts
                     or override_feature_context.get(
                         "priority",
                         constants.DEFAULT_PRIORITY,
                     )
-                    < (segment_feature_contexts[feature_key]["feature_context"]).get(
+                    < (segment_feature_contexts[feature_name]["feature_context"]).get(
                         "priority",
                         constants.DEFAULT_PRIORITY,
                     )
                 ):
-                    segment_feature_contexts[feature_key] = (
+                    segment_feature_contexts[feature_name] = (
                         FeatureContextWithSegmentName(
                             feature_context=override_feature_context,
                             segment_name=segment_context["name"],
@@ -99,13 +98,12 @@ def get_evaluation_result(
     for feature_context in (context.get("features") or {}).values():
         feature_name = feature_context["name"]
         if feature_context_with_segment_name := segment_feature_contexts.get(
-            feature_context["feature_key"],
+            feature_context["name"],
         ):
             feature_context = feature_context_with_segment_name["feature_context"]
             flag_result: FlagResult[FeatureMetadataT]
             flags[feature_name] = flag_result = {
                 "enabled": feature_context["enabled"],
-                "feature_key": feature_context["feature_key"],
                 "name": feature_context["name"],
                 "reason": f"TARGETING_MATCH; segment={feature_context_with_segment_name['segment_name']}",
                 "value": feature_context.get("value"),
@@ -153,7 +151,6 @@ def get_flag_result_from_feature_context(
             if start_percentage <= percentage_value < limit:
                 flag_result = {
                     "enabled": feature_context["enabled"],
-                    "feature_key": feature_context["feature_key"],
                     "name": feature_context["name"],
                     "reason": f"SPLIT; weight={weight}",
                     "value": variant["value"],
@@ -165,7 +162,6 @@ def get_flag_result_from_feature_context(
     if flag_result is None:
         flag_result = {
             "enabled": feature_context["enabled"],
-            "feature_key": feature_context["feature_key"],
             "name": feature_context["name"],
             "reason": "DEFAULT",
             "value": feature_context["value"],

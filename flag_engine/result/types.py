@@ -12,7 +12,6 @@ from flag_engine.segments.types import FeatureMetadataT, SegmentMetadataT
 
 
 class FlagResult(TypedDict, Generic[FeatureMetadataT]):
-    feature_key: str
     name: str
     enabled: bool
     value: Any
@@ -21,7 +20,6 @@ class FlagResult(TypedDict, Generic[FeatureMetadataT]):
 
 
 class SegmentResult(TypedDict, Generic[SegmentMetadataT]):
-    key: str
     name: str
     metadata: NotRequired[SegmentMetadataT]
 

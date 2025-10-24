@@ -23,14 +23,12 @@ def test_get_evaluation_result__no_overrides__returns_expected(
         flags={
             "feature_1": {
                 "enabled": True,
-                "feature_key": "1",
                 "name": "feature_1",
                 "reason": "DEFAULT",
                 "value": None,
             },
             "feature_2": {
                 "enabled": False,
-                "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
@@ -51,20 +49,18 @@ def test_get_evaluation_result__segment_override__returns_expected(
         "flags": {
             "feature_1": {
                 "enabled": False,
-                "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=my_segment",
                 "value": "segment_override",
             },
             "feature_2": {
                 "enabled": False,
-                "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
         },
-        "segments": [{"key": "1", "name": "my_segment"}],
+        "segments": [{"name": "my_segment"}],
     }
 
 
@@ -91,7 +87,6 @@ def test_get_evaluation_result__identity_override__returns_expected(
         overrides=[
             {
                 "key": "5",
-                "feature_key": "1",
                 "name": "feature_1",
                 "enabled": True,
                 "value": "overridden_for_identity",
@@ -108,25 +103,18 @@ def test_get_evaluation_result__identity_override__returns_expected(
         "flags": {
             "feature_1": {
                 "enabled": True,
-                "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=identity_overrides",
                 "value": "overridden_for_identity",
             },
             "feature_2": {
                 "enabled": False,
-                "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
         },
-        "segments": [
-            {
-                "key": "",
-                "name": "identity_overrides",
-            },
-        ],
+        "segments": [{"name": "identity_overrides"}],
     }
 
 
@@ -144,14 +132,12 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
         "features": {
             "feature_1": {
                 "key": "1",
-                "feature_key": "1",
                 "name": "feature_1",
                 "enabled": False,
                 "value": None,
             },
             "feature_2": {
                 "key": "2",
-                "feature_key": "2",
                 "name": "feature_2",
                 "enabled": False,
                 "value": None,
@@ -173,7 +159,6 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
                 "overrides": [
                     {
                         "key": "4",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "enabled": False,
                         "value": "segment_override",
@@ -197,7 +182,6 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
                     {
                         "enabled": True,
                         "key": "2",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "value": "segment_override_other",
                         "priority": 1,
@@ -215,22 +199,20 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
         "flags": {
             "feature_1": {
                 "enabled": True,
-                "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=higher_priority_segment",
                 "value": "segment_override_other",
             },
             "feature_2": {
                 "enabled": False,
-                "feature_key": "2",
                 "name": "feature_2",
                 "reason": "DEFAULT",
                 "value": None,
             },
         },
         "segments": [
-            {"key": "1", "name": "my_segment"},
-            {"key": "3", "name": "higher_priority_segment"},
+            {"name": "my_segment"},
+            {"name": "higher_priority_segment"},
         ],
     }
 
@@ -249,14 +231,12 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
         "features": {
             "feature_1": {
                 "key": "1",
-                "feature_key": "1",
                 "name": "feature_1",
                 "enabled": False,
                 "value": None,
             },
             "feature_2": {
                 "key": "2",
-                "feature_key": "2",
                 "name": "feature_2",
                 "enabled": False,
                 "value": None,
@@ -278,7 +258,6 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
                 "overrides": [
                     {
                         "key": "3",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "enabled": True,
                         "value": "overridden_without_priority",
@@ -300,7 +279,6 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
                 "overrides": [
                     {
                         "key": "4",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "enabled": True,
                         "value": "overridden_with_priority",
@@ -327,7 +305,6 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
                 "overrides": [
                     {
                         "key": "5",
-                        "feature_key": "2",
                         "name": "feature_2",
                         "enabled": False,
                         "value": "moose",
@@ -345,23 +322,21 @@ def test_get_evaluation_result__segment_override__no_priority__returns_expected(
         "flags": {
             "feature_1": {
                 "enabled": True,
-                "feature_key": "1",
                 "name": "feature_1",
                 "reason": "TARGETING_MATCH; segment=segment_with_override_priority",
                 "value": "overridden_with_priority",
             },
             "feature_2": {
                 "enabled": False,
-                "feature_key": "2",
                 "name": "feature_2",
                 "reason": "TARGETING_MATCH; segment=another_segment",
                 "value": "moose",
             },
         },
         "segments": [
-            {"key": "1", "name": "segment_without_override_priority"},
-            {"key": "2", "name": "segment_with_override_priority"},
-            {"key": "3", "name": "another_segment"},
+            {"name": "segment_without_override_priority"},
+            {"name": "segment_with_override_priority"},
+            {"name": "another_segment"},
         ],
     }
 
@@ -456,7 +431,6 @@ def test_feature_metadata_generic_type__returns_expected() -> None:
         "features": {
             "feature_1": {
                 "key": "1",
-                "feature_key": "1",
                 "name": "feature_1",
                 "enabled": False,
                 "value": None,
@@ -483,7 +457,6 @@ def test_feature_metadata_generic_type__returns_expected() -> None:
                 "overrides": [
                     {
                         "key": "5",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "enabled": True,
                         "value": "overridden_for_identity",
@@ -512,7 +485,6 @@ def test_feature_metadata_generic_type__default__returns_expected() -> None:
         "features": {
             "feature_1": {
                 "key": "1",
-                "feature_key": "1",
                 "name": "feature_1",
                 "enabled": False,
                 "value": None,
@@ -539,7 +511,6 @@ def test_feature_metadata_generic_type__default__returns_expected() -> None:
                 "overrides": [
                     {
                         "key": "5",
-                        "feature_key": "1",
                         "name": "feature_1",
                         "enabled": True,
                         "value": "overridden_for_identity",
