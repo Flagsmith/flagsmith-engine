@@ -30,7 +30,7 @@ class FeatureValue(TypedDict):
 
 class IdentityContext(TypedDict):
     identifier: str
-    key: str
+    key: NotRequired[str]
     traits: NotRequired[Dict[str, ContextValue]]
 
 
