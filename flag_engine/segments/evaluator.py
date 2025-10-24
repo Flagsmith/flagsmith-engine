@@ -41,6 +41,11 @@ class FeatureContextWithSegmentName(TypedDict, typing.Generic[FeatureMetadataT])
     segment_name: str
 
 
+# Type alias for EvaluationContext with any metadata types
+# used in internal evaluation logic
+_EvaluationContextAnyMeta = EvaluationContext[typing.Any, typing.Any]
+
+
 def get_evaluation_result(
     context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
 ) -> EvaluationResult[SegmentMetadataT, FeatureMetadataT]:
@@ -90,11 +95,7 @@ def get_evaluation_result(
                         )
                     )
 
-    identity_key = (
-        identity_context["key"]
-        if (identity_context := context.get("identity"))
-        else None
-    )
+    identity_key = _get_identity_key(context)
     for feature_context in (context.get("features") or {}).values():
         feature_name = feature_context["name"]
         if feature_context_with_segment_name := segment_feature_contexts.get(
@@ -174,7 +175,7 @@ def get_flag_result_from_feature_context(
 
 
 def is_context_in_segment(
-    context: EvaluationContext[typing.Any, typing.Any],
+    context: _EvaluationContextAnyMeta,
     segment_context: SegmentContext[typing.Any, typing.Any],
 ) -> bool:
     return bool(rules := segment_context["rules"]) and all(
@@ -186,7 +187,7 @@ def is_context_in_segment(
 
 
 def context_matches_rule(
-    context: EvaluationContext[typing.Any, typing.Any],
+    context: _EvaluationContextAnyMeta,
     rule: SegmentRule,
     segment_key: SupportsStr,
 ) -> bool:
@@ -216,7 +217,7 @@ def context_matches_rule(
 
 
 def context_matches_condition(
-    context: EvaluationContext[typing.Any, typing.Any],
+    context: _EvaluationContextAnyMeta,
     condition: SegmentCondition,
     segment_key: SupportsStr,
 ) -> bool:
@@ -277,7 +278,7 @@ def context_matches_condition(
 
 
 def get_context_value(
-    context: EvaluationContext[typing.Any, typing.Any],
+    context: _EvaluationContextAnyMeta,
     property: str,
 ) -> ContextValue:
     value = None
@@ -371,8 +372,19 @@ MATCHERS_BY_OPERATOR: dict[
 }
 
 
+def _get_identity_key(
+    context: _EvaluationContextAnyMeta,
+) -> typing.Optional[SupportsStr]:
+    if identity_context := context.get("identity"):
+        return (
+            identity_context.get("key")
+            or f"{context['environment']['key']}_{identity_context['identifier']}"
+        )
+    return None
+
+
 def _get_trait_value(
-    context: EvaluationContext[SegmentMetadataT],
+    context: _EvaluationContextAnyMeta,
     trait_key: str,
 ) -> ContextValue:
     if identity_context := context.get("identity"):
@@ -384,7 +396,7 @@ def _get_trait_value(
 @lru_cache
 def _get_context_value_getter(
     property: str,
-) -> typing.Callable[[EvaluationContext[SegmentMetadataT]], ContextValue]:
+) -> typing.Callable[[_EvaluationContextAnyMeta], ContextValue]:
     """
     Get a function to retrieve a context value based on property value,
     assumed to be either a JSONPath string or a trait key.
@@ -399,7 +411,7 @@ def _get_context_value_getter(
         # but not a valid JSONPath, is used.
         return partial(_get_trait_value, trait_key=property)
 
-    def getter(context: EvaluationContext[SegmentMetadataT]) -> ContextValue:
+    def getter(context: _EvaluationContextAnyMeta) -> ContextValue:
         value: object
         if (value := _get_trait_value(context, property)) is not None:
             return value
