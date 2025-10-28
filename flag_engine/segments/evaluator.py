@@ -36,10 +36,12 @@ from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
 
 
-class FeatureContextWithSegmentName(TypedDict, typing.Generic[FeatureMetadataT]):
+class SegmentOverride(TypedDict, typing.Generic[FeatureMetadataT]):
     feature_context: FeatureContext[FeatureMetadataT]
     segment_name: str
 
+
+SegmentOverrides = dict[str, SegmentOverride[FeatureMetadataT]]
 
 # Type alias for EvaluationContext with any metadata types
 # used in internal evaluation logic
@@ -55,15 +57,52 @@ def get_evaluation_result(
     :param context: the evaluation context
     :return: EvaluationResult containing the context, flags, and segments
     """
-    segments: list[SegmentResult[SegmentMetadataT]] = []
-    flags: dict[str, FlagResult[FeatureMetadataT]] = {}
+    context = get_enriched_context(context)
+    segments, segment_overrides = evaluate_segments(context)
+    flags = evaluate_features(context, segment_overrides)
 
-    segment_feature_contexts: dict[
-        SupportsStr,
-        FeatureContextWithSegmentName[FeatureMetadataT],
-    ] = {}
+    return {
+        "flags": flags,
+        "segments": segments,
+    }
 
-    for segment_context in (context.get("segments") or {}).values():
+
+def get_enriched_context(
+    context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+) -> EvaluationContext[SegmentMetadataT, FeatureMetadataT]:
+    """
+    Get an enriched version of the evaluation context by ensuring that:
+     - `$.identity.key` is set
+
+    :param context: the evaluation context to enrich
+    :return: the enriched evaluation context. If not modified, returns the original context.
+    """
+    if identity_context := context.get("identity"):
+        if not identity_context.get("key"):
+            context = context.copy()
+            context["identity"] = {
+                **identity_context,
+                "key": (
+                    f"{context['environment']['key']}_{identity_context['identifier']}"
+                ),
+            }
+
+    return context
+
+
+def evaluate_segments(
+    context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+) -> typing.Tuple[
+    list[SegmentResult[SegmentMetadataT]],
+    SegmentOverrides[FeatureMetadataT],
+]:
+    if not (segment_contexts := context.get("segments")):
+        return [], {}
+
+    segment_results: list[SegmentResult[SegmentMetadataT]] = []
+    segment_overrides: SegmentOverrides[FeatureMetadataT] = {}
+
+    for segment_context in segment_contexts.values():
         if not is_context_in_segment(context, segment_context):
             continue
 
@@ -72,69 +111,75 @@ def get_evaluation_result(
         }
         if segment_metadata := segment_context.get("metadata"):
             segment_result["metadata"] = segment_metadata
-        segments.append(segment_result)
+        segment_results.append(segment_result)
 
         if overrides := segment_context.get("overrides"):
             for override_feature_context in overrides:
                 feature_name = override_feature_context["name"]
                 if (
-                    feature_name not in segment_feature_contexts
+                    feature_name not in segment_overrides
                     or override_feature_context.get(
                         "priority",
                         constants.DEFAULT_PRIORITY,
                     )
-                    < (segment_feature_contexts[feature_name]["feature_context"]).get(
+                    < (segment_overrides[feature_name]["feature_context"]).get(
                         "priority",
                         constants.DEFAULT_PRIORITY,
                     )
                 ):
-                    segment_feature_contexts[feature_name] = (
-                        FeatureContextWithSegmentName(
-                            feature_context=override_feature_context,
-                            segment_name=segment_context["name"],
-                        )
+                    segment_overrides[feature_name] = SegmentOverride(
+                        feature_context=override_feature_context,
+                        segment_name=segment_context["name"],
                     )
 
-    identity_key = _get_identity_key(context)
+    return segment_results, segment_overrides
+
+
+def evaluate_features(
+    context: EvaluationContext[typing.Any, FeatureMetadataT],
+    segment_overrides: SegmentOverrides[FeatureMetadataT],
+) -> dict[str, FlagResult[FeatureMetadataT]]:
+    flags: dict[str, FlagResult[FeatureMetadataT]] = {}
+
     for feature_context in (context.get("features") or {}).values():
         feature_name = feature_context["name"]
-        if feature_context_with_segment_name := segment_feature_contexts.get(
+        if segment_override := segment_overrides.get(
             feature_context["name"],
         ):
-            feature_context = feature_context_with_segment_name["feature_context"]
+            feature_context = segment_override["feature_context"]
             flag_result: FlagResult[FeatureMetadataT]
             flags[feature_name] = flag_result = {
                 "enabled": feature_context["enabled"],
                 "name": feature_context["name"],
-                "reason": f"TARGETING_MATCH; segment={feature_context_with_segment_name['segment_name']}",
+                "reason": f"TARGETING_MATCH; segment={segment_override['segment_name']}",
                 "value": feature_context.get("value"),
             }
             if feature_metadata := feature_context.get("metadata"):
                 flag_result["metadata"] = feature_metadata
             continue
-        flags[feature_name] = get_flag_result_from_feature_context(
-            feature_context=feature_context,
-            key=identity_key,
+        flags[feature_name] = get_flag_result_from_context(
+            context=context,
+            feature_name=feature_name,
         )
 
-    return {
-        "flags": flags,
-        "segments": segments,
-    }
+    return flags
 
 
-def get_flag_result_from_feature_context(
-    feature_context: FeatureContext[FeatureMetadataT],
-    key: typing.Optional[SupportsStr],
+def get_flag_result_from_context(
+    context: EvaluationContext[typing.Any, FeatureMetadataT],
+    feature_name: str,
 ) -> FlagResult[FeatureMetadataT]:
     """
-    Get a feature value from the feature context
-    for a given key.
+    Get a feature value from the evaluation context
+    for a given feature name.
 
-    :param feature_context: the feature context
-    :param key: the key to get the value for
-    :return: the value for the key in the feature context
+    :param context: the evaluation context
+    :param feature_name: the feature name to get the value for
+    :return: the value for the feature name in the evaluation context
     """
+    feature_context = context["features"][feature_name]
+    key = _get_identity_key(context)
+
     flag_result: typing.Optional[FlagResult[FeatureMetadataT]] = None
 
     if key is not None and (variants := feature_context.get("variants")):
@@ -253,8 +298,8 @@ def context_matches_condition(
     if condition["operator"] == constants.PERCENTAGE_SPLIT:
         if context_value is not None:
             object_ids = [segment_key, context_value]
-        elif identity_context := context.get("identity"):
-            object_ids = [segment_key, identity_context["key"]]
+        elif identity_key := _get_identity_key(context):
+            object_ids = [segment_key, identity_key]
         else:
             return False
 
@@ -376,10 +421,7 @@ def _get_identity_key(
     context: _EvaluationContextAnyMeta,
 ) -> typing.Optional[SupportsStr]:
     if identity_context := context.get("identity"):
-        return (
-            identity_context.get("key")
-            or f"{context['environment']['key']}_{identity_context['identifier']}"
-        )
+        return identity_context.get("key")
     return None
 
 

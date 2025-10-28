@@ -17,7 +17,7 @@ from flag_engine.segments.evaluator import (
     _matches_context_value,
     context_matches_condition,
     get_context_value,
-    get_flag_result_from_feature_context,
+    get_flag_result_from_context,
     is_context_in_segment,
 )
 from flag_engine.segments.types import ConditionOperator
@@ -828,7 +828,8 @@ def test_segment_condition_matches_context_value_for_modulo(
         ),
     ),
 )
-def test_get_flag_result_from_feature_context__calls_returns_expected(
+def test_get_flag_result_from_context__calls_returns_expected(
+    context: EvaluationContext,
     percentage_value: int,
     expected_result: FlagResult,
     mocker: MockerFixture,
@@ -855,11 +856,13 @@ def test_get_flag_result_from_feature_context__calls_returns_expected(
             {"value": "bar", "weight": 30, "priority": 2},
         ],
     }
+    context["features"]["my_feature"] = feature_context
+    context["identity"] = {"identifier": expected_key, "key": expected_key}
 
     # When
-    result = get_flag_result_from_feature_context(
-        feature_context=feature_context,
-        key=expected_key,
+    result = get_flag_result_from_context(
+        context=context,
+        feature_name="my_feature",
     )
 
     # the value of the feature state is correct based on the percentage value returned
@@ -875,12 +878,11 @@ def test_get_flag_result_from_feature_context__calls_returns_expected(
 
 
 def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
+    context: EvaluationContext,
     mocker: MockerFixture,
 ) -> None:
     # Given
     expected_feature_context_key = "2"
-    # a None key is provided (no identity context present)
-    expected_key = None
 
     get_hashed_percentage_for_object_ids_mock = mocker.patch(
         "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids",
@@ -897,10 +899,15 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
         ],
     }
 
+    context["features"]["my_feature"] = feature_context
+
+    # no identity context present
+    context["identity"] = None
+
     # When
-    result = get_flag_result_from_feature_context(
-        feature_context=feature_context,
-        key=expected_key,
+    result = get_flag_result_from_context(
+        context=context,
+        feature_name="my_feature",
     )
 
     # Then
