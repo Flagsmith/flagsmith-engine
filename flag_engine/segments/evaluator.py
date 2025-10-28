@@ -57,7 +57,7 @@ def get_evaluation_result(
     :param context: the evaluation context
     :return: EvaluationResult containing the context, flags, and segments
     """
-    enrich_context(context)
+    context = get_enriched_context(context)
     segments, segment_overrides = evaluate_segments(context)
     flags = evaluate_features(context, segment_overrides)
 
@@ -67,20 +67,27 @@ def get_evaluation_result(
     }
 
 
-def enrich_context(
-    context: _EvaluationContextAnyMeta,
-) -> None:
+def get_enriched_context(
+    context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+) -> EvaluationContext[SegmentMetadataT, FeatureMetadataT]:
     """
-    Enrich the evaluation context in-place by ensuring that:
+    Get an enriched version of the evaluation context by ensuring that:
      - `$.identity.key` is set
 
     :param context: the evaluation context to enrich
+    :return: the enriched evaluation context. If not modified, returns the original context.
     """
     if identity_context := context.get("identity"):
         if not identity_context.get("key"):
-            identity_context["key"] = (
-                f"{context['environment']['key']}_{identity_context['identifier']}"
-            )
+            context = context.copy()
+            context["identity"] = {
+                **identity_context,
+                "key": (
+                    f"{context['environment']['key']}_{identity_context['identifier']}"
+                ),
+            }
+
+    return context
 
 
 def evaluate_segments(
