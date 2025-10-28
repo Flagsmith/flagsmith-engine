@@ -2,10 +2,11 @@
 
 ## [10.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.0...v10.0.1) (2025-10-28)
 
-
 ### Bug Fixes
 
-* Implicit identity key not supported for % Split operator ([#276](https://github.com/Flagsmith/flagsmith-engine/issues/276)) ([4d0fa9a](https://github.com/Flagsmith/flagsmith-engine/commit/4d0fa9ad2834501c459bbb29aab33a592b46ea94))
+- Implicit identity key not supported for % Split operator
+  ([#276](https://github.com/Flagsmith/flagsmith-engine/issues/276))
+  ([4d0fa9a](https://github.com/Flagsmith/flagsmith-engine/commit/4d0fa9ad2834501c459bbb29aab33a592b46ea94))
 
 ## [10.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v9.1.0...v10.0.0) (2025-10-24)
 
