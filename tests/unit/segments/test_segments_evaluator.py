@@ -856,13 +856,13 @@ def test_get_flag_result_from_context__calls_returns_expected(
             {"value": "bar", "weight": 30, "priority": 2},
         ],
     }
-    context["features"]["my_feature"] = feature_context
     context["identity"] = {"identifier": expected_key, "key": expected_key}
 
     # When
     result = get_flag_result_from_context(
         context=context,
-        feature_name="my_feature",
+        feature_context=feature_context,
+        reason="DEFAULT",
     )
 
     # the value of the feature state is correct based on the percentage value returned
@@ -899,15 +899,14 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
         ],
     }
 
-    context["features"]["my_feature"] = feature_context
-
     # no identity context present
     context["identity"] = None
 
     # When
     result = get_flag_result_from_context(
         context=context,
-        feature_name="my_feature",
+        feature_context=feature_context,
+        reason="DEFAULT",
     )
 
     # Then
