@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.0.2](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.1...v10.0.2) (2025-10-30)
+
+### Bug Fixes
+
+- Multivariate segment overrides not supported ([#279](https://github.com/Flagsmith/flagsmith-engine/issues/279))
+  ([fa5907d](https://github.com/Flagsmith/flagsmith-engine/commit/fa5907dd85f39aa9d1929ea6a5fcf2d6b5d2b32c))
+
 ## [10.0.1](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.0...v10.0.1) (2025-10-28)
 
 ### Bug Fixes
