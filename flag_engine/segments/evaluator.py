@@ -139,13 +139,14 @@ def evaluate_features(
     context: EvaluationContext[typing.Any, FeatureMetadataT],
     segment_overrides: SegmentOverrides[FeatureMetadataT],
 ) -> dict[str, FlagResult[FeatureMetadataT]]:
+    if not (features := context.get("features")):
+        return {}
+
     flags: dict[str, FlagResult[FeatureMetadataT]] = {}
 
-    for feature_context in (context.get("features") or {}).values():
+    for feature_context in features.values():
         feature_name = feature_context["name"]
-        if segment_override := segment_overrides.get(
-            feature_context["name"],
-        ):
+        if segment_override := segment_overrides.get(feature_name):
             flags[feature_name] = get_flag_result_from_context(
                 context=context,
                 feature_context=segment_override["feature_context"],
