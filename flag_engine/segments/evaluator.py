@@ -139,45 +139,43 @@ def evaluate_features(
     context: EvaluationContext[typing.Any, FeatureMetadataT],
     segment_overrides: SegmentOverrides[FeatureMetadataT],
 ) -> dict[str, FlagResult[FeatureMetadataT]]:
+    if not (features := context.get("features")):
+        return {}
+
     flags: dict[str, FlagResult[FeatureMetadataT]] = {}
 
-    for feature_context in (context.get("features") or {}).values():
+    for feature_context in features.values():
         feature_name = feature_context["name"]
-        if segment_override := segment_overrides.get(
-            feature_context["name"],
-        ):
-            feature_context = segment_override["feature_context"]
-            flag_result: FlagResult[FeatureMetadataT]
-            flags[feature_name] = flag_result = {
-                "enabled": feature_context["enabled"],
-                "name": feature_context["name"],
-                "reason": f"TARGETING_MATCH; segment={segment_override['segment_name']}",
-                "value": feature_context.get("value"),
-            }
-            if feature_metadata := feature_context.get("metadata"):
-                flag_result["metadata"] = feature_metadata
+        if segment_override := segment_overrides.get(feature_name):
+            flags[feature_name] = get_flag_result_from_context(
+                context=context,
+                feature_context=segment_override["feature_context"],
+                reason=f"TARGETING_MATCH; segment={segment_override['segment_name']}",
+            )
             continue
         flags[feature_name] = get_flag_result_from_context(
             context=context,
-            feature_name=feature_name,
+            feature_context=context["features"][feature_name],
+            reason="DEFAULT",
         )
 
     return flags
 
 
 def get_flag_result_from_context(
-    context: EvaluationContext[typing.Any, FeatureMetadataT],
-    feature_name: str,
+    context: _EvaluationContextAnyMeta,
+    feature_context: FeatureContext[FeatureMetadataT],
+    reason: str,
 ) -> FlagResult[FeatureMetadataT]:
     """
     Get a feature value from the evaluation context
     for a given feature name.
 
-    :param context: the evaluation context
-    :param feature_name: the feature name to get the value for
+    :param context: evaluation context
+    :param feature_context: feature context
+    :param reason: reason to use when no variant selected
     :return: the value for the feature name in the evaluation context
     """
-    feature_context = context["features"][feature_name]
     key = _get_identity_key(context)
 
     flag_result: typing.Optional[FlagResult[FeatureMetadataT]] = None
@@ -209,7 +207,7 @@ def get_flag_result_from_context(
         flag_result = {
             "enabled": feature_context["enabled"],
             "name": feature_context["name"],
-            "reason": "DEFAULT",
+            "reason": reason,
             "value": feature_context["value"],
         }
 
