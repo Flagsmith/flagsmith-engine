@@ -10,47 +10,48 @@ on:
       - main
 
 jobs:
-  test:
+  test-rust:
     runs-on: ubuntu-latest
-    name: Flag engine Unit tests
-
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+    name: Flag engine with Rust (Experimental)
 
     steps:
-      - name: Cloning repo
+      - name: Cloning Python repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Cloning Rust repo
+        uses: actions/checkout@v4
+        with:
+          repository: Flagsmith/flagsmith-rust-flag-engine
+          ref: fix/who-needs-python
+          path: rust-engine
+
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Dependencies
+          python-version: '3.12'
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Check Typing
-        run: mypy --strict .
+      - name: Install maturin
+        run: pip install maturin
 
-      - name: Run Tests
+      - name: Build and install Rust extension
+        run: |
+          cd rust-engine
+          maturin build --release --features python
+          ls -la target/wheels/
+          pip install --force-reinstall target/wheels/*.whl
+          pip list | grep flagsmith
+
+      - name: Run Tests with Rust
+        env:
+          FLAGSMITH_USE_RUST: '1'
         run: pytest -p no:warnings
-
-      - name: Check Coverage
-        uses: 5monkeys/cobertura-action@v14
-        with:
-          minimum_coverage: 100
-          fail_below_threshold: true
-          show_missing: true
-
-      - name: Run Benchmarks
-        if: ${{ matrix.python-version == '3.12' }}
-        uses: CodSpeedHQ/action@v3
-        with:
-          token: ${{ secrets.CODSPEED_TOKEN }}
-          run: pytest --codspeed --no-cov

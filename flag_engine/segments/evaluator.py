@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import operator
+import os
 import re
 import typing
 import warnings
@@ -47,12 +48,20 @@ SegmentOverrides = dict[str, SegmentOverride[FeatureMetadataT]]
 # used in internal evaluation logic
 _EvaluationContextAnyMeta = EvaluationContext[typing.Any, typing.Any]
 
+from flagsmith_flag_engine_rust import get_evaluation_result_rust
+
 
 def get_evaluation_result(
     context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
 ) -> EvaluationResult[SegmentMetadataT, FeatureMetadataT]:
+    return get_evaluation_result_rust(context)  # type: ignore[no-any-return]
+
+
+def _get_evaluation_result_python(
+    context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+) -> EvaluationResult[SegmentMetadataT, FeatureMetadataT]:
     """
-    Get the evaluation result for a given context.
+    Python implementation of evaluation result.
 
     :param context: the evaluation context
     :return: EvaluationResult containing the context, flags, and segments
