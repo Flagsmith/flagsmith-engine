@@ -53,6 +53,5 @@ jobs:
 
       - name: Run Tests with Rust
         env:
-          FLAGSMITH_USE_RUST: "1"
+          FLAGSMITH_USE_RUST: '1'
         run: pytest -p no:warnings
-

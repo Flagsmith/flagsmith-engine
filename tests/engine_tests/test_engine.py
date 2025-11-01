@@ -73,6 +73,7 @@ TEST_CASES = sorted(
 )
 BENCHMARK_CONTEXTS = []
 
+
 @pytest.mark.parametrize(
     "context, expected_result",
     TEST_CASES,
@@ -91,5 +92,3 @@ def test_engine(
 
     # Then - compare without metadata (for Rust experiment)
     assert _remove_metadata(result) == _remove_metadata(expected_result)
-
-

@@ -56,6 +56,7 @@ def get_evaluation_result(
 ) -> EvaluationResult[SegmentMetadataT, FeatureMetadataT]:
     return get_evaluation_result_rust(context)  # type: ignore[no-any-return]
 
+
 def _get_evaluation_result_python(
     context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
 ) -> EvaluationResult[SegmentMetadataT, FeatureMetadataT]:
