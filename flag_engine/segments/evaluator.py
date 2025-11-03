@@ -271,6 +271,9 @@ def context_matches_condition(
     )
 
     if condition["operator"] == constants.IN:
+        # Guard against comparing null and boolean values to numeric strings
+        if any(context_value is value for value in (None, True, False)):
+            return False
         if isinstance(segment_value := condition["value"], list):
             in_values = segment_value
         else:
@@ -284,12 +287,7 @@ def context_matches_condition(
             except ValueError:
                 in_values = segment_value.split(",")
         in_values = [str(value) for value in in_values]
-        # Guard against comparing boolean values to numeric strings.
-        if isinstance(context_value, int) and not (
-            context_value is True or context_value is False
-        ):
-            context_value = str(context_value)
-        return context_value in in_values
+        return str(context_value) in in_values
 
     condition = typing.cast(StrValueSegmentCondition, condition)
 
