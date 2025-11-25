@@ -264,13 +264,21 @@ def context_matches_condition(
     condition: SegmentCondition,
     segment_key: SupportsStr,
 ) -> bool:
-    context_value = (
-        get_context_value(context, condition_property)
-        if (condition_property := condition.get("property"))
-        else None
-    )
+    context_value: ContextValue
+    condition_property = condition["property"]
+    condition_operator = condition["operator"]
 
-    if condition["operator"] == constants.IN:
+    if condition_operator == constants.PERCENTAGE_SPLIT and (not condition_property):
+        # Currently, the only supported condition with a blank property
+        # is percentage split.
+        # In this case, we use the identity key as context value.
+        # This is mainly to support legacy segments created before
+        # we introduced JSONPath support.
+        context_value = _get_identity_key(context)
+    else:
+        context_value = get_context_value(context, condition_property)
+
+    if condition_operator == constants.IN:
         if isinstance(segment_value := condition["value"], list):
             in_values = segment_value
         else:
@@ -293,13 +301,11 @@ def context_matches_condition(
 
     condition = typing.cast(StrValueSegmentCondition, condition)
 
-    if condition["operator"] == constants.PERCENTAGE_SPLIT:
-        if context_value is not None:
-            object_ids = [segment_key, context_value]
-        elif identity_key := _get_identity_key(context):
-            object_ids = [segment_key, identity_key]
-        else:
+    if condition_operator == constants.PERCENTAGE_SPLIT:
+        if context_value is None:
             return False
+
+        object_ids = [segment_key, context_value]
 
         try:
             float_value = float(condition["value"])
@@ -307,10 +313,10 @@ def context_matches_condition(
             return False
         return get_hashed_percentage_for_object_ids(object_ids) <= float_value
 
-    if condition["operator"] == constants.IS_NOT_SET:
+    if condition_operator == constants.IS_NOT_SET:
         return context_value is None
 
-    if condition["operator"] == constants.IS_SET:
+    if condition_operator == constants.IS_SET:
         return context_value is not None
 
     return (
@@ -417,7 +423,7 @@ MATCHERS_BY_OPERATOR: dict[
 
 def _get_identity_key(
     context: _EvaluationContextAnyMeta,
-) -> typing.Optional[SupportsStr]:
+) -> typing.Optional[str]:
     if identity_context := context.get("identity"):
         return identity_context.get("key")
     return None
