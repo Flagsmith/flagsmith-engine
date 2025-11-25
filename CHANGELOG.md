@@ -1,5 +1,13 @@
 # Changelog
 
+## [10.0.3](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.2...v10.0.3) (2025-11-25)
+
+### Bug Fixes
+
+- Exclude identities when PERCENTAGE_SPLIT trait is undefined
+  ([#284](https://github.com/Flagsmith/flagsmith-engine/issues/284))
+  ([0427c04](https://github.com/Flagsmith/flagsmith-engine/commit/0427c0483980c426a059c2b40ae5ebc0d853501c))
+
 ## [10.0.2](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.1...v10.0.2) (2025-10-30)
 
 ### Bug Fixes
