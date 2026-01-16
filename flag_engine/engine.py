@@ -6,8 +6,17 @@ from flag_engine.environments.models import EnvironmentModel
 from flag_engine.features.models import FeatureModel, FeatureStateModel
 from flag_engine.identities.models import IdentityModel
 from flag_engine.identities.traits.models import TraitModel
+from flag_engine.identities.traits.types import ContextValue
 from flag_engine.segments.evaluator import get_context_segments
 from flag_engine.utils.exceptions import FeatureStateNotFound
+
+__all__ = (
+    "ContextValue",
+    "get_environment_feature_state",
+    "get_environment_feature_states",
+    "get_identity_feature_state",
+    "get_identity_feature_states",
+)
 
 
 def get_environment_feature_states(
