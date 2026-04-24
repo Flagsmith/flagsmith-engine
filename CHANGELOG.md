@@ -1,5 +1,17 @@
 # Changelog
 
+## [10.0.4](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.3...v10.0.4) (2026-04-24)
+
+### Performance Improvements
+
+- Speed up IN segment condition evaluation ([#295](https://github.com/Flagsmith/flagsmith-engine/issues/295))
+  ([1d8b273](https://github.com/Flagsmith/flagsmith-engine/commit/1d8b2731fe4d10cf11c47a4726664c3bd82c2807))
+
+### Other
+
+- Remove amannn/action-semantic-pull-request workflow ([#290](https://github.com/Flagsmith/flagsmith-engine/issues/290))
+  ([6237c31](https://github.com/Flagsmith/flagsmith-engine/commit/6237c31333022bc779bce14a9ea134818d56cb0b))
+
 ## [10.0.3](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.2...v10.0.3) (2025-11-25)
 
 ### Bug Fixes
