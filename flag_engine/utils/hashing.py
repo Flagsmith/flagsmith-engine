@@ -31,3 +31,24 @@ def get_hashed_percentage_for_object_ids(
         )
 
     return value
+
+
+def get_hashed_percentage_for_object_id_pair(
+    first: SupportsStr,
+    second: SupportsStr,
+) -> float:
+    """Fast path for the hot two-key case used by variant selection and
+    ``PERCENTAGE_SPLIT`` conditions. Skips the iterator / list wrapping that
+    the generic helper performs on every call.
+
+    Returns the same value as
+    ``get_hashed_percentage_for_object_ids([first, second])``.
+    """
+    to_hash = f"{first},{second}"
+    hashed_value = hashlib.md5(to_hash.encode("utf-8"))
+    hashed_value_as_int = int(hashed_value.hexdigest(), base=16)
+    value = ((hashed_value_as_int % 9999) / 9998) * 100
+    if value == 100:
+        # Extremely unlikely; fall back to the generic recursion-capable path.
+        return get_hashed_percentage_for_object_ids([first, second], iterations=2)
+    return value
