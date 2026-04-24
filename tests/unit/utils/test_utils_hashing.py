@@ -5,7 +5,10 @@ from unittest import mock
 
 import pytest
 
-from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
+from flag_engine.utils.hashing import (
+    get_hashed_percentage_for_object_id_pair,
+    get_hashed_percentage_for_object_ids,
+)
 
 
 @pytest.mark.parametrize(
@@ -146,3 +149,31 @@ def test_get_hashed_percentage_does_not_return_1(mock_hashlib: mock.Mock) -> Non
     # the second call, with a string (in bytes) that contains each object id twice
     expected_bytes_2 = ",".join(str(id_) for id_ in object_ids * 2).encode("utf-8")
     assert call_list[1][0][0] == expected_bytes_2
+
+
+@mock.patch("flag_engine.utils.hashing.hashlib")
+def test_get_hashed_percentage_for_object_id_pair__value_is_100__falls_back(
+    mock_hashlib: mock.Mock,
+) -> None:
+    """When the two-key fast path would return exactly 100, it must fall back
+    to the generic helper with iterations=2 (same anti-boundary guarantee as
+    ``get_hashed_percentage_for_object_ids``)."""
+
+    # 270e converts to 9998, forcing value == 100. 270f → 9999 → value == 0.
+    hashed_values = ["270f", "270e"]
+
+    def hexdigest_side_effect() -> str:
+        return hashed_values.pop()
+
+    mock_hash = mock.MagicMock()
+    mock_hashlib.md5.return_value = mock_hash
+    mock_hash.hexdigest.side_effect = hexdigest_side_effect
+
+    value = get_hashed_percentage_for_object_id_pair("12", "93")
+
+    assert value == 0
+    # First call: fast-path two-key hash (single pair); second: recursive fallback.
+    call_list = mock_hashlib.md5.call_args_list
+    assert len(call_list) == 2
+    assert call_list[0][0][0] == b"12,93"
+    assert call_list[1][0][0] == b"12,93,12,93"

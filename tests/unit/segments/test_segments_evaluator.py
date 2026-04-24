@@ -806,6 +806,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "foo",
+                "metadata": {"id": 7},
             },
         ),
         (
@@ -815,6 +816,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "bar",
+                "metadata": {"id": 7},
             },
         ),
         (
@@ -824,6 +826,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "DEFAULT",
                 "value": "control",
+                "metadata": {"id": 7},
             },
         ),
     ),
@@ -851,6 +854,7 @@ def test_get_flag_result_from_context__calls_returns_expected(
         "enabled": False,
         "name": "my_feature",
         "value": "control",
+        "metadata": {"id": 7},
         "variants": [
             {"value": "foo", "weight": 30, "priority": 1},
             {"value": "bar", "weight": 30, "priority": 2},
