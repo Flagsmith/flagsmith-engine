@@ -36,6 +36,9 @@ def _extract_benchmark_contexts(
     for file_path in [
         "test_0cfd0d72-4de4-4ed7-9cfb-d80dc3dacead__default.json",
         "test_1bde8445-ca19-4bda-a9d5-3543a800fc0f__context_values.json",
+        "test_in_condition_json_array_format__should_match.jsonc",
+        "test_in_condition_numeric_comma_separated__should_match.jsonc",
+        "test_in_condition_array_matching_value__should_match.jsonc",
     ]:
         yield pyjson5.loads((test_cases_dir_path / file_path).read_text())["context"]
 

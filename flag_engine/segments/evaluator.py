@@ -279,23 +279,9 @@ def context_matches_condition(
         context_value = get_context_value(context, condition_property)
 
     if condition_operator == constants.IN:
-        if isinstance(segment_value := condition["value"], list):
-            in_values = segment_value
-        else:
-            try:
-                in_values = json.loads(segment_value)
-                # Only accept JSON lists.
-                # Ideally, we should use something like pydantic.TypeAdapter[list[str]],
-                # but we aim to ditch the pydantic dependency in the future.
-                if not isinstance(in_values, list):
-                    raise ValueError
-            except ValueError:
-                in_values = segment_value.split(",")
-        in_values = [str(value) for value in in_values]
+        in_values = _get_in_values(condition["value"])
         # Guard against comparing boolean values to numeric strings.
-        if isinstance(context_value, int) and not (
-            context_value is True or context_value is False
-        ):
+        if type(context_value) is int:
             context_value = str(context_value)
         return context_value in in_values
 
@@ -346,6 +332,30 @@ def _matches_context_value(
         return matcher(condition["value"], context_value)
 
     return False
+
+
+@lru_cache(maxsize=1024)
+def _parse_in_values_str(segment_value: str) -> frozenset[str]:
+    """
+    Parse a string-form IN condition value into a frozenset of strings.
+    A bracketed value is tried as JSON first (with CSV fallback on parse
+    error); anything else is split on commas directly.
+    """
+    if segment_value.startswith("["):
+        try:
+            parsed: list[typing.Any] = json.loads(segment_value)
+        except ValueError:
+            return frozenset(segment_value.split(","))
+        return frozenset(v if type(v) is str else str(v) for v in parsed)
+    return frozenset(segment_value.split(","))
+
+
+def _get_in_values(
+    segment_value: typing.Union[str, list[typing.Any]],
+) -> frozenset[str]:
+    if isinstance(segment_value, list):
+        return frozenset(v if type(v) is str else str(v) for v in segment_value)
+    return _parse_in_values_str(segment_value)
 
 
 def _evaluate_not_contains(
