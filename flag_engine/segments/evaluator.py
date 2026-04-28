@@ -31,7 +31,7 @@ from flag_engine.segments.types import (
     is_context_value,
 )
 from flag_engine.segments.utils import get_matching_function
-from flag_engine.utils.hashing import get_hashed_percentage_for_object_ids
+from flag_engine.utils.hashing import get_hashed_percentage_for_object_id_pair
 from flag_engine.utils.semver import is_semver
 from flag_engine.utils.types import SupportsStr, get_casting_function
 
@@ -58,8 +58,9 @@ def get_evaluation_result(
     :return: EvaluationResult containing the context, flags, and segments
     """
     context = get_enriched_context(context)
+    identity_key = _get_identity_key(context)
     segments, segment_overrides = evaluate_segments(context)
-    flags = evaluate_features(context, segment_overrides)
+    flags = evaluate_features(context, segment_overrides, identity_key=identity_key)
 
     return {
         "flags": flags,
@@ -138,26 +139,57 @@ def evaluate_segments(
 def evaluate_features(
     context: EvaluationContext[typing.Any, FeatureMetadataT],
     segment_overrides: SegmentOverrides[FeatureMetadataT],
+    *,
+    identity_key: typing.Optional[str] = None,
 ) -> dict[str, FlagResult[FeatureMetadataT]]:
     if not (features := context.get("features")):
         return {}
 
-    flags: dict[str, FlagResult[FeatureMetadataT]] = {}
+    # ``identity_key`` is invariant across all features in a single evaluation.
+    # Resolving it here (or accepting it from the caller) means the per-feature
+    # hot loop below doesn't have to re-walk ``context["identity"]`` N times.
+    if identity_key is None:
+        identity_key = _get_identity_key(context)
 
-    for feature_context in features.values():
-        feature_name = feature_context["name"]
-        if segment_override := segment_overrides.get(feature_name):
-            flags[feature_name] = get_flag_result_from_context(
-                context=context,
-                feature_context=segment_override["feature_context"],
-                reason=f"TARGETING_MATCH; segment={segment_override['segment_name']}",
-            )
-            continue
-        flags[feature_name] = get_flag_result_from_context(
-            context=context,
-            feature_context=context["features"][feature_name],
-            reason="DEFAULT",
-        )
+    # Localise loop dependencies once so the tight per-feature loop doesn't
+    # chase module globals on every iteration. ``_build_flag_result`` is
+    # inlined below for environments with many features (e.g. 250+), where
+    # the function-call overhead is otherwise ~15% of per-call time.
+    hash_fn = get_hashed_percentage_for_object_id_pair
+    overrides_get = segment_overrides.get
+
+    flags: dict[str, FlagResult[FeatureMetadataT]] = {}
+    for feature_name, feature_context in features.items():
+        if segment_override := overrides_get(feature_name):
+            effective_feature_context = segment_override["feature_context"]
+            reason = f"TARGETING_MATCH; segment={segment_override['segment_name']}"
+        else:
+            effective_feature_context = feature_context
+            reason = "DEFAULT"
+
+        value: typing.Any = effective_feature_context["value"]
+        if identity_key is not None and (
+            variants := effective_feature_context.get("variants")
+        ):
+            percentage_value = hash_fn(effective_feature_context["key"], identity_key)
+            start_percentage = 0.0
+            for variant in sorted(variants, key=_variant_priority):
+                limit = (weight := variant["weight"]) + start_percentage
+                if start_percentage <= percentage_value < limit:
+                    value = variant["value"]
+                    reason = f"SPLIT; weight={weight}"
+                    break
+                start_percentage = limit
+
+        flag_result: FlagResult[FeatureMetadataT] = {
+            "enabled": effective_feature_context["enabled"],
+            "name": effective_feature_context["name"],
+            "reason": reason,
+            "value": value,
+        }
+        if metadata := effective_feature_context.get("metadata"):
+            flag_result["metadata"] = metadata
+        flags[feature_name] = flag_result
 
     return flags
 
@@ -176,45 +208,36 @@ def get_flag_result_from_context(
     :param reason: reason to use when no variant selected
     :return: the value for the feature name in the evaluation context
     """
-    key = _get_identity_key(context)
+    identity_key = _get_identity_key(context)
+    value: typing.Any = feature_context["value"]
 
-    flag_result: typing.Optional[FlagResult[FeatureMetadataT]] = None
-
-    if key is not None and (variants := feature_context.get("variants")):
-        percentage_value = get_hashed_percentage_for_object_ids(
-            [feature_context["key"], key]
+    if identity_key is not None and (variants := feature_context.get("variants")):
+        percentage_value = get_hashed_percentage_for_object_id_pair(
+            feature_context["key"], identity_key
         )
-
         start_percentage = 0.0
-
-        for variant in sorted(
-            variants,
-            key=operator.itemgetter("priority"),
-        ):
+        for variant in sorted(variants, key=_variant_priority):
             limit = (weight := variant["weight"]) + start_percentage
             if start_percentage <= percentage_value < limit:
-                flag_result = {
-                    "enabled": feature_context["enabled"],
-                    "name": feature_context["name"],
-                    "reason": f"SPLIT; weight={weight}",
-                    "value": variant["value"],
-                }
+                value = variant["value"]
+                reason = f"SPLIT; weight={weight}"
                 break
-
             start_percentage = limit
 
-    if flag_result is None:
-        flag_result = {
-            "enabled": feature_context["enabled"],
-            "name": feature_context["name"],
-            "reason": reason,
-            "value": feature_context["value"],
-        }
-
+    flag_result: FlagResult[FeatureMetadataT] = {
+        "enabled": feature_context["enabled"],
+        "name": feature_context["name"],
+        "reason": reason,
+        "value": value,
+    }
     if metadata := feature_context.get("metadata"):
         flag_result["metadata"] = metadata
-
     return flag_result
+
+
+def _variant_priority(variant: typing.Mapping[str, typing.Any]) -> int:
+    priority: int = variant["priority"]
+    return priority
 
 
 def is_context_in_segment(
@@ -290,14 +313,14 @@ def context_matches_condition(
     if condition_operator == constants.PERCENTAGE_SPLIT:
         if context_value is None:
             return False
-
-        object_ids = [segment_key, context_value]
-
         try:
             float_value = float(condition["value"])
         except ValueError:
             return False
-        return get_hashed_percentage_for_object_ids(object_ids) <= float_value
+        return (
+            get_hashed_percentage_for_object_id_pair(segment_key, context_value)
+            <= float_value
+        )
 
     if condition_operator == constants.IS_NOT_SET:
         return context_value is None

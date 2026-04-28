@@ -265,7 +265,7 @@ def test_context_in_segment_percentage_split(
     }
 
     mock_get_hashed_percentage = mocker.patch(
-        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_id_pair"
     )
     mock_get_hashed_percentage.return_value = identity_hashed_percentage
 
@@ -308,7 +308,7 @@ def test_context_in_segment_percentage_split__no_identity__returns_expected(
     }
 
     mock_get_hashed_percentage = mocker.patch(
-        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_id_pair"
     )
 
     # When
@@ -352,7 +352,7 @@ def test_context_in_segment_percentage_split__trait_value__calls_expected(
     }
 
     mock_get_hashed_percentage = mocker.patch(
-        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids"
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_id_pair"
     )
     mock_get_hashed_percentage.return_value = 1
 
@@ -361,7 +361,7 @@ def test_context_in_segment_percentage_split__trait_value__calls_expected(
 
     # Then
     mock_get_hashed_percentage.assert_called_once_with(
-        [segment_context["key"], "custom_value"]
+        segment_context["key"], "custom_value"
     )
     assert result
 
@@ -806,6 +806,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "foo",
+                "metadata": {"id": 7},
             },
         ),
         (
@@ -815,6 +816,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "bar",
+                "metadata": {"id": 7},
             },
         ),
         (
@@ -824,6 +826,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "DEFAULT",
                 "value": "control",
+                "metadata": {"id": 7},
             },
         ),
     ),
@@ -841,7 +844,7 @@ def test_get_flag_result_from_context__calls_returns_expected(
     # we mock the function which gets the percentage value for an identity to
     # return a deterministic value so we know which value to expect
     get_hashed_percentage_for_object_ids_mock = mocker.patch(
-        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids",
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_id_pair",
     )
     get_hashed_percentage_for_object_ids_mock.return_value = percentage_value
 
@@ -851,6 +854,7 @@ def test_get_flag_result_from_context__calls_returns_expected(
         "enabled": False,
         "name": "my_feature",
         "value": "control",
+        "metadata": {"id": 7},
         "variants": [
             {"value": "foo", "weight": 30, "priority": 1},
             {"value": "bar", "weight": 30, "priority": 2},
@@ -870,10 +874,8 @@ def test_get_flag_result_from_context__calls_returns_expected(
 
     # the function is called with the expected key
     get_hashed_percentage_for_object_ids_mock.assert_called_once_with(
-        [
-            expected_feature_context_key,
-            expected_key,
-        ]
+        expected_feature_context_key,
+        expected_key,
     )
 
 
@@ -885,7 +887,7 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
     expected_feature_context_key = "2"
 
     get_hashed_percentage_for_object_ids_mock = mocker.patch(
-        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_ids",
+        "flag_engine.segments.evaluator.get_hashed_percentage_for_object_id_pair",
     )
 
     feature_context: FeatureContext = {

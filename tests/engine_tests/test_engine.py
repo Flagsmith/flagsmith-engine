@@ -11,6 +11,9 @@ from flag_engine.engine import get_evaluation_result
 from flag_engine.result.types import EvaluationResult
 
 TEST_CASES_PATH = Path(__file__).parent / "engine-test-data/test_cases"
+LARGE_ENVIRONMENT_TEST_CASE = (
+    "test_000000cf-0000-0000-0000-000000000000__large_environment.json"
+)
 
 EnvironmentDocument = dict[str, typing.Any]
 
@@ -43,11 +46,19 @@ def _extract_benchmark_contexts(
         yield pyjson5.loads((test_cases_dir_path / file_path).read_text())["context"]
 
 
+def _load_test_case_context(name: str) -> EvaluationContext:
+    ctx: EvaluationContext = pyjson5.loads((TEST_CASES_PATH / name).read_text())[
+        "context"
+    ]
+    return ctx
+
+
 TEST_CASES = sorted(
     _extract_test_cases(TEST_CASES_PATH),
     key=lambda param: str(param.id),
 )
 BENCHMARK_CONTEXTS = list(_extract_benchmark_contexts(TEST_CASES_PATH))
+LARGE_BENCHMARK_CONTEXT = _load_test_case_context(LARGE_ENVIRONMENT_TEST_CASE)
 
 
 @pytest.mark.parametrize(
@@ -69,3 +80,8 @@ def test_engine(
 def test_engine_benchmark() -> None:
     for context in BENCHMARK_CONTEXTS:
         get_evaluation_result(context)
+
+
+@pytest.mark.benchmark
+def test_engine_benchmark_large_context() -> None:
+    get_evaluation_result(LARGE_BENCHMARK_CONTEXT)
