@@ -110,6 +110,48 @@ segment_nested_rules: SegmentContext = {
     ],
 }
 
+segment_any_with_nested_all_groups: SegmentContext = {
+    "key": "7",
+    "name": "segment_any_with_nested_all_groups",
+    "rules": [
+        {
+            "type": constants.ALL_RULE,
+            "rules": [
+                {
+                    "type": constants.ANY_RULE,
+                    "rules": [
+                        {
+                            "type": constants.ALL_RULE,
+                            "conditions": [
+                                {
+                                    "operator": constants.EQUAL,
+                                    "property": trait_key_1,
+                                    "value": trait_value_1,
+                                },
+                                {
+                                    "operator": constants.EQUAL,
+                                    "property": trait_key_2,
+                                    "value": trait_value_2,
+                                },
+                            ],
+                        },
+                        {
+                            "type": constants.ALL_RULE,
+                            "conditions": [
+                                {
+                                    "operator": constants.EQUAL,
+                                    "property": trait_key_3,
+                                    "value": trait_value_3,
+                                },
+                            ],
+                        },
+                    ],
+                }
+            ],
+        }
+    ],
+}
+
 segment_conditions_and_nested_rules: SegmentContext = {
     "key": "6",
     "name": "segment_multiple_conditions_all_and_nested_rules",
