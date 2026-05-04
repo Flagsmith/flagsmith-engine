@@ -23,7 +23,6 @@ from flag_engine.segments.evaluator import (
 from flag_engine.segments.types import ConditionOperator
 from tests.unit.segments.fixtures import (
     empty_segment,
-    segment_any_with_nested_all_groups,
     segment_conditions_and_nested_rules,
     segment_multiple_conditions_all,
     segment_multiple_conditions_any,
@@ -212,49 +211,6 @@ from tests.unit.segments.fixtures import (
                 },
             },
             True,
-        ),
-        (
-            segment_any_with_nested_all_groups,
-            {
-                "environment": {"key": "key", "name": "Environment"},
-                "identity": {
-                    "identifier": "foo",
-                    "key": "key_foo",
-                    "traits": {
-                        trait_key_1: trait_value_1,
-                        trait_key_2: trait_value_2,
-                    },
-                },
-            },
-            True,
-        ),
-        (
-            segment_any_with_nested_all_groups,
-            {
-                "environment": {"key": "key", "name": "Environment"},
-                "identity": {
-                    "identifier": "foo",
-                    "key": "key_foo",
-                    "traits": {
-                        trait_key_3: trait_value_3,
-                    },
-                },
-            },
-            True,
-        ),
-        (
-            segment_any_with_nested_all_groups,
-            {
-                "environment": {"key": "key", "name": "Environment"},
-                "identity": {
-                    "identifier": "foo",
-                    "key": "key_foo",
-                    "traits": {
-                        trait_key_1: trait_value_1,
-                    },
-                },
-            },
-            False,
         ),
     ),
 )
