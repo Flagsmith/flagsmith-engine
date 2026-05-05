@@ -1,11 +1,29 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
+  "extends": ["config:recommended", ":semanticCommitScopeDisabled"],
+  "ignorePresets": [":semanticPrefixFixDepsChoreOthers"],
+  "semanticCommitType": "deps",
   "git-submodules": {
     "enabled": true
   },
-  "pip-compile": {
-    "enabled": true,
-    "fileMatch": ["requirements\\.in$", "requirements-dev\\.in$"]
-  }
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "major",
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "rollback",
+        "bump",
+        "replacement",
+        "lockFileMaintenance"
+      ],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["git-submodules", "pip_requirements", "pip-compile", "pep621", "poetry"],
+      "enabled": true
+    }
+  ]
 }
