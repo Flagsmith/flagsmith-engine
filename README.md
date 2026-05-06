@@ -15,6 +15,14 @@ source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 ```
 
+## Syncing engine-test-data
+
+The engine-test-data submodule is pinned to a specific tag. To sync it locally:
+
+```bash
+make sync-engine-test-data
+```
+
 ## Design
 
 - Marshmallow Schemas
