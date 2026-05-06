@@ -236,27 +236,30 @@ def context_matches_rule(
 ) -> bool:
     matches_conditions = (
         get_matching_function(rule["type"])(
-            [
-                context_matches_condition(
-                    context=context,
-                    condition=condition,
-                    segment_key=segment_key,
-                )
-                for condition in conditions
-            ]
+            context_matches_condition(
+                context=context,
+                condition=condition,
+                segment_key=segment_key,
+            )
+            for condition in conditions
         )
         if (conditions := rule.get("conditions"))
         else True
     )
 
-    return matches_conditions and all(
-        context_matches_rule(
-            context=context,
-            rule=rule,
-            segment_key=segment_key,
+    matches_rules = (
+        get_matching_function(rule["type"])(
+            context_matches_rule(
+                context=context,
+                rule=sub_rule,
+                segment_key=segment_key,
+            )
+            for sub_rule in rules
         )
-        for rule in rule.get("rules") or []
+        if (rules := rule.get("rules"))
+        else True
     )
+    return matches_conditions and matches_rules
 
 
 def context_matches_condition(
