@@ -1,5 +1,19 @@
 # Changelog
 
+## [10.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.4...v10.1.0) (2026-05-06)
+
+### Features
+
+- apply rules based on the all-any type ([#313](https://github.com/Flagsmith/flagsmith-engine/issues/313))
+  ([f2363e3](https://github.com/Flagsmith/flagsmith-engine/commit/f2363e32f7605c98a70e3bdeef5c3b68c75f17ce))
+
+### CI
+
+- added renovate config ([#298](https://github.com/Flagsmith/flagsmith-engine/issues/298))
+  ([05bd5dc](https://github.com/Flagsmith/flagsmith-engine/commit/05bd5dc5eec15531a85334d6fba648a6b1125776))
+- reduce renovate watchlist ([#309](https://github.com/Flagsmith/flagsmith-engine/issues/309))
+  ([fae5c73](https://github.com/Flagsmith/flagsmith-engine/commit/fae5c735558dacc69c717cb6a12dca989581af07))
+
 ## [10.0.4](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.3...v10.0.4) (2026-04-24)
 
 ### Performance Improvements
