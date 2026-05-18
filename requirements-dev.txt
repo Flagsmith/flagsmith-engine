@@ -4,7 +4,7 @@ absolufy-imports==0.3.1
     # via -r requirements-dev.in
 annotated-types==0.7.0
     # via pydantic
-argcomplete==3.6.2
+argcomplete==3.6.3
     # via datamodel-code-generator
 black==25.1.0
     # via
