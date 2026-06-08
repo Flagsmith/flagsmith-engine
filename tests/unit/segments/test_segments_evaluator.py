@@ -806,6 +806,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "foo",
+                "variant": None,
             },
         ),
         (
@@ -815,6 +816,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "SPLIT; weight=30",
                 "value": "bar",
+                "variant": None,
             },
         ),
         (
@@ -824,6 +826,7 @@ def test_segment_condition_matches_context_value_for_modulo(
                 "name": "my_feature",
                 "reason": "DEFAULT",
                 "value": "control",
+                "variant": "control",
             },
         ),
     ),
@@ -910,12 +913,14 @@ def test_get_flag_result_from_feature_context__null_key__calls_returns_expected(
     )
 
     # Then
-    # the value of the feature state is the default one
+    # the value of the feature state is the default one and no variant is
+    # attributed because the identity was never bucketed
     assert result == {
         "enabled": False,
         "name": "my_feature",
         "reason": "DEFAULT",
         "value": "control",
+        "variant": None,
     }
 
     # the function is not called as there is no key to hash against

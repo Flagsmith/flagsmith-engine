@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Generic, List
+from typing import Any, Dict, Generic, List, Optional
 
 from typing_extensions import NotRequired, TypedDict
 
@@ -16,6 +16,7 @@ class FlagResult(TypedDict, Generic[FeatureMetadataT]):
     enabled: bool
     value: Any
     reason: str
+    variant: Optional[str]
     metadata: NotRequired[FeatureMetadataT]
 
 

@@ -23,6 +23,7 @@ class EnvironmentContext(TypedDict):
 
 
 class FeatureValue(TypedDict):
+    key: NotRequired[str]
     value: Any
     weight: float
     priority: int
