@@ -178,38 +178,39 @@ def get_flag_result_from_context(
     """
     key = _get_identity_key(context)
 
-    flag_result: typing.Optional[FlagResult[FeatureMetadataT]] = None
+    value = feature_context["value"]
+    variant: typing.Optional[str] = None
 
     if key is not None and (variants := feature_context.get("variants")):
+        # Default to the control bucket; a matched named variant overrides this.
+        variant = "control"
+
         percentage_value = get_hashed_percentage_for_object_ids(
             [feature_context["key"], key]
         )
 
         start_percentage = 0.0
 
-        for variant in sorted(
+        for feature_value in sorted(
             variants,
             key=operator.itemgetter("priority"),
         ):
-            limit = (weight := variant["weight"]) + start_percentage
+            limit = (weight := feature_value["weight"]) + start_percentage
             if start_percentage <= percentage_value < limit:
-                flag_result = {
-                    "enabled": feature_context["enabled"],
-                    "name": feature_context["name"],
-                    "reason": f"SPLIT; weight={weight}",
-                    "value": variant["value"],
-                }
+                reason = f"SPLIT; weight={weight}"
+                value = feature_value["value"]
+                variant = feature_value.get("key")
                 break
 
             start_percentage = limit
 
-    if flag_result is None:
-        flag_result = {
-            "enabled": feature_context["enabled"],
-            "name": feature_context["name"],
-            "reason": reason,
-            "value": feature_context["value"],
-        }
+    flag_result: FlagResult[FeatureMetadataT] = {
+        "enabled": feature_context["enabled"],
+        "name": feature_context["name"],
+        "reason": reason,
+        "value": value,
+        "variant": variant,
+    }
 
     if metadata := feature_context.get("metadata"):
         flag_result["metadata"] = metadata
