@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.2.0](https://github.com/Flagsmith/flagsmith-engine/compare/v10.1.0...v10.2.0) (2026-06-09)
+
+
+### Features
+
+* include selected variant key in flag results ([#314](https://github.com/Flagsmith/flagsmith-engine/issues/314)) ([74fb147](https://github.com/Flagsmith/flagsmith-engine/commit/74fb147ffecae27db21a7f3fff7d25a3eecd8145))
+
 ## [10.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v10.0.4...v10.1.0) (2026-05-06)
 
 ### Features
