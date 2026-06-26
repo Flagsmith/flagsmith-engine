@@ -20,7 +20,7 @@ click==8.1.8
     #   pip-tools
 coverage==7.10.4
     # via pytest-cov
-datamodel-code-generator==0.33.0
+datamodel-code-generator==0.66.0
     # via -r requirements-dev.in
 exceptiongroup==1.3.0
     # via pytest
