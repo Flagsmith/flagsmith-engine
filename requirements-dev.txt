@@ -69,7 +69,7 @@ pathspec==0.12.1
     # via
     #   black
     #   mypy
-pip==25.2
+pip==26.1.2
     # via pip-tools
 pip-tools==7.5.0
     # via -r requirements-dev.in
