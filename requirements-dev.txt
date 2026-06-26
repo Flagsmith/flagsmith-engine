@@ -10,7 +10,7 @@ black==25.1.0
     # via
     #   -r requirements-dev.in
     #   datamodel-code-generator
-build==1.3.0
+build==1.5.0
     # via pip-tools
 cffi==1.17.1
     # via pytest-codspeed
