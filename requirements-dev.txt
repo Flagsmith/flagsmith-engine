@@ -145,7 +145,7 @@ typing-extensions==4.14.1
     #   typing-inspection
 typing-inspection==0.4.1
     # via pydantic
-wheel==0.45.1
+wheel==0.46.2
     # via pip-tools
 zipp==3.23.0
     # via importlib-metadata
