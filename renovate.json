@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":semanticCommitScopeDisabled"],
+  "extends": ["security:only-security-updates", ":semanticCommitScopeDisabled"],
   "ignorePresets": [":semanticPrefixFixDepsChoreOthers"],
   "semanticCommitType": "deps",
   "git-submodules": {
