@@ -93,7 +93,7 @@ pygments==2.20.0
     # via
     #   pytest
     #   rich
-pyjson5==2.0.0
+pyjson5==2.0.1
     # via -r requirements-dev.in
 pyproject-hooks==1.2.0
     # via
