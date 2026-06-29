@@ -2,7 +2,7 @@
 #    uv pip compile requirements.in --constraints requirements.txt --python-version 3.9
 iregexp-check==0.1.4
     # via jsonpath-rfc9535
-jsonpath-rfc9535==0.1.6
+jsonpath-rfc9535==0.2.0
     # via -r requirements.in
 regex==2025.7.34
     # via jsonpath-rfc9535
