@@ -3,6 +3,10 @@
   "extends": ["security:only-security-updates", ":semanticCommitScopeDisabled"],
   "ignorePresets": [":semanticPrefixFixDepsChoreOthers"],
   "semanticCommitType": "deps",
+  "constraints": {
+    "python": ">=3.10"
+  },
+  "constraintsFiltering": "strict",
   "git-submodules": {
     "enabled": true
   },
