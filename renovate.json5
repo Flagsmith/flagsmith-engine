@@ -8,6 +8,12 @@
   // `fix`/`chore`; ignore it so we keep `deps:` as the commit prefix.
   ignorePresets: [':semanticPrefixFixDepsChoreOthers'],
   semanticCommitType: 'deps',
+  // `constraintsFiltering: strict` filters out releases whose
+  // `requires-python` excludes `constraints.python`.
+  constraints: {
+    python: '>=3.10',
+  },
+  constraintsFiltering: 'strict',
   'git-submodules': {
     enabled: true,
   },
