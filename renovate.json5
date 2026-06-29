@@ -1,0 +1,31 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  // `security:only-security-updates` disables Renovate by default and only lets
+  // vulnerability-alert PRs through. `:semanticCommitScopeDisabled` drops the
+  // semantic-commit scope (e.g. `deps(deps):` becomes `deps:`).
+  extends: ['security:only-security-updates', ':semanticCommitScopeDisabled'],
+  // The default semantic-commit preset would rewrite our `deps` type to
+  // `fix`/`chore`; ignore it so we keep `deps:` as the commit prefix.
+  ignorePresets: [':semanticPrefixFixDepsChoreOthers'],
+  semanticCommitType: 'deps',
+  'git-submodules': {
+    enabled: true,
+  },
+  // `packageRules` only governs the *normal* update flow. Security PRs go
+  // through a separate `vulnerabilityAlerts` block (enabled by default and
+  // kept on by `security:only-security-updates`) and are evaluated after
+  // `packageRules`, so nothing here blocks security PRs — they still come
+  // through for every manager.
+  //
+  // Re-enable normal-flow updates for git-submodules so the engine-test-data
+  // submodule keeps updating. Do NOT add pip managers (`pip_requirements`,
+  // `pip-compile`, `pep621`, `poetry`) here — that re-enables ALL normal
+  // (non-security) update types for Python deps and defeats the security-only
+  // setup (see PR #325).
+  packageRules: [
+    {
+      matchManagers: ['git-submodules'],
+      enabled: true,
+    },
+  ],
+}
