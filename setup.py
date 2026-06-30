@@ -12,6 +12,7 @@ setup(
     description="Flag engine for the Flagsmith API.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
+    python_requires=">=3.10",
     install_requires=[
         "jsonpath-rfc9535>=0.1.5,<1",
         "semver>=3.0.4,<4",
@@ -20,10 +21,10 @@ setup(
     classifiers=[
         "License :: OSI Approved :: BSD License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
 )
