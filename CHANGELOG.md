@@ -2,32 +2,43 @@
 
 ## [11.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v10.2.0...v11.0.0) (2026-08-28)
 
-
 ### ⚠ BREAKING CHANGES
 
-* **deps:** Drop Python 3.9 support, add 3.14, configure updates ([#334](https://github.com/Flagsmith/flagsmith-engine/issues/334))
+- **deps:** Drop Python 3.9 support, add 3.14, configure updates
+  ([#334](https://github.com/Flagsmith/flagsmith-engine/issues/334))
 
 ### CI
 
-* **deps:** Drop Python 3.9 support, add 3.14, configure updates ([#334](https://github.com/Flagsmith/flagsmith-engine/issues/334)) ([da806ad](https://github.com/Flagsmith/flagsmith-engine/commit/da806ad60ec54e409da56ab9653e2d1f754f2abd))
-* **renovate:** fix pip managers bypassing security-only mode ([#333](https://github.com/Flagsmith/flagsmith-engine/issues/333)) ([b8e4a8e](https://github.com/Flagsmith/flagsmith-engine/commit/b8e4a8e7c3c6e349a046a4bb2c8c18fa4e524ef6))
-* **renovate:** Only apply security patches ([#316](https://github.com/Flagsmith/flagsmith-engine/issues/316)) ([5cfab39](https://github.com/Flagsmith/flagsmith-engine/commit/5cfab39edbd3a2432f4b570c3a471776e11cb93f))
-* track engine-test-data semver tags via Renovate ([#337](https://github.com/Flagsmith/flagsmith-engine/issues/337)) ([cc74d0a](https://github.com/Flagsmith/flagsmith-engine/commit/cc74d0a9a3b1a589d801055cda8b8cd0ab6b05ac))
-
+- **deps:** Drop Python 3.9 support, add 3.14, configure updates
+  ([#334](https://github.com/Flagsmith/flagsmith-engine/issues/334))
+  ([da806ad](https://github.com/Flagsmith/flagsmith-engine/commit/da806ad60ec54e409da56ab9653e2d1f754f2abd))
+- **renovate:** fix pip managers bypassing security-only mode
+  ([#333](https://github.com/Flagsmith/flagsmith-engine/issues/333))
+  ([b8e4a8e](https://github.com/Flagsmith/flagsmith-engine/commit/b8e4a8e7c3c6e349a046a4bb2c8c18fa4e524ef6))
+- **renovate:** Only apply security patches ([#316](https://github.com/Flagsmith/flagsmith-engine/issues/316))
+  ([5cfab39](https://github.com/Flagsmith/flagsmith-engine/commit/5cfab39edbd3a2432f4b570c3a471776e11cb93f))
+- track engine-test-data semver tags via Renovate ([#337](https://github.com/Flagsmith/flagsmith-engine/issues/337))
+  ([cc74d0a](https://github.com/Flagsmith/flagsmith-engine/commit/cc74d0a9a3b1a589d801055cda8b8cd0ab6b05ac))
 
 ### Dependency Updates
 
-* Bump datamodel-code-generator to 0.75.1 ([#344](https://github.com/Flagsmith/flagsmith-engine/issues/344)) ([96d60cf](https://github.com/Flagsmith/flagsmith-engine/commit/96d60cfe93d8170bb04a2c8ffb7f1343f1b9c31f))
-* update black 25.1.0 -&gt; 26.5.1 ([#335](https://github.com/Flagsmith/flagsmith-engine/issues/335)) ([7e2cfc7](https://github.com/Flagsmith/flagsmith-engine/commit/7e2cfc774384fc1b5b3ba6d1c1166f5ca167a363))
-* update dependency isort to v6.1.0 ([#328](https://github.com/Flagsmith/flagsmith-engine/issues/328)) ([8f5bdd3](https://github.com/Flagsmith/flagsmith-engine/commit/8f5bdd30322ee022e634a78af770f5ad8afde48d))
-* update dependency pip to v26.2 [security] ([#342](https://github.com/Flagsmith/flagsmith-engine/issues/342)) ([16e51d9](https://github.com/Flagsmith/flagsmith-engine/commit/16e51d93cf43638d2c3594ccc0a8cbccd5dd0878))
-* update dependency pygments to v2.20.0 [security] ([#301](https://github.com/Flagsmith/flagsmith-engine/issues/301)) ([142f03e](https://github.com/Flagsmith/flagsmith-engine/commit/142f03e34df16d477fa1d18bb587f0882f155b7b))
-* update dependency wheel to v0.46.2 [security] ([#302](https://github.com/Flagsmith/flagsmith-engine/issues/302)) ([7054dc4](https://github.com/Flagsmith/flagsmith-engine/commit/7054dc4d8b0b6d4b3499b33c1065bc9376273451))
-
+- Bump datamodel-code-generator to 0.75.1 ([#344](https://github.com/Flagsmith/flagsmith-engine/issues/344))
+  ([96d60cf](https://github.com/Flagsmith/flagsmith-engine/commit/96d60cfe93d8170bb04a2c8ffb7f1343f1b9c31f))
+- update black 25.1.0 -&gt; 26.5.1 ([#335](https://github.com/Flagsmith/flagsmith-engine/issues/335))
+  ([7e2cfc7](https://github.com/Flagsmith/flagsmith-engine/commit/7e2cfc774384fc1b5b3ba6d1c1166f5ca167a363))
+- update dependency isort to v6.1.0 ([#328](https://github.com/Flagsmith/flagsmith-engine/issues/328))
+  ([8f5bdd3](https://github.com/Flagsmith/flagsmith-engine/commit/8f5bdd30322ee022e634a78af770f5ad8afde48d))
+- update dependency pip to v26.2 [security] ([#342](https://github.com/Flagsmith/flagsmith-engine/issues/342))
+  ([16e51d9](https://github.com/Flagsmith/flagsmith-engine/commit/16e51d93cf43638d2c3594ccc0a8cbccd5dd0878))
+- update dependency pygments to v2.20.0 [security] ([#301](https://github.com/Flagsmith/flagsmith-engine/issues/301))
+  ([142f03e](https://github.com/Flagsmith/flagsmith-engine/commit/142f03e34df16d477fa1d18bb587f0882f155b7b))
+- update dependency wheel to v0.46.2 [security] ([#302](https://github.com/Flagsmith/flagsmith-engine/issues/302))
+  ([7054dc4](https://github.com/Flagsmith/flagsmith-engine/commit/7054dc4d8b0b6d4b3499b33c1065bc9376273451))
 
 ### Other
 
-* **deps:** bump pip from 25.2 to 26.1 ([#319](https://github.com/Flagsmith/flagsmith-engine/issues/319)) ([2ab10ed](https://github.com/Flagsmith/flagsmith-engine/commit/2ab10ed243886f51db29e0e51a4b9443ff995a15))
+- **deps:** bump pip from 25.2 to 26.1 ([#319](https://github.com/Flagsmith/flagsmith-engine/issues/319))
+  ([2ab10ed](https://github.com/Flagsmith/flagsmith-engine/commit/2ab10ed243886f51db29e0e51a4b9443ff995a15))
 
 ## [10.2.0](https://github.com/Flagsmith/flagsmith-engine/compare/v10.1.0...v10.2.0) (2026-06-09)
 
