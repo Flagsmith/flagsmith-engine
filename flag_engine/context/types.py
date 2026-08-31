@@ -8,6 +8,7 @@ from typing import Any, Dict, Generic, List, Literal, Optional, Union
 
 from typing_extensions import NotRequired, TypedDict
 
+from flag_engine.result.types import FlagResult
 from flag_engine.segments.types import (
     ConditionOperator,
     ContextValue,
@@ -79,3 +80,4 @@ class EvaluationContext(TypedDict, Generic[SegmentMetadataT, FeatureMetadataT]):
     identity: NotRequired[Optional[IdentityContext]]
     segments: NotRequired[Dict[str, SegmentContext[SegmentMetadataT, FeatureMetadataT]]]
     features: NotRequired[Dict[str, FeatureContext[FeatureMetadataT]]]
+    flags: NotRequired[Dict[str, FlagResult[FeatureMetadataT]]]
