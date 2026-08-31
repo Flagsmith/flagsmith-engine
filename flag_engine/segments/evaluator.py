@@ -84,11 +84,6 @@ def get_evaluation_result(
 class _LazyFlags(dict[str, FlagResult[typing.Any]]):
     """
     The `$.flags` mapping, resolving a flag when a condition first reads it.
-
-    A dict subclass rather than a Mapping, because the JSONPath implementation
-    only traverses real dicts; `__missing__` is what makes the read lazy. The
-    resolver is only ever entered by a read, so a context whose segments read
-    no flag never leaves the single-pass path.
     """
 
     _context: _EvaluationContextAnyMeta
@@ -98,8 +93,6 @@ class _LazyFlags(dict[str, FlagResult[typing.Any]]):
 
     @cached_property
     def _resolver(self) -> _DependencyResolver[typing.Any, typing.Any]:
-        # Built on the first read of a flag, so a context whose segments read
-        # none never pays for it.
         return _DependencyResolver(self._context, self)
 
     def __missing__(self, key: str) -> typing.Optional[FlagResult[typing.Any]]:
@@ -202,27 +195,14 @@ def evaluate_features(
     return flags
 
 
-# A condition property is only treated as a JSONPath query when it carries this
-# prefix; anything else is a trait key.
 _JSONPATH_PREFIX = "$."
 
-# Reported in place of `DEFAULT` for a flag that could not be resolved because
-# its dependencies form a cycle, so that the flag serving its environment
-# default is distinguishable from one that was never gated at all.
 CIRCULAR_DEPENDENCY_REASON = "ERROR; code=CIRCULAR_DEPENDENCY"
 
 
 class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
     """
-    Resolves flags and segment membership for a context with flag dependencies,
-    memoising both.
-
-    A flag is resolved by first evaluating every segment that overrides it,
-    which in turn resolves any flag those segments are conditioned on. A flag
-    involved in a dependency cycle is left unresolved rather than raising, so
-    that a cycle degrades to a non-matching condition instead of breaking
-    evaluation for the whole context. Cycles are expected to be rejected when
-    dependencies are written, not here.
+    Resolves overrides for a context with flag dependencies, memoising the results.
     """
 
     def __init__(
@@ -236,8 +216,6 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
         self.cyclic: set[str] = set()
         self._segment_matches: dict[str, bool] = {}
         self._resolving: list[str] = []
-        # Feature name to the keys of the segments overriding it, in context
-        # order, so that override precedence doesn't depend on resolution order.
         self._segment_keys_by_feature_name: dict[str, list[str]] = {}
         for segment_key, segment_context in (context.get("segments") or {}).items():
             for override in segment_context.get("overrides") or ():
@@ -246,14 +224,8 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
                 ).append(segment_key)
 
     def resolve_feature(self, feature_name: str) -> None:
-        # Only ever reached from `_LazyFlags.__missing__`, so the flag is known
-        # not to be resolved yet; a second read of a resolved flag is a plain
-        # dict hit and never arrives here.
         if feature_name in self._resolving:
-            # Cyclic dependency. Leave the flag unresolved so that the
-            # condition that led here sees no value, and so doesn't match.
-            # Every flag from the re-entered one upwards is part of the cycle,
-            # and is reported as such; anything below merely depends on it.
+            # Cyclic dependency. Leave the flag unresolved.
             cycle_start = self._resolving.index(feature_name)
             self.cyclic.update(self._resolving[cycle_start:])
             self._cycle_hits += 1
@@ -261,8 +233,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
         if not (
             feature_context := (self._context.get("features") or {}).get(feature_name)
         ):
-            # Depending on a feature absent from the context is not an error;
-            # it resolves to no value, as an unset property would.
+            # Depending on a feature absent from the context.
             return
 
         self._resolving.append(feature_name)
@@ -275,10 +246,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
             self._resolving.pop()
 
         if feature_name in self.cyclic:
-            # Resolved only by cutting a cycle, so the result is not something
-            # another condition may match on. Leaving it unpublished keeps
-            # every read of it empty, and the reason is applied to the
-            # single-pass result at the end.
+            # The result is not something another condition may match on.
             return
 
         if segment_override is not None:
@@ -306,9 +274,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
         )
 
         if self._cycle_hits == cycle_hits:
-            # Only memoise a verdict reached without breaking a cycle. In a
-            # cycle a segment can be evaluated against an unresolved flag, and
-            # that verdict mustn't be reused afterwards.
+            # Only memoise a verdict reached without breaking a cycle.
             self._segment_matches[segment_key] = matches
 
         return matches
