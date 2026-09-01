@@ -63,7 +63,7 @@ def get_evaluation_result(
     context = {**context, "flags": resolved}
     resolved.bind(context)
 
-    segments, segment_overrides = evaluate_segments(context)
+    segments, segment_overrides = evaluate_segments(context, resolved)
     flags = evaluate_features(context, segment_overrides)
 
     if (resolver := resolved.__dict__.get("_resolver")) is not None:
@@ -87,6 +87,11 @@ class _LazyFlags(dict[str, FlagResult[typing.Any]]):
     """
 
     _context: _EvaluationContextAnyMeta
+
+    #: Incremented whenever a cycle is cut. A segment whose own evaluation
+    #: increments it read a flag that could not be resolved, so its verdict
+    #: rests on that flag's absence and it must not match.
+    cycle_hits: int = 0
 
     def bind(self, context: _EvaluationContextAnyMeta) -> None:
         self._context = context
@@ -125,6 +130,7 @@ def get_enriched_context(
 
 def evaluate_segments(
     context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+    flags: "_LazyFlags",
 ) -> typing.Tuple[
     list[SegmentResult[SegmentMetadataT]],
     SegmentOverrides[FeatureMetadataT],
@@ -134,9 +140,18 @@ def evaluate_segments(
 
     segment_results: list[SegmentResult[SegmentMetadataT]] = []
     segment_overrides: SegmentOverrides[FeatureMetadataT] = {}
+    cycle_hits = flags.cycle_hits
 
     for segment_context in segment_contexts.values():
-        if not is_context_in_segment(context, segment_context):
+        matches = is_context_in_segment(context, segment_context)
+
+        if (hits := flags.cycle_hits) != cycle_hits:
+            # Evaluating this segment cut a cycle, so it matched, or failed to,
+            # on a flag that could not be resolved. Neither verdict is sound.
+            cycle_hits = hits
+            continue
+
+        if not matches:
             continue
 
         segment_result: SegmentResult[SegmentMetadataT] = {
@@ -208,11 +223,10 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
     def __init__(
         self,
         context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
-        flags: dict[str, FlagResult[FeatureMetadataT]],
+        flags: "_LazyFlags",
     ) -> None:
         self._context = context
         self._flags = flags
-        self._cycle_hits = 0
         self.cyclic: set[str] = set()
         self._segment_matches: dict[str, bool] = {}
         self._resolving: list[str] = []
@@ -228,7 +242,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
             # Cyclic dependency. Leave the flag unresolved.
             cycle_start = self._resolving.index(feature_name)
             self.cyclic.update(self._resolving[cycle_start:])
-            self._cycle_hits += 1
+            self._flags.cycle_hits += 1
             return
         if not (
             feature_context := (self._context.get("features") or {}).get(feature_name)
@@ -267,16 +281,18 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
         if (matches := self._segment_matches.get(segment_key)) is not None:
             return matches
 
-        cycle_hits = self._cycle_hits
+        cycle_hits = self._flags.cycle_hits
         matches = is_context_in_segment(
             self._context,
             (self._context.get("segments") or {})[segment_key],
         )
 
-        if self._cycle_hits == cycle_hits:
-            # Only memoise a verdict reached without breaking a cycle.
-            self._segment_matches[segment_key] = matches
+        if self._flags.cycle_hits != cycle_hits:
+            # Reached by cutting a cycle, so the verdict rests on a flag that
+            # could not be resolved. Not a match, and not worth memoising.
+            return False
 
+        self._segment_matches[segment_key] = matches
         return matches
 
     def _get_segment_override(
