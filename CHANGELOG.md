@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v11.0.0...v11.1.0) (2026-09-01)
+
+
+### Features
+
+* Evaluate flags that depend on other flags ([#343](https://github.com/Flagsmith/flagsmith-engine/issues/343)) ([d1f379c](https://github.com/Flagsmith/flagsmith-engine/commit/d1f379cc65010ff66417e6289506c6ecda59ebae))
+
 ## [11.0.0](https://github.com/Flagsmith/flagsmith-engine/compare/v10.2.0...v11.0.0) (2026-08-28)
 
 ### ⚠ BREAKING CHANGES
