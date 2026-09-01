@@ -66,12 +66,12 @@ def get_evaluation_result(
     segments, segment_overrides = evaluate_segments(context, resolved)
     flags = evaluate_features(context, segment_overrides)
 
-    if (resolver := resolved.__dict__.get("_resolver")) is not None:
+    if resolved.used:
         # Only reached when a segment condition read a flag. Those results take
         # precedence: they were resolved with the cycle guard, unlike the
         # single-pass recomputation above.
         flags.update(resolved)
-        for feature_name in resolver.cyclic:
+        for feature_name in resolved.cyclic:
             if (flag := flags.get(feature_name)) is not None:
                 flag["reason"] = CIRCULAR_DEPENDENCY_REASON
 
@@ -88,6 +88,14 @@ class _LazyFlags(dict[str, FlagResult[typing.Any]]):
 
     _context: _EvaluationContextAnyMeta
 
+    #: Names of the flags found to be in a dependency cycle.
+    cyclic: set[str]
+
+    #: Set the first time a condition reads a flag. Distinguishes "no
+    #: dependency was ever consulted" from "one was, and resolved to nothing",
+    #: which an empty mapping cannot.
+    used: bool = False
+
     #: Incremented whenever a cycle is cut. A segment whose own evaluation
     #: increments it read a flag that could not be resolved, so its verdict
     #: rests on that flag's absence and it must not match.
@@ -101,6 +109,11 @@ class _LazyFlags(dict[str, FlagResult[typing.Any]]):
         return _DependencyResolver(self._context, self)
 
     def __missing__(self, key: str) -> typing.Optional[FlagResult[typing.Any]]:
+        if not self.used:
+            # Both are only needed once a condition has read a flag, so a
+            # context whose segments read none allocates neither.
+            self.used = True
+            self.cyclic = set()
         self._resolver.resolve_feature(key)
         return self.get(key)
 
@@ -227,7 +240,6 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
     ) -> None:
         self._context = context
         self._flags = flags
-        self.cyclic: set[str] = set()
         self._segment_matches: dict[str, bool] = {}
         self._resolving: list[str] = []
         self._segment_keys_by_feature_name: dict[str, list[str]] = {}
@@ -241,7 +253,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
         if feature_name in self._resolving:
             # Cyclic dependency. Leave the flag unresolved.
             cycle_start = self._resolving.index(feature_name)
-            self.cyclic.update(self._resolving[cycle_start:])
+            self._flags.cyclic.update(self._resolving[cycle_start:])
             self._flags.cycle_hits += 1
             return
         if not (
@@ -259,7 +271,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
             # stack would silently look like a cycle to a later read.
             self._resolving.pop()
 
-        if feature_name in self.cyclic:
+        if feature_name in self._flags.cyclic:
             # The result is not something another condition may match on.
             return
 
