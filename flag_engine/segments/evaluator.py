@@ -141,6 +141,22 @@ def get_enriched_context(
     return context
 
 
+def _wins_over(
+    candidate: FeatureContext[FeatureMetadataT],
+    incumbent: typing.Optional[FeatureContext[FeatureMetadataT]],
+) -> bool:
+    """
+    Whether a segment override takes precedence over the one held so far.
+
+    Lower priority wins, and the first seen wins a tie, so that precedence
+    follows context order rather than the order segments happen to be
+    evaluated in.
+    """
+    return incumbent is None or candidate.get(
+        "priority", constants.DEFAULT_PRIORITY
+    ) < incumbent.get("priority", constants.DEFAULT_PRIORITY)
+
+
 def evaluate_segments(
     context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
     flags: "_LazyFlags",
@@ -174,24 +190,17 @@ def evaluate_segments(
             segment_result["metadata"] = segment_metadata
         segment_results.append(segment_result)
 
-        if overrides := segment_context.get("overrides"):
-            for override_feature_context in overrides:
-                feature_name = override_feature_context["name"]
-                if (
-                    feature_name not in segment_overrides
-                    or override_feature_context.get(
-                        "priority",
-                        constants.DEFAULT_PRIORITY,
-                    )
-                    < (segment_overrides[feature_name]["feature_context"]).get(
-                        "priority",
-                        constants.DEFAULT_PRIORITY,
-                    )
-                ):
-                    segment_overrides[feature_name] = SegmentOverride(
-                        feature_context=override_feature_context,
-                        segment_name=segment_context["name"],
-                    )
+        for override_feature_context in segment_context.get("overrides") or ():
+            feature_name = override_feature_context["name"]
+            incumbent = segment_overrides.get(feature_name)
+            if _wins_over(
+                override_feature_context,
+                incumbent["feature_context"] if incumbent else None,
+            ):
+                segment_overrides[feature_name] = SegmentOverride(
+                    feature_context=override_feature_context,
+                    segment_name=segment_context["name"],
+                )
 
     return segment_results, segment_overrides
 
@@ -312,7 +321,6 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
         feature_name: str,
     ) -> typing.Optional[SegmentOverride[FeatureMetadataT]]:
         segment_override: typing.Optional[SegmentOverride[FeatureMetadataT]] = None
-        override_priority = constants.DEFAULT_PRIORITY
 
         for segment_key in self._segment_keys_by_feature_name.get(feature_name) or ():
             if not self.matches_segment(segment_key):
@@ -321,16 +329,14 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
             for override_feature_context in segment_context.get("overrides") or ():
                 if override_feature_context["name"] != feature_name:
                     continue
-                priority = override_feature_context.get(
-                    "priority",
-                    constants.DEFAULT_PRIORITY,
-                )
-                if segment_override is None or priority < override_priority:
+                if _wins_over(
+                    override_feature_context,
+                    segment_override["feature_context"] if segment_override else None,
+                ):
                     segment_override = SegmentOverride(
                         feature_context=override_feature_context,
                         segment_name=segment_context["name"],
                     )
-                    override_priority = priority
 
         return segment_override
 
