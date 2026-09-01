@@ -6,7 +6,7 @@ import re
 import typing
 import warnings
 from contextlib import suppress
-from functools import lru_cache, partial, wraps
+from functools import cached_property, lru_cache, partial, wraps
 
 import jsonpath_rfc9535
 import semver
@@ -58,13 +58,64 @@ def get_evaluation_result(
     :return: EvaluationResult containing the context, flags, and segments
     """
     context = get_enriched_context(context)
-    segments, segment_overrides = evaluate_segments(context)
+
+    resolved: _LazyFlags = _LazyFlags()
+    context = {**context, "flags": resolved}
+    resolved.bind(context)
+
+    segments, segment_overrides = evaluate_segments(context, resolved)
     flags = evaluate_features(context, segment_overrides)
+
+    if resolved.used:
+        # Only reached when a segment condition read a flag. Those results take
+        # precedence: they were resolved with the cycle guard, unlike the
+        # single-pass recomputation above.
+        flags.update(resolved)
+        for feature_name in resolved.cyclic:
+            if (flag := flags.get(feature_name)) is not None:
+                flag["reason"] = CIRCULAR_DEPENDENCY_REASON
 
     return {
         "flags": flags,
         "segments": segments,
     }
+
+
+class _LazyFlags(dict[str, FlagResult[typing.Any]]):
+    """
+    The `$.flags` mapping, resolving a flag when a condition first reads it.
+    """
+
+    _context: _EvaluationContextAnyMeta
+
+    #: Names of the flags found to be in a dependency cycle.
+    cyclic: set[str]
+
+    #: Set the first time a condition reads a flag. Distinguishes "no
+    #: dependency was ever consulted" from "one was, and resolved to nothing",
+    #: which an empty mapping cannot.
+    used: bool = False
+
+    #: Incremented whenever a cycle is cut. A segment whose own evaluation
+    #: increments it read a flag that could not be resolved, so its verdict
+    #: rests on that flag's absence and it must not match.
+    cycle_hits: int = 0
+
+    def bind(self, context: _EvaluationContextAnyMeta) -> None:
+        self._context = context
+
+    @cached_property
+    def _resolver(self) -> _DependencyResolver[typing.Any, typing.Any]:
+        return _DependencyResolver(self._context, self)
+
+    def __missing__(self, key: str) -> typing.Optional[FlagResult[typing.Any]]:
+        if not self.used:
+            # Both are only needed once a condition has read a flag, so a
+            # context whose segments read none allocates neither.
+            self.used = True
+            self.cyclic = set()
+        self._resolver.resolve_feature(key)
+        return self.get(key)
 
 
 def get_enriched_context(
@@ -90,8 +141,25 @@ def get_enriched_context(
     return context
 
 
+def _wins_over(
+    candidate: FeatureContext[FeatureMetadataT],
+    incumbent: typing.Optional[FeatureContext[FeatureMetadataT]],
+) -> bool:
+    """
+    Whether a segment override takes precedence over the one held so far.
+
+    Lower priority wins, and the first seen wins a tie, so that precedence
+    follows context order rather than the order segments happen to be
+    evaluated in.
+    """
+    return incumbent is None or candidate.get(
+        "priority", constants.DEFAULT_PRIORITY
+    ) < incumbent.get("priority", constants.DEFAULT_PRIORITY)
+
+
 def evaluate_segments(
     context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+    flags: "_LazyFlags",
 ) -> typing.Tuple[
     list[SegmentResult[SegmentMetadataT]],
     SegmentOverrides[FeatureMetadataT],
@@ -101,9 +169,18 @@ def evaluate_segments(
 
     segment_results: list[SegmentResult[SegmentMetadataT]] = []
     segment_overrides: SegmentOverrides[FeatureMetadataT] = {}
+    cycle_hits = flags.cycle_hits
 
     for segment_context in segment_contexts.values():
-        if not is_context_in_segment(context, segment_context):
+        matches = is_context_in_segment(context, segment_context)
+
+        if (hits := flags.cycle_hits) != cycle_hits:
+            # Evaluating this segment cut a cycle, so it matched, or failed to,
+            # on a flag that could not be resolved. Neither verdict is sound.
+            cycle_hits = hits
+            continue
+
+        if not matches:
             continue
 
         segment_result: SegmentResult[SegmentMetadataT] = {
@@ -113,24 +190,17 @@ def evaluate_segments(
             segment_result["metadata"] = segment_metadata
         segment_results.append(segment_result)
 
-        if overrides := segment_context.get("overrides"):
-            for override_feature_context in overrides:
-                feature_name = override_feature_context["name"]
-                if (
-                    feature_name not in segment_overrides
-                    or override_feature_context.get(
-                        "priority",
-                        constants.DEFAULT_PRIORITY,
-                    )
-                    < (segment_overrides[feature_name]["feature_context"]).get(
-                        "priority",
-                        constants.DEFAULT_PRIORITY,
-                    )
-                ):
-                    segment_overrides[feature_name] = SegmentOverride(
-                        feature_context=override_feature_context,
-                        segment_name=segment_context["name"],
-                    )
+        for override_feature_context in segment_context.get("overrides") or ():
+            feature_name = override_feature_context["name"]
+            incumbent = segment_overrides.get(feature_name)
+            if _wins_over(
+                override_feature_context,
+                incumbent["feature_context"] if incumbent else None,
+            ):
+                segment_overrides[feature_name] = SegmentOverride(
+                    feature_context=override_feature_context,
+                    segment_name=segment_context["name"],
+                )
 
     return segment_results, segment_overrides
 
@@ -160,6 +230,115 @@ def evaluate_features(
         )
 
     return flags
+
+
+_JSONPATH_PREFIX = "$."
+
+CIRCULAR_DEPENDENCY_REASON = "ERROR; code=CIRCULAR_DEPENDENCY"
+
+
+class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
+    """
+    Resolves overrides for a context with flag dependencies, memoising the results.
+    """
+
+    def __init__(
+        self,
+        context: EvaluationContext[SegmentMetadataT, FeatureMetadataT],
+        flags: "_LazyFlags",
+    ) -> None:
+        self._context = context
+        self._flags = flags
+        self._segment_matches: dict[str, bool] = {}
+        self._resolving: list[str] = []
+        self._segment_keys_by_feature_name: dict[str, list[str]] = {}
+        for segment_key, segment_context in (context.get("segments") or {}).items():
+            for override in segment_context.get("overrides") or ():
+                self._segment_keys_by_feature_name.setdefault(
+                    override["name"], []
+                ).append(segment_key)
+
+    def resolve_feature(self, feature_name: str) -> None:
+        if feature_name in self._resolving:
+            # Cyclic dependency. Leave the flag unresolved.
+            cycle_start = self._resolving.index(feature_name)
+            self._flags.cyclic.update(self._resolving[cycle_start:])
+            self._flags.cycle_hits += 1
+            return
+        if not (
+            feature_context := (self._context.get("features") or {}).get(feature_name)
+        ):
+            # Depending on a feature absent from the context.
+            return
+
+        self._resolving.append(feature_name)
+        try:
+            segment_override = self._get_segment_override(feature_name)
+        finally:
+            # A `KeyError` raised under here is swallowed by the JSONPath
+            # implementation and evaluation carries on, so a name left on the
+            # stack would silently look like a cycle to a later read.
+            self._resolving.pop()
+
+        if feature_name in self._flags.cyclic:
+            # The result is not something another condition may match on.
+            return
+
+        if segment_override is not None:
+            segment_name = segment_override["segment_name"]
+            self._flags[feature_name] = get_flag_result_from_context(
+                context=self._context,
+                feature_context=segment_override["feature_context"],
+                reason=f"TARGETING_MATCH; segment={segment_name}",
+            )
+        else:
+            self._flags[feature_name] = get_flag_result_from_context(
+                context=self._context,
+                feature_context=feature_context,
+                reason="DEFAULT",
+            )
+
+    def matches_segment(self, segment_key: str) -> bool:
+        if (matches := self._segment_matches.get(segment_key)) is not None:
+            return matches
+
+        cycle_hits = self._flags.cycle_hits
+        matches = is_context_in_segment(
+            self._context,
+            (self._context.get("segments") or {})[segment_key],
+        )
+
+        if self._flags.cycle_hits != cycle_hits:
+            # Reached by cutting a cycle, so the verdict rests on a flag that
+            # could not be resolved. Not a match, and not worth memoising.
+            return False
+
+        self._segment_matches[segment_key] = matches
+        return matches
+
+    def _get_segment_override(
+        self,
+        feature_name: str,
+    ) -> typing.Optional[SegmentOverride[FeatureMetadataT]]:
+        segment_override: typing.Optional[SegmentOverride[FeatureMetadataT]] = None
+
+        for segment_key in self._segment_keys_by_feature_name.get(feature_name) or ():
+            if not self.matches_segment(segment_key):
+                continue
+            segment_context = (self._context.get("segments") or {})[segment_key]
+            for override_feature_context in segment_context.get("overrides") or ():
+                if override_feature_context["name"] != feature_name:
+                    continue
+                if _wins_over(
+                    override_feature_context,
+                    segment_override["feature_context"] if segment_override else None,
+                ):
+                    segment_override = SegmentOverride(
+                        feature_context=override_feature_context,
+                        segment_name=segment_context["name"],
+                    )
+
+        return segment_override
 
 
 def get_flag_result_from_context(
@@ -321,7 +500,7 @@ def get_context_value(
     property: str,
 ) -> ContextValue:
     value = None
-    if property.startswith("$."):
+    if property.startswith(_JSONPATH_PREFIX):
         value = _get_context_value_getter(property)(context)
     else:
         value = _get_trait_value(context, property)
