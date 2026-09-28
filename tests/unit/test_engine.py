@@ -24,14 +24,14 @@ def test_get_evaluation_result__no_overrides__returns_expected(
             "feature_1": {
                 "enabled": True,
                 "name": "feature_1",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
@@ -59,13 +59,48 @@ def test_get_evaluation_result__segment_override__returns_expected(
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
         },
         "segments": [{"name": "my_segment"}],
     }
+
+
+def test_get_evaluation_result__unmatched_segment_override__returns_default_reason(
+    context: EvaluationContext,
+) -> None:
+    # Given
+    context["segments"] = {
+        "1": {
+            "key": "1",
+            "name": "unmatched_segment",
+            "rules": [
+                {
+                    "type": "ALL",
+                    "conditions": [
+                        {"property": "foo", "operator": "EQUAL", "value": "no match"}
+                    ],
+                }
+            ],
+            "overrides": [
+                {
+                    "key": "4",
+                    "name": "feature_1",
+                    "enabled": False,
+                    "value": "segment_override",
+                }
+            ],
+        }
+    }
+
+    # When
+    result = get_evaluation_result(context)
+
+    # Then
+    assert result["flags"]["feature_1"]["reason"] == "DEFAULT"
+    assert result["flags"]["feature_2"]["reason"] == "STATIC"
 
 
 def test_get_evaluation_result__identity_override__returns_expected(
@@ -115,7 +150,7 @@ def test_get_evaluation_result__identity_override__returns_expected(
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
@@ -213,7 +248,7 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
