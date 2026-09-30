@@ -239,11 +239,15 @@ def get_targeted_feature_names(
     """
     Get the names of the features overridden by at least one segment.
     """
-    return {
-        override["name"]
-        for segment_context in (context.get("segments") or {}).values()
-        for override in segment_context.get("overrides") or ()
-    }
+    targeted_feature_names: set[str] = set()
+    segment_contexts = context.get("segments") or {}
+
+    for segment_context in segment_contexts.values():
+        overrides = segment_context.get("overrides") or ()
+        for override in overrides:
+            targeted_feature_names.add(override["name"])
+
+    return targeted_feature_names
 
 
 def get_fallback_reason(
