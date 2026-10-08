@@ -213,6 +213,7 @@ def evaluate_features(
         return {}
 
     flags: dict[str, FlagResult[FeatureMetadataT]] = {}
+    targeted_feature_names = get_targeted_feature_names(context)
 
     for feature_context in features.values():
         feature_name = feature_context["name"]
@@ -226,10 +227,40 @@ def evaluate_features(
         flags[feature_name] = get_flag_result_from_context(
             context=context,
             feature_context=context["features"][feature_name],
-            reason="DEFAULT",
+            reason=get_fallback_reason(feature_name, targeted_feature_names),
         )
 
     return flags
+
+
+def get_targeted_feature_names(
+    context: _EvaluationContextAnyMeta,
+) -> set[str]:
+    """
+    Get the names of the features overridden by at least one segment.
+    """
+    targeted_feature_names: set[str] = set()
+    segment_contexts = context.get("segments") or {}
+
+    for segment_context in segment_contexts.values():
+        overrides = segment_context.get("overrides") or ()
+        for override in overrides:
+            targeted_feature_names.add(override["name"])
+
+    return targeted_feature_names
+
+
+def get_fallback_reason(
+    feature_name: str,
+    targeted_feature_names: typing.Container[str],
+) -> str:
+    """
+    Get the reason for a flag evaluated to its environment default.
+
+    `DEFAULT` if the feature has targeting rules that did not match,
+    `STATIC` if it has none.
+    """
+    return "DEFAULT" if feature_name in targeted_feature_names else "STATIC"
 
 
 _JSONPATH_PREFIX = "$."
@@ -295,7 +326,9 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
             self._flags[feature_name] = get_flag_result_from_context(
                 context=self._context,
                 feature_context=feature_context,
-                reason="DEFAULT",
+                reason=get_fallback_reason(
+                    feature_name, self._segment_keys_by_feature_name
+                ),
             )
 
     def matches_segment(self, segment_key: str) -> bool:

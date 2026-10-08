@@ -24,14 +24,14 @@ def test_get_evaluation_result__no_overrides__returns_expected(
             "feature_1": {
                 "enabled": True,
                 "name": "feature_1",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
@@ -59,7 +59,7 @@ def test_get_evaluation_result__segment_override__returns_expected(
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
@@ -115,7 +115,7 @@ def test_get_evaluation_result__identity_override__returns_expected(
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
@@ -213,7 +213,7 @@ def test_get_evaluation_result__two_segments_override_same_feature__returns_expe
             "feature_2": {
                 "enabled": False,
                 "name": "feature_2",
-                "reason": "DEFAULT",
+                "reason": "STATIC",
                 "value": None,
                 "variant": None,
             },
