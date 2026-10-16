@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.1.1](https://github.com/Flagsmith/flagsmith-engine/compare/v11.1.0...v11.1.1) (2026-10-08)
+
+### Bug Fixes
+
+- Reasons for environment default flags ([#347](https://github.com/Flagsmith/flagsmith-engine/issues/347))
+  ([534cc99](https://github.com/Flagsmith/flagsmith-engine/commit/534cc9956f91920e8b1c659d0c9e802ac2922119))
+
 ## [11.1.0](https://github.com/Flagsmith/flagsmith-engine/compare/v11.0.0...v11.1.0) (2026-09-01)
 
 ### Features
