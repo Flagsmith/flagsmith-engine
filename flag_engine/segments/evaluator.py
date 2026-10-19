@@ -10,6 +10,8 @@ from functools import cached_property, lru_cache, partial, wraps
 
 import jsonpath_rfc9535
 import semver
+from jsonpath_rfc9535.segments import JSONPathChildSegment
+from jsonpath_rfc9535.selectors import NameSelector
 from typing_extensions import TypedDict
 
 from flag_engine.context.mappers import map_any_value_to_context_value
@@ -701,6 +703,9 @@ def _get_context_value_getter(
         # but not a valid JSONPath, is used.
         return partial(_get_trait_value, trait_key=property)
 
+    if (names := _get_singular_names(compiled_query)) is not None:
+        return partial(_get_context_value_by_names, property=property, names=names)
+
     def getter(context: _EvaluationContextAnyMeta) -> ContextValue:
         value: object
         if (value := _get_trait_value(context, property)) is not None:
@@ -725,3 +730,45 @@ def _get_context_value_getter(
             return None
 
     return getter
+
+
+def _get_singular_names(
+    compiled_query: jsonpath_rfc9535.JSONPathQuery,
+) -> typing.Optional[tuple[str, ...]]:
+    """
+    Get the names a query selects one after the other, e.g. `identity` then
+    `identifier` for `$.identity.identifier`, or `None` for a query using
+    anything else, such as wildcards, indices, filters or descendants.
+    """
+    names: list[str] = []
+    for segment in compiled_query.segments:
+        if type(segment) is not JSONPathChildSegment or len(segment.selectors) != 1:
+            return None
+        if type(selector := segment.selectors[0]) is not NameSelector:
+            return None
+        names.append(selector.name)
+    return tuple(names)
+
+
+def _get_context_value_by_names(
+    context: _EvaluationContextAnyMeta,
+    property: str,
+    names: tuple[str, ...],
+) -> ContextValue:
+    """
+    Get a context value as the JSONPath query selecting `names` would, without
+    running the query: most context value properties are such queries.
+    """
+    if (trait_value := _get_trait_value(context, property)) is not None:
+        return trait_value
+    value: object = context
+    try:
+        for name in names:
+            # As `jsonpath_rfc9535` selects names: from dicts only, and
+            # swallowing a `KeyError`, including one raised resolving `$.flags`.
+            if not isinstance(value, dict):
+                return None
+            value = value[name]
+    except KeyError:
+        return None
+    return value if is_context_value(value) else None

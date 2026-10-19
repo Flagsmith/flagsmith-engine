@@ -1,5 +1,7 @@
+import copy
 import typing
 
+import jsonpath_rfc9535
 import pytest
 from pytest_lazy_fixtures import lf
 from pytest_mock import MockerFixture
@@ -14,13 +16,15 @@ from flag_engine.context.types import (
 from flag_engine.result.types import FlagResult
 from flag_engine.segments import constants
 from flag_engine.segments.evaluator import (
+    _get_context_value_by_names,
+    _get_context_value_getter,
     _matches_context_value,
     context_matches_condition,
     get_context_value,
     get_flag_result_from_context,
     is_context_in_segment,
 )
-from flag_engine.segments.types import ConditionOperator
+from flag_engine.segments.types import ConditionOperator, is_context_value
 from tests.unit.segments.fixtures import (
     empty_segment,
     segment_conditions_and_nested_rules,
@@ -960,3 +964,88 @@ def test_get_context_value__jsonpath_like_trait__returns_expected(
 
     # Then
     assert result == expected_result
+
+
+_JSONPATH_CONTEXT: EvaluationContext = {
+    "environment": {"key": "key", "name": "Environment"},
+    "identity": {
+        "identifier": "user",
+        "key": "key_user",
+        "traits": {
+            "plan": "premium",
+            "with space": 42,
+            "object": {"nested": "value"},  # type: ignore[dict-item]
+            "list": ["first"],  # type: ignore[dict-item]
+        },
+    },
+}
+
+
+@pytest.mark.parametrize(
+    "property, is_singular",
+    [
+        ("$.identity.identifier", True),
+        ("$.environment.name", True),
+        ("$.identity.traits.plan", True),
+        ("$.identity.traits['with space']", True),
+        ("$.identity.traits.object.nested", True),
+        ("$.identity.traits.object", True),
+        ("$.identity.identifier.length", True),
+        ("$.identity.missing", True),
+        ("$.missing.missing", True),
+        ("$.identity.traits.list[0]", False),
+        ("$.identity.traits.*", False),
+        ("$..identifier", False),
+        ("$.identity['identifier', 'key']", False),
+        ("$.identity.traits[?@ == 'premium']", False),
+    ],
+)
+def test_get_context_value__jsonpath__returns_same_as_query(
+    property: str,
+    is_singular: bool,
+) -> None:
+    # Given
+    query = jsonpath_rfc9535.compile(property)
+    node = query.find_one(typing.cast(typing.Any, _JSONPATH_CONTEXT))
+    expected = node.value if node and is_context_value(node.value) else None
+
+    # When
+    result = get_context_value(_JSONPATH_CONTEXT, property)
+
+    # Then
+    # the value is the one the JSONPath query selects...
+    assert result == expected
+    # ...without running the query when it selects names only
+    getter = _get_context_value_getter(property)
+    assert (getattr(getter, "func", None) is _get_context_value_by_names) is is_singular
+
+
+@pytest.mark.parametrize("property", ["$.identity.identifier", "$..identifier"])
+def test_get_context_value__jsonpath__trait_named_as_property__returns_trait(
+    property: str,
+) -> None:
+    # Given
+    context = copy.deepcopy(_JSONPATH_CONTEXT)
+    assert context["identity"]
+    context["identity"]["traits"] = {property: "trait"}
+
+    # When
+    result = get_context_value(context, property)
+
+    # Then
+    assert result == "trait"
+
+
+def test_get_context_value__jsonpath_names__key_error__returns_none() -> None:
+    # Given
+    class RaisingDict(dict[str, typing.Any]):
+        def __missing__(self, key: str) -> None:
+            raise KeyError(key)
+
+    context = typing.cast(EvaluationContext, {"flags": RaisingDict()})
+
+    # When
+    result = get_context_value(context, "$.flags.feature.enabled")
+
+    # Then
+    assert result is None
