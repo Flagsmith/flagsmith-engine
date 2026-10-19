@@ -1049,3 +1049,40 @@ def test_get_context_value__jsonpath_names__key_error__returns_none() -> None:
 
     # Then
     assert result is None
+
+
+@pytest.mark.parametrize(
+    "trait_value, segment_value, expected_result",
+    [
+        ("foo", ["foo", "bar"], True),
+        ("baz", ["foo", "bar"], False),
+        ("2", [1, 2, 3], True),
+        (2, [1, 2, 3], True),
+        (2, ["1", "2", "3"], True),
+        (5, [1, 2, 3], False),
+        (1.5, ["1.5"], False),
+        (1.5, [1.5], False),
+        (True, ["True", "true"], False),
+        (False, ["False", "false"], False),
+        ("foo", [], False),
+    ],
+)
+def test_context_matches_condition__in_list__returns_expected(
+    trait_value: typing.Any,
+    segment_value: list[typing.Any],
+    expected_result: bool,
+) -> None:
+    # Given
+    context = typing.cast(
+        EvaluationContext, {"identity": {"traits": {"trait": trait_value}}}
+    )
+    condition = typing.cast(
+        SegmentCondition,
+        {"operator": constants.IN, "property": "trait", "value": segment_value},
+    )
+
+    # When
+    result = context_matches_condition(context, condition, "segment_key")
+
+    # Then
+    assert result is expected_result
