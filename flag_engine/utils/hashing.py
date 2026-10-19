@@ -17,9 +17,11 @@ def get_hashed_percentage_for_object_ids(
     :return: (float) number between 0 (inclusive) and 100 (exclusive)
     """
 
-    to_hash = ",".join(str(id_) for id_ in list(object_ids) * iterations)
+    to_hash = ",".join(map(str, object_ids))
+    if iterations > 1:
+        to_hash = ",".join([to_hash] * iterations)
     hashed_value = hashlib.md5(to_hash.encode("utf-8"))
-    hashed_value_as_int = int(hashed_value.hexdigest(), base=16)
+    hashed_value_as_int = int.from_bytes(hashed_value.digest(), "big")
     value = ((hashed_value_as_int % 9999) / 9998) * 100
 
     if value == 100:

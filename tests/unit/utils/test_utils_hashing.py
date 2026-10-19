@@ -101,28 +101,29 @@ def test_get_hashed_percentage_does_not_return_1(mock_hashlib: mock.Mock) -> Non
     Quite complex test to ensure that the function will never return 1.
 
     To achieve this, we mock the hashlib module to return a magic mock so that we can
-    subsequently mock the hexdigest method to return known strings. These strings are
-    chosen such that they can be converted (via `int(s, base=16)`) to known integers.
+    subsequently mock the digest method to return known bytes. These bytes are
+    chosen such that they can be converted (via `int.from_bytes(b, "big")`) to known
+    integers.
     """
 
     # Given
     object_ids = [12, 93]
 
     # -- SETTING UP THE MOCKS --
-    # hash strings specifically created to return specific values when converted to
-    # integers via int(s, base=16). Note that the reverse function was created
-    # courtesy of https://code.i-harness.com/en/q/1f7c41
-    hash_string_to_return_1 = "270e"
-    hash_string_to_return_0 = "270f"
-    hashed_values = [hash_string_to_return_0, hash_string_to_return_1]
+    # hash bytes specifically created to return specific values when converted to
+    # integers via int.from_bytes(b, "big"): 0x270e % 9999 == 9998 and
+    # 0x270f % 9999 == 0.
+    hash_bytes_to_return_1 = bytes.fromhex("270e")
+    hash_bytes_to_return_0 = bytes.fromhex("270f")
+    hashed_values = [hash_bytes_to_return_0, hash_bytes_to_return_1]
 
-    def hexdigest_side_effect() -> str:
+    def digest_side_effect() -> bytes:
         return hashed_values.pop()
 
     mock_hash = mock.MagicMock()
     mock_hashlib.md5.return_value = mock_hash
 
-    mock_hash.hexdigest.side_effect = hexdigest_side_effect
+    mock_hash.digest.side_effect = digest_side_effect
 
     # -- FINISH SETTING UP THE MOCKS --
 
@@ -146,3 +147,24 @@ def test_get_hashed_percentage_does_not_return_1(mock_hashlib: mock.Mock) -> Non
     # the second call, with a string (in bytes) that contains each object id twice
     expected_bytes_2 = ",".join(str(id_) for id_ in object_ids * 2).encode("utf-8")
     assert call_list[1][0][0] == expected_bytes_2
+
+
+@pytest.mark.parametrize(
+    "object_ids, iterations, expected",
+    (
+        ([12, 93], 1, 27.655531106221243),
+        (["feature-key", "environment-key_identifier"], 1, 0.9201840368073614),
+        ([12, 93], 2, 81.80636127225445),
+    ),
+)
+def test_get_hashed_percentage_for_object_ids__returns_expected(
+    object_ids: list[typing.Union[int, str]],
+    iterations: int,
+    expected: float,
+) -> None:
+    # When
+    value = get_hashed_percentage_for_object_ids(object_ids, iterations=iterations)
+
+    # Then
+    # values are stable across implementations, as they bucket identities
+    assert value == expected
