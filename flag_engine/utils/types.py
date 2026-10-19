@@ -1,5 +1,4 @@
 import typing
-from functools import singledispatch
 
 import semver
 
@@ -12,7 +11,19 @@ class SupportsStr(typing.Protocol):
         ...
 
 
-@singledispatch
+def _cast_bool(value: object) -> bool:
+    return value not in ("False", "false")
+
+
+# Most specific first, as `bool` is a subclass of `int`.
+_CASTING_FUNCTIONS: dict[type, typing.Callable[..., ContextValue]] = {
+    bool: _cast_bool,
+    int: int,
+    float: float,
+    semver.Version: remove_semver_suffix,
+}
+
+
 def get_casting_function(
     input_: object,
 ) -> typing.Callable[..., ContextValue]:
@@ -23,24 +34,10 @@ def get_casting_function(
     >>> assert get_casting_function(1.2) == float
     >>> assert get_casting_function(semver.Version.parse("3.4.5")) == remove_semver_suffix
     """
+    # Exact type lookup first: this runs for every typed condition evaluated.
+    if (casting_function := _CASTING_FUNCTIONS.get(type(input_))) is not None:
+        return casting_function
+    for type_, casting_function in _CASTING_FUNCTIONS.items():
+        if isinstance(input_, type_):
+            return casting_function
     return str
-
-
-@get_casting_function.register
-def _(input_: bool) -> typing.Callable[..., bool]:
-    return lambda v: v not in ("False", "false")
-
-
-@get_casting_function.register
-def _(input_: int) -> typing.Callable[..., int]:
-    return int
-
-
-@get_casting_function.register
-def _(input_: float) -> typing.Callable[..., float]:
-    return float
-
-
-@get_casting_function.register
-def _(input_: semver.Version) -> typing.Callable[..., str]:
-    return remove_semver_suffix
