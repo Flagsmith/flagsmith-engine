@@ -515,11 +515,12 @@ def context_matches_condition(
         context_value = get_context_value(context, condition_property)
 
     if condition_operator == constants.IN:
-        in_values = _get_in_values(condition["value"])
         # Guard against comparing boolean values to numeric strings.
         if type(context_value) is int:
             context_value = str(context_value)
-        return context_value in in_values
+        if isinstance(segment_value := condition["value"], list):
+            return _is_in_values_list(context_value, segment_value)
+        return context_value in _parse_in_values_str(segment_value)
 
     condition = typing.cast(StrValueSegmentCondition, condition)
 
@@ -586,12 +587,21 @@ def _parse_in_values_str(segment_value: str) -> frozenset[str]:
     return frozenset(segment_value.split(","))
 
 
-def _get_in_values(
-    segment_value: typing.Union[str, list[typing.Any]],
-) -> frozenset[str]:
-    if isinstance(segment_value, list):
-        return frozenset(v if type(v) is str else str(v) for v in segment_value)
-    return _parse_in_values_str(segment_value)
+def _is_in_values_list(
+    context_value: ContextValue,
+    segment_value: list[typing.Any],
+) -> bool:
+    """
+    Whether a context value is among a list IN condition value's values, as
+    strings. Scanned rather than collected into a set: lists can't be cached,
+    and collecting them on every evaluation costs more than scanning.
+    """
+    if not isinstance(context_value, str):
+        return False
+    for value in segment_value:
+        if (value if type(value) is str else str(value)) == context_value:
+            return True
+    return False
 
 
 def _evaluate_not_contains(
