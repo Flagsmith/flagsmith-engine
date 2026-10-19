@@ -30,7 +30,13 @@ _int_pattern = re.compile(r"-?[0-9]+")
 _float_pattern = re.compile(r"-?[0-9]+\.[0-9]+")
 
 
+_number_first_chars = frozenset("-0123456789")
+
+
 def _map_string_value_to_context_value(value: str) -> ContextValue:
+    if not value or value[0] not in _number_first_chars:
+        # Cannot be a number: skip matching patterns, as most strings aren't.
+        return value
     if _int_pattern.fullmatch(value):
         return int(value)
     if _float_pattern.fullmatch(value):
