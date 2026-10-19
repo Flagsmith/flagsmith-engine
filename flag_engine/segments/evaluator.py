@@ -5,7 +5,6 @@ import operator
 import re
 import typing
 import warnings
-from contextlib import suppress
 from functools import cached_property, lru_cache, partial, wraps
 
 import jsonpath_rfc9535
@@ -649,14 +648,17 @@ def _context_value_typed(
         segment_value: typing.Optional[str],
         context_value: typing.Union[ContextValue, semver.Version],
     ) -> bool:
-        with suppress(TypeError, ValueError):
+        # A `try` statement rather than `contextlib.suppress`, which costs more
+        # than the comparison itself: this runs for every typed condition.
+        try:
             if isinstance(context_value, str) and is_semver(segment_value):
                 context_value = semver.Version.parse(
                     context_value,
                 )
             match_value = get_casting_function(context_value)(segment_value)
             return func(context_value, match_value)
-        return False
+        except (TypeError, ValueError):
+            return False
 
     return inner
 
