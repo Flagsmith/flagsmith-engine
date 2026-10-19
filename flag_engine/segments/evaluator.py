@@ -214,20 +214,21 @@ def evaluate_features(
 
     flags: dict[str, FlagResult[FeatureMetadataT]] = {}
     targeted_feature_names = get_targeted_feature_names(context)
+    identity_key = _get_identity_key(context)
 
     for feature_context in features.values():
         feature_name = feature_context["name"]
         if segment_override := segment_overrides.get(feature_name):
-            flags[feature_name] = get_flag_result_from_context(
-                context=context,
+            flags[feature_name] = _get_flag_result(
                 feature_context=segment_override["feature_context"],
                 reason=f"TARGETING_MATCH; segment={segment_override['segment_name']}",
+                identity_key=identity_key,
             )
             continue
-        flags[feature_name] = get_flag_result_from_context(
-            context=context,
+        flags[feature_name] = _get_flag_result(
             feature_context=context["features"][feature_name],
             reason=get_fallback_reason(feature_name, targeted_feature_names),
+            identity_key=identity_key,
         )
 
     return flags
@@ -280,6 +281,7 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
     ) -> None:
         self._context = context
         self._flags = flags
+        self._identity_key = _get_identity_key(context)
         self._segment_matches: dict[str, bool] = {}
         self._resolving: list[str] = []
         self._segment_keys_by_feature_name: dict[str, list[str]] = {}
@@ -317,18 +319,18 @@ class _DependencyResolver(typing.Generic[SegmentMetadataT, FeatureMetadataT]):
 
         if segment_override is not None:
             segment_name = segment_override["segment_name"]
-            self._flags[feature_name] = get_flag_result_from_context(
-                context=self._context,
+            self._flags[feature_name] = _get_flag_result(
                 feature_context=segment_override["feature_context"],
                 reason=f"TARGETING_MATCH; segment={segment_name}",
+                identity_key=self._identity_key,
             )
         else:
-            self._flags[feature_name] = get_flag_result_from_context(
-                context=self._context,
+            self._flags[feature_name] = _get_flag_result(
                 feature_context=feature_context,
                 reason=get_fallback_reason(
                     feature_name, self._segment_keys_by_feature_name
                 ),
+                identity_key=self._identity_key,
             )
 
     def matches_segment(self, segment_key: str) -> bool:
@@ -388,7 +390,23 @@ def get_flag_result_from_context(
     :param reason: reason to use when no variant selected
     :return: the value for the feature name in the evaluation context
     """
-    key = _get_identity_key(context)
+    return _get_flag_result(
+        feature_context=feature_context,
+        reason=reason,
+        identity_key=_get_identity_key(context),
+    )
+
+
+def _get_flag_result(
+    feature_context: FeatureContext[FeatureMetadataT],
+    reason: str,
+    identity_key: typing.Optional[str],
+) -> FlagResult[FeatureMetadataT]:
+    """
+    Like `get_flag_result_from_context`, with the identity key resolved by
+    the caller, once per evaluation rather than once per feature.
+    """
+    key = identity_key
 
     value = feature_context["value"]
     variant: typing.Optional[str] = None
