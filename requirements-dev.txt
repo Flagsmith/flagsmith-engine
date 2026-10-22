@@ -6,7 +6,7 @@ annotated-types==0.7.0
     # via pydantic
 argcomplete==3.6.2
     # via datamodel-code-generator
-black==26.5.1
+black==26.10.1
     # via
     #   -r requirements-dev.in
     #   datamodel-code-generator
