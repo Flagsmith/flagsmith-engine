@@ -1,5 +1,17 @@
 # Changelog
 
+## [11.1.2](https://github.com/Flagsmith/flagsmith-engine/compare/v11.1.1...v11.1.2) (2026-11-04)
+
+
+### CI
+
+* Bump CodSpeedHQ/action to v5 ([#365](https://github.com/Flagsmith/flagsmith-engine/issues/365)) ([787ce2f](https://github.com/Flagsmith/flagsmith-engine/commit/787ce2f0b7949d212e718d2acfb465e9f11a1195))
+
+
+### Dependency Updates
+
+* update dependency tests/engine_tests/engine-test-data to v3.13.0 ([#364](https://github.com/Flagsmith/flagsmith-engine/issues/364)) ([360082d](https://github.com/Flagsmith/flagsmith-engine/commit/360082d184668aaee924d2259cf00d4afd17db12))
+
 ## [11.1.1](https://github.com/Flagsmith/flagsmith-engine/compare/v11.1.0...v11.1.1) (2026-10-08)
 
 ### Bug Fixes
