@@ -50,7 +50,8 @@ jobs:
 
       - name: Run Benchmarks
         if: ${{ matrix.python-version == '3.12' }}
-        uses: CodSpeedHQ/action@v3
+        uses: CodSpeedHQ/action@v5
         with:
+          mode: simulation
           token: ${{ secrets.CODSPEED_TOKEN }}
           run: pytest --codspeed --no-cov
